@@ -6,5 +6,5 @@ class ConsoleLogger(Logger):
     def __init__(self):
         super().__init__()
 
-    def add(self, time=None, **kwargs):
+    def update(self, time=None, **kwargs):
         print(datetime.fromtimestamp(time).isoformat(), ':', kwargs)
