@@ -28,4 +28,4 @@ class App(object):
         if measurement.get('time', None) is None:
             measurement['time'] = time_stamp
 
-        self.__logger.add(measurement)
+        self.__logger.add(**measurement)
