@@ -2,7 +2,7 @@ from sensormesh.applications import App
 
 from sensormesh.sensors import FakeSensor
 
-from sensormesh.logging import ConsoleLogger
+from sensormesh.console import ConsoleLogger
 
 if __name__ == '__main__':
     app = App()
