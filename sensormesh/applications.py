@@ -1,15 +1,12 @@
 import time
 
-from .sensors import FakeSensor
-from .loggers.console import ConsoleLogger
-
 
 class App(object):
     def __init__(self):
         self.name = "SensorMesh"
-        self.__sensor = FakeSensor()
-        self.__loggers = [ConsoleLogger()]
-        self.__step = 1
+        self.__sensor = None
+        self.__loggers = []
+        self.__step = 20
         self.__num_steps = 5
 
     def start(self):
