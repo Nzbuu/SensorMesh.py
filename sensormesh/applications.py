@@ -1,16 +1,16 @@
 import time
 
-from . import sensors
-from . import loggers
+from .sensors import FakeSensor
+from .loggers.console import ConsoleLogger
 
 
 class App(object):
     def __init__(self):
         self.name = "SensorMesh"
-        self.__sensor = sensors.FakeSensor()
-        self.__logger = loggers.ConsoleLogger()
+        self.__sensor = FakeSensor()
+        self.__loggers = [ConsoleLogger()]
         self.__step = 1
-        self.__num_steps = 8
+        self.__num_steps = 5
 
     def start(self):
         time_start_next = time.time()
@@ -28,4 +28,5 @@ class App(object):
         if measurement.get('time', None) is None:
             measurement['time'] = time_stamp
 
-        self.__logger.add(**measurement)
+        for l in self.__loggers:
+            l.add(**measurement)
