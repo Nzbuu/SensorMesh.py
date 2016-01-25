@@ -3,7 +3,7 @@ class Sensor(object):
         pass
 
     def read(self):
-        return {}
+        raise NotImplementedError()
 
 
 class FakeSensor(Sensor):
@@ -14,4 +14,4 @@ class FakeSensor(Sensor):
     def read(self):
         out = self.__value
         self.__value += 1
-        return {'c': out}
+        return {'count': out}

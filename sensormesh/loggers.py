@@ -3,4 +3,4 @@ class Logger(object):
         pass
 
     def update(self, **kwargs):
-        pass
+        raise NotImplementedError()
