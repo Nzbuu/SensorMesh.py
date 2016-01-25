@@ -41,11 +41,11 @@ class App(object):
             time.sleep(time_start_next - time_finish_now)
 
     def step(self):
-        time_stamp = time.time()
+        timestamp = time.time()
 
         measurement = self.__sensor.read()
-        if measurement.get('time', None) is None:
-            measurement['time'] = time_stamp
+        if not measurement.get('timestamp', None):
+            measurement['timestamp'] = timestamp
 
         for l in self.__loggers:
             l.update(**measurement)
