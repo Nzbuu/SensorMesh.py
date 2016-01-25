@@ -5,6 +5,8 @@ setup(
     version="0.0.1",
     packages=find_packages(),
 
+    install_requires=['requests', 'python-dateutil'],
+
     author='James Myatt',
     license="MIT",
     url='https://github.com/Nzbuu/SensorMesh.py',
