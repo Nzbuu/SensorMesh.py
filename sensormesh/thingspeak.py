@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 
 import requests
 import dateutil.parser
@@ -16,7 +17,63 @@ class ThingSpeakEndpoint(DataSource, Logger):
         self.__write_key = None
         self.__read_key = None
         self.__channel = None
+        self.__name = ''
         self.__feeds = {}
+
+    @property
+    def name(self):
+        return self.__name
+
+    @property
+    def channel(self):
+        return self.__channel
+
+    def load_config(self, filename):
+        with open(filename) as cfg_file:
+            cfg_data = json.load(cfg_file)
+        self.configure(**cfg_data)
+
+    def read_config(self):
+        cfg_data = self.read_info()
+        cfg_data.pop('created_at', None)
+        cfg_data.pop('updated_at', None)
+        cfg_data.pop('last_entry_id', None)
+
+        self.configure(**cfg_data)
+
+    def configure(self, write_key=None, read_key=None, id=None, name=None, **kwargs):
+        if write_key:
+            self.__write_key = write_key
+        if read_key:
+            self.__read_key = read_key
+        if id:
+            self.__channel = id
+        if name:
+            self.__name = name
+
+        for field, feed in kwargs.items():
+            if isinstance(feed, str):
+                self.__feeds[field] = feed
+            else:
+                # ignore
+                pass
+
+    def read_info(self):
+        if not self.__channel:
+            raise ConfigurationError()
+
+        headers = self.prepare_headers(write=False)
+        params = {'results': 0}
+
+        # Fetch data from ThingSpeak
+        url = self.base_url + '/channels/' + str(self.__channel) + '/feed.json'
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+
+        data = response.json()
+        channel_data = data['channel']
+
+        return channel_data
 
     def read(self):
         if not self.__channel:
