@@ -6,30 +6,30 @@ from .exceptions import ConfigurationError
 class App(object):
     def __init__(self):
         self.name = "SensorMesh"
-        self.__sensor = None
+        self.__source = None
         self.__loggers = []
         self.__step = 20
         self.__num_steps = 5
 
-    def add_sensor(self, s):
-        if self.__sensor is None:
-            self.__sensor = s
+    def add_source(self, source):
+        if self.__source is None:
+            self.__source = source
         else:
             raise ConfigurationError()
 
-    def _check_for_sensor(self):
-        if self.__sensor is None:
+    def add_logger(self, logger):
+        self.__loggers.append(logger)
+
+    def _check_for_source(self):
+        if self.__source is None:
             raise ConfigurationError()
 
     def _check_for_loggers(self):
-        if self.__sensor is None:
+        if self.__loggers is None:
             raise ConfigurationError()
 
-    def add_logger(self, l):
-        self.__loggers.append(l)
-
     def start(self):
-        self._check_for_sensor()
+        self._check_for_source()
         self._check_for_loggers()
 
         time_start_next = time.time()
@@ -43,9 +43,9 @@ class App(object):
     def step(self):
         timestamp = time.time()
 
-        measurement = self.__sensor.read()
-        if not measurement.get('timestamp', None):
-            measurement['timestamp'] = timestamp
+        data = self.__source.read()
+        if not data.get('timestamp', None):
+            data['timestamp'] = timestamp
 
         for l in self.__loggers:
-            l.update(**measurement)
+            l.update(**data)

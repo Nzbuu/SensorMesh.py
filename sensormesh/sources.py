@@ -1,4 +1,4 @@
-class Sensor(object):
+class DataSource(object):
     def __init__(self):
         pass
 
@@ -6,7 +6,7 @@ class Sensor(object):
         raise NotImplementedError()
 
 
-class FakeSensor(Sensor):
+class FakeDataSource(DataSource):
     def __init__(self):
         super().__init__()
         self.__value = 0

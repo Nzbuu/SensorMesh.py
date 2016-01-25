@@ -3,12 +3,12 @@ from datetime import datetime
 import requests
 import dateutil.parser
 
-from .sensors import Sensor
+from .sources import DataSource
 from .loggers import Logger
 from .exceptions import ConfigurationError
 
 
-class ThingSpeakEndpoint(Sensor, Logger):
+class ThingSpeakEndpoint(DataSource, Logger):
     base_url = 'https://api.thingspeak.com'
 
     def __init__(self):
