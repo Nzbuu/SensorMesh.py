@@ -59,6 +59,27 @@ class TestThingSpeakSource():
     @responses.activate
     def test_can_read_data_from_url(self):
         obj = ThingSpeakEndpoint()
+        obj.configure(id=3, field1='Server Temp', read_key='ABCDEFGHIJKLMNOPQRST')
+
+        with responses.RequestsMock() as responses_:
+            responses_.add(
+                    responses.GET,
+                    'https://api.thingspeak.com/channels/3/feed/last.json',
+                    json=canned_responses['https://api.thingspeak.com/channels/3/feed/last.json']
+            )
+            data = obj.read()
+
+            assert len(responses_.calls) == 1
+            the_request = responses_.calls[0].request
+            assert the_request.url == 'https://api.thingspeak.com/channels/3/feed/last.json'
+            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ABCDEFGHIJKLMNOPQRST'
+
+        assert data['timestamp'] == 1453927930
+        assert data['Server Temp'] == '58.5 F'
+
+    @responses.activate
+    def test_can_read_data_without_key(self):
+        obj = ThingSpeakEndpoint()
         obj.configure(id=3, field1='Server Temp')
 
         with responses.RequestsMock() as responses_:
@@ -69,9 +90,13 @@ class TestThingSpeakSource():
             )
             data = obj.read()
 
+            assert len(responses_.calls) == 1
+            the_request = responses_.calls[0].request
+            assert the_request.url == 'https://api.thingspeak.com/channels/3/feed/last.json'
+            assert 'X-THINGSPEAKAPIKEY' not in the_request.headers
+
         assert data['timestamp'] == 1453927930
         assert data['Server Temp'] == '58.5 F'
-
 
 class TestThingSpeakLogger():
     def test_no_key_is_error(self):
