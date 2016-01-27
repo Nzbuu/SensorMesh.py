@@ -6,6 +6,8 @@ setup(
     packages=find_packages(),
 
     install_requires=['requests', 'python-dateutil'],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
 
     author='James Myatt',
     license="MIT",
