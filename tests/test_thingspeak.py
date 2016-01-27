@@ -4,7 +4,7 @@ import responses
 from sensormesh.thingspeak import *
 
 
-class TestThingspeakSource():
+class TestThingSpeakSource():
     def test_default_key_is_none(self):
         obj = ThingSpeakEndpoint()
         assert obj.get_key(write=False) is None
@@ -62,7 +62,7 @@ class TestThingspeakSource():
         assert data['Server Temp'] == '58.5 F'
 
 
-class TestThingspeakLogger():
+class TestThingSpeakLogger():
     def test_no_key_is_error(self):
         obj = ThingSpeakEndpoint()
         with pytest.raises(ConfigurationError):
@@ -72,6 +72,52 @@ class TestThingspeakLogger():
         obj = ThingSpeakEndpoint()
         obj.configure(write_key='ZYXWVUTSRQP0987654321')
         assert obj.get_key(write=True) == 'ZYXWVUTSRQP0987654321'
+
+    @responses.activate
+    def test_can_get_config_from_url(self):
+        obj = ThingSpeakEndpoint()
+        obj.configure(id=3)
+
+        with responses.RequestsMock() as responses_:
+            responses_.add(
+                    responses.GET,
+                    'https://api.thingspeak.com/channels/3/feed.json',
+                    json=canned_responses['https://api.thingspeak.com/channels/3/feed.json']
+            )
+            info = obj.read_info()
+
+        assert info['name'] == 'ioBridge Server'
+        assert info['field1'] == 'Server Temp'
+
+    @responses.activate
+    def test_can_configure_from_url(self):
+        obj = ThingSpeakEndpoint()
+        obj.configure(id=3)
+
+        with responses.RequestsMock() as responses_:
+            responses_.add(
+                    responses.GET,
+                    'https://api.thingspeak.com/channels/3/feed.json',
+                    json=canned_responses['https://api.thingspeak.com/channels/3/feed.json']
+            )
+            obj.read_config()
+
+        assert obj.name == 'ioBridge Server'
+
+    @responses.activate
+    def test_send_data_to_url(self):
+        obj = ThingSpeakEndpoint()
+        obj.configure(id=3, field1='Server Temp', write_key='DUMMY')
+
+        data = {'timestamp': 1453927940, 'Server Temp': '60.0 F'}
+
+        with responses.RequestsMock() as responses_:
+            responses_.add(
+                    responses.POST,
+                    'https://api.thingspeak.com/update.json',
+                    json=canned_responses['https://api.thingspeak.com/update.json']
+            )
+            obj.update(**data)
 
 
 canned_responses = {
@@ -91,5 +137,9 @@ canned_responses = {
         ]},
     'https://api.thingspeak.com/channels/3/feed/last.json': {
         "created_at": "2016-01-27T20:52:10Z", "entry_id": 263592, "field1": "58.5 F"
-    }
+    },
+    'https://api.thingspeak.com/update.json': {
+        "created_at": "2016-01-27T20:52:20Z", "entry_id": 263593, "field1": "60.0 F",
+        "field2": None, "field3": None, "field4": None, "field5": None, "field6": None, "field7": None, "field8": None,
+    },
 }
