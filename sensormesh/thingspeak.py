@@ -86,7 +86,6 @@ class ThingSpeakEndpoint(DataSource, Logger):
         response = requests.get(url, headers=headers)
         response.raise_for_status()
 
-        print(response.json())
         return self.parse_feed(response.json())
 
     def update(self, **kwargs):
