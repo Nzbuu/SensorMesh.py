@@ -98,6 +98,7 @@ class TestThingSpeakSource():
         assert data['timestamp'] == 1453927930
         assert data['Server Temp'] == '58.5 F'
 
+
 class TestThingSpeakLogger():
     def test_no_key_is_error(self):
         obj = ThingSpeakEndpoint()

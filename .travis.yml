@@ -5,5 +5,8 @@ python:
 install:
   - pip install --disable-pip-version-check --upgrade pip
   - pip install -r requirements.txt
+  - pip install python-coveralls
 script:
-  - python -m pytest
+  - python -m pytest --cov=sensormesh
+after_success:
+  - coveralls
