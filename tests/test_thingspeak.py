@@ -1,5 +1,6 @@
 import pytest
 import responses
+import json
 
 from sensormesh.thingspeak import *
 
@@ -17,7 +18,7 @@ class TestThingSpeakSource():
     @responses.activate
     def test_can_get_config_from_url(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(id=3)
+        obj.configure(id=3, read_key='ABCDEFGHIJKLMNOPQRST')
 
         with responses.RequestsMock() as responses_:
             responses_.add(
@@ -27,13 +28,18 @@ class TestThingSpeakSource():
             )
             info = obj.read_info()
 
+            assert len(responses_.calls) == 1
+            the_request = responses_.calls[0].request
+            assert the_request.url == 'https://api.thingspeak.com/channels/3/feed.json?results=0'
+            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ABCDEFGHIJKLMNOPQRST'
+
         assert info['name'] == 'ioBridge Server'
         assert info['field1'] == 'Server Temp'
 
     @responses.activate
     def test_can_configure_from_url(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(id=3)
+        obj.configure(id=3, read_key='ABCDEFGHIJKLMNOPQRST')
 
         with responses.RequestsMock() as responses_:
             responses_.add(
@@ -42,6 +48,11 @@ class TestThingSpeakSource():
                     json=canned_responses['https://api.thingspeak.com/channels/3/feed.json']
             )
             obj.read_config()
+
+            assert len(responses_.calls) == 1
+            the_request = responses_.calls[0].request
+            assert the_request.url == 'https://api.thingspeak.com/channels/3/feed.json?results=0'
+            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ABCDEFGHIJKLMNOPQRST'
 
         assert obj.name == 'ioBridge Server'
 
@@ -76,7 +87,7 @@ class TestThingSpeakLogger():
     @responses.activate
     def test_can_get_config_from_url(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(id=3)
+        obj.configure(id=3, write_key='ZYXWVUTSRQP0987654321')
 
         with responses.RequestsMock() as responses_:
             responses_.add(
@@ -86,13 +97,18 @@ class TestThingSpeakLogger():
             )
             info = obj.read_info()
 
+            assert len(responses_.calls) == 1
+            the_request = responses_.calls[0].request
+            assert the_request.url == 'https://api.thingspeak.com/channels/3/feed.json?results=0'
+            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ZYXWVUTSRQP0987654321'
+
         assert info['name'] == 'ioBridge Server'
         assert info['field1'] == 'Server Temp'
 
     @responses.activate
     def test_can_configure_from_url(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(id=3)
+        obj.configure(id=3, write_key='ZYXWVUTSRQP0987654321')
 
         with responses.RequestsMock() as responses_:
             responses_.add(
@@ -102,12 +118,17 @@ class TestThingSpeakLogger():
             )
             obj.read_config()
 
+            assert len(responses_.calls) == 1
+            the_request = responses_.calls[0].request
+            assert the_request.url == 'https://api.thingspeak.com/channels/3/feed.json?results=0'
+            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ZYXWVUTSRQP0987654321'
+
         assert obj.name == 'ioBridge Server'
 
     @responses.activate
     def test_send_data_to_url(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(id=3, field1='Server Temp', write_key='DUMMY')
+        obj.configure(id=3, field1='Server Temp', write_key='ZYXWVUTSRQP0987654321')
 
         data = {'timestamp': 1453927940, 'Server Temp': '60.0 F'}
 
@@ -118,6 +139,14 @@ class TestThingSpeakLogger():
                     json=canned_responses['https://api.thingspeak.com/update.json']
             )
             obj.update(**data)
+
+            assert len(responses_.calls) == 1
+            the_request = responses_.calls[0].request
+            assert the_request.url == 'https://api.thingspeak.com/update.json'
+            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ZYXWVUTSRQP0987654321'
+            assert (
+                json.loads(the_request.body) ==
+                {"created_at": "2016-01-27T20:52:20", "field1": "60.0 F"})
 
 
 canned_responses = {
