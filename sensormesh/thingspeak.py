@@ -4,8 +4,8 @@ import json
 import requests
 import dateutil.parser
 
-from .sources import DataSource
-from .loggers import Logger
+from .base import DataSource
+from .base import Logger
 from .exceptions import ConfigurationError
 
 
