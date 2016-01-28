@@ -14,8 +14,7 @@ class ThingSpeakEndpoint(DataSource, Logger):
 
     def __init__(self):
         super().__init__()
-        self.__write_key = None
-        self.__read_key = None
+        self._key = None
         self.__channel = None
         self.__name = ''
         self.__feeds = {}
@@ -41,11 +40,9 @@ class ThingSpeakEndpoint(DataSource, Logger):
 
         self.configure(**cfg_data)
 
-    def configure(self, write_key=None, read_key=None, id=None, name=None, **kwargs):
-        if write_key:
-            self.__write_key = write_key
-        if read_key:
-            self.__read_key = read_key
+    def configure(self, key=None, id=None, name=None, **kwargs):
+        if key:
+            self._key = key
         if id:
             self.__channel = id
         if name:
@@ -110,15 +107,15 @@ class ThingSpeakEndpoint(DataSource, Logger):
 
         return out
 
-    def prepare_update(self, **kwargs):
+    def prepare_update(self, **data):
         values = {}
 
         for field, feed in self.__feeds.items():
-            if feed in kwargs:
-                values[field] = kwargs[feed]
+            if feed in data:
+                values[field] = data[feed]
 
-        if 'timestamp' in kwargs and kwargs['timestamp']:
-            timestamp = kwargs['timestamp']
+        if 'timestamp' in data and data['timestamp']:
+            timestamp = data['timestamp']
             ts = datetime.fromtimestamp(timestamp)
             values['created_at'] = ts.isoformat()
 
@@ -133,15 +130,10 @@ class ThingSpeakEndpoint(DataSource, Logger):
         return headers
 
     def get_key(self, write=False):
-        if write:
-            if self.__write_key:
-                return self.__write_key
-            else:
-                raise ConfigurationError()
+        if self._key:
+            return self._key
+        elif write:
+            raise ConfigurationError()
         else:
-            if self.__read_key:
-                return self.__read_key
-            elif self.__write_key:
-                return self.__write_key
-            else:
-                return None
+            return None
+

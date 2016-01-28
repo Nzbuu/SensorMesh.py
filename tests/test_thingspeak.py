@@ -1,6 +1,5 @@
 import pytest
 import responses
-import json
 
 from sensormesh.thingspeak import *
 
@@ -12,13 +11,13 @@ class TestThingSpeakSource():
 
     def test_can_configure_key(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(read_key='ABCDEFGHIJKLMNOPQRST')
+        obj.configure(key='ABCDEFGHIJKLMNOPQRST')
         assert obj.get_key(write=False) == 'ABCDEFGHIJKLMNOPQRST'
 
     @responses.activate
     def test_can_get_config_from_url(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(id=3, read_key='ABCDEFGHIJKLMNOPQRST')
+        obj.configure(id=3, key='ABCDEFGHIJKLMNOPQRST')
 
         with responses.RequestsMock() as responses_:
             responses_.add(
@@ -39,7 +38,7 @@ class TestThingSpeakSource():
     @responses.activate
     def test_can_configure_from_url(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(id=3, read_key='ABCDEFGHIJKLMNOPQRST')
+        obj.configure(id=3, key='ABCDEFGHIJKLMNOPQRST')
 
         with responses.RequestsMock() as responses_:
             responses_.add(
@@ -59,7 +58,7 @@ class TestThingSpeakSource():
     @responses.activate
     def test_can_read_data_from_url(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(id=3, field1='Server Temp', read_key='ABCDEFGHIJKLMNOPQRST')
+        obj.configure(id=3, field1='Server Temp', key='ABCDEFGHIJKLMNOPQRST')
 
         with responses.RequestsMock() as responses_:
             responses_.add(
@@ -107,13 +106,13 @@ class TestThingSpeakLogger():
 
     def test_can_configure_key(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(write_key='ZYXWVUTSRQP0987654321')
+        obj.configure(key='ZYXWVUTSRQP0987654321')
         assert obj.get_key(write=True) == 'ZYXWVUTSRQP0987654321'
 
     @responses.activate
     def test_can_get_config_from_url(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(id=3, write_key='ZYXWVUTSRQP0987654321')
+        obj.configure(id=3, key='ZYXWVUTSRQP0987654321')
 
         with responses.RequestsMock() as responses_:
             responses_.add(
@@ -134,7 +133,7 @@ class TestThingSpeakLogger():
     @responses.activate
     def test_can_configure_from_url(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(id=3, write_key='ZYXWVUTSRQP0987654321')
+        obj.configure(id=3, key='ZYXWVUTSRQP0987654321')
 
         with responses.RequestsMock() as responses_:
             responses_.add(
@@ -154,7 +153,7 @@ class TestThingSpeakLogger():
     @responses.activate
     def test_send_data_to_url(self):
         obj = ThingSpeakEndpoint()
-        obj.configure(id=3, field1='Server Temp', write_key='ZYXWVUTSRQP0987654321')
+        obj.configure(id=3, field1='Server Temp', key='ZYXWVUTSRQP0987654321')
 
         data = {'timestamp': 1453927940, 'Server Temp': '60.0 F'}
 
