@@ -1,12 +1,15 @@
 from datetime import datetime
-from .loggers import Logger
+from .base import Logger
 
 
 class ConsoleLogger(Logger):
     def __init__(self):
         super().__init__()
 
-    def update(self, timestamp=None, **kwargs):
+    def update(self, timestamp=None, *args, **kwargs):
+        if args:
+            raise ValueError()
+
         if timestamp is None:
             str_time = 'None'
         else:

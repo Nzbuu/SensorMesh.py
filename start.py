@@ -1,7 +1,8 @@
 from sensormesh.applications import App
-from sensormesh.sources import FakeDataSource
+from sensormesh.fake import FakeDataSource
 from sensormesh.console import ConsoleLogger
 from sensormesh.thingspeak import ThingSpeakEndpoint
+
 
 if __name__ == '__main__':
     app = App()
