@@ -88,7 +88,10 @@ class ThingSpeakEndpoint(DataSource, Logger):
 
         return self.parse_feed(response.json())
 
-    def update(self, **kwargs):
+    def update(self, *args, **kwargs):
+        if args:
+            raise ValueError()
+
         headers = self.prepare_headers(write=True)
         values = self.prepare_update(**kwargs)
 
