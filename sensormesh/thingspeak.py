@@ -15,17 +15,17 @@ class ThingSpeakEndpoint(DataSource, Logger):
     def __init__(self):
         super().__init__()
         self._key = None
-        self.__channel = None
-        self.__name = ''
-        self.__feeds = {}
+        self._channel = None
+        self._name = ''
+        self._feeds = {}
 
     @property
     def name(self):
-        return self.__name
+        return self._name
 
     @property
     def channel(self):
-        return self.__channel
+        return self._channel
 
     def load_config(self, filename):
         with open(filename) as cfg_file:
@@ -44,26 +44,26 @@ class ThingSpeakEndpoint(DataSource, Logger):
         if key:
             self._key = key
         if id:
-            self.__channel = id
+            self._channel = id
         if name:
-            self.__name = name
+            self._name = name
 
         for field, feed in kwargs.items():
             if isinstance(feed, str):
-                self.__feeds[field] = feed
+                self._feeds[field] = feed
             else:
                 # ignore
                 pass
 
     def read_info(self):
-        if not self.__channel:
+        if not self._channel:
             raise ConfigurationError()
 
         headers = self.prepare_headers(write=False)
         params = {'results': 0}
 
         # Fetch data from ThingSpeak
-        url = self.base_url + '/channels/' + str(self.__channel) + '/feed.json'
+        url = self.base_url + '/channels/' + str(self._channel) + '/feed.json'
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
 
@@ -73,13 +73,13 @@ class ThingSpeakEndpoint(DataSource, Logger):
         return channel_data
 
     def read(self):
-        if not self.__channel:
+        if not self._channel:
             raise ConfigurationError()
 
         headers = self.prepare_headers(write=False)
 
         # Fetch data from ThingSpeak
-        url = self.base_url + '/channels/' + str(self.__channel) + '/feed/last.json'
+        url = self.base_url + '/channels/' + str(self._channel) + '/feed/last.json'
         response = requests.get(url, headers=headers)
         response.raise_for_status()
 
@@ -101,7 +101,7 @@ class ThingSpeakEndpoint(DataSource, Logger):
         ts = dateutil.parser.parse(content['created_at'])
         out = {'timestamp': ts.timestamp()}
 
-        for field, feed in self.__feeds.items():
+        for field, feed in self._feeds.items():
             if field in content:
                 out[feed] = content[field]
 
@@ -110,7 +110,7 @@ class ThingSpeakEndpoint(DataSource, Logger):
     def prepare_update(self, **data):
         values = {}
 
-        for field, feed in self.__feeds.items():
+        for field, feed in self._feeds.items():
             if feed in data:
                 values[field] = data[feed]
 
