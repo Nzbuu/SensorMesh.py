@@ -1,6 +1,6 @@
 class DataSource(object):
     def __init__(self):
-        pass
+        super().__init__()
 
     def read(self):
         raise NotImplementedError()
