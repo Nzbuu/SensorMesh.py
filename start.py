@@ -1,15 +1,23 @@
+import random
+
 from sensormesh.applications import App
-from sensormesh.fake import FakeDataSource
+from sensormesh.base import DataSourceWrapper
 from sensormesh.console import ConsoleLogger
-from sensormesh.thingspeak import ThingSpeakEndpoint
+from sensormesh.thingspeak import ThingSpeakLogger
 
 
 if __name__ == '__main__':
     app = App()
-    app.add_source(FakeDataSource())
+
+    # Source
+    s = DataSourceWrapper(value=random.random)
+    app.add_source(s)
+
+    # Logger 1
     app.add_logger(ConsoleLogger())
 
-    l = ThingSpeakEndpoint()
+    # Logger 2
+    l = ThingSpeakLogger()
     l.load_config('thingspeak.json')
     l.read_config()
     app.add_logger(l)

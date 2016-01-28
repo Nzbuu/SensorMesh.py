@@ -12,3 +12,16 @@ class Logger(object):
 
     def update(self, *args, **kwargs):
         raise NotImplementedError()
+
+
+class DataSourceWrapper(DataSource):
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        if args:
+            raise ValueError()
+
+        self._dict = kwargs
+
+    def read(self):
+        data = {k: v() for k, v in self._dict.items()}
+        return data
