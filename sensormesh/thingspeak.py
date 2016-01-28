@@ -137,3 +137,10 @@ class ThingSpeakEndpoint(DataSource, Logger):
         else:
             return None
 
+
+class ThingSpeakLogger(ThingSpeakEndpoint):
+    pass
+
+
+class ThingSpeakSource(ThingSpeakEndpoint):
+    pass

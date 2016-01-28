@@ -6,17 +6,17 @@ from sensormesh.thingspeak import *
 
 class TestThingSpeakSource():
     def test_default_key_is_none(self):
-        obj = ThingSpeakEndpoint()
+        obj = ThingSpeakSource()
         assert obj.get_key(write=False) is None
 
     def test_can_configure_key(self):
-        obj = ThingSpeakEndpoint()
+        obj = ThingSpeakSource()
         obj.configure(key='ABCDEFGHIJKLMNOPQRST')
         assert obj.get_key(write=False) == 'ABCDEFGHIJKLMNOPQRST'
 
     @responses.mock.activate
     def test_can_get_config_from_url(self):
-        obj = ThingSpeakEndpoint()
+        obj = ThingSpeakSource()
         obj.configure(id=3, key='ABCDEFGHIJKLMNOPQRST')
 
         with responses.RequestsMock() as r_mock:
@@ -37,7 +37,7 @@ class TestThingSpeakSource():
 
     @responses.mock.activate
     def test_can_configure_from_url(self):
-        obj = ThingSpeakEndpoint()
+        obj = ThingSpeakSource()
         obj.configure(id=3, key='ABCDEFGHIJKLMNOPQRST')
 
         with responses.RequestsMock() as r_mock:
@@ -57,7 +57,7 @@ class TestThingSpeakSource():
 
     @responses.mock.activate
     def test_can_read_data_from_url(self):
-        obj = ThingSpeakEndpoint()
+        obj = ThingSpeakSource()
         obj.configure(id=3, field1='Server Temp', key='ABCDEFGHIJKLMNOPQRST')
 
         with responses.RequestsMock() as r_mock:
@@ -78,7 +78,7 @@ class TestThingSpeakSource():
 
     @responses.mock.activate
     def test_can_read_data_without_key(self):
-        obj = ThingSpeakEndpoint()
+        obj = ThingSpeakSource()
         obj.configure(id=3, field1='Server Temp')
 
         with responses.RequestsMock() as r_mock:
@@ -100,18 +100,18 @@ class TestThingSpeakSource():
 
 class TestThingSpeakLogger():
     def test_no_key_is_error(self):
-        obj = ThingSpeakEndpoint()
+        obj = ThingSpeakLogger()
         with pytest.raises(ConfigurationError):
             obj.get_key(write=True)
 
     def test_can_configure_key(self):
-        obj = ThingSpeakEndpoint()
+        obj = ThingSpeakLogger()
         obj.configure(key='ZYXWVUTSRQP0987654321')
         assert obj.get_key(write=True) == 'ZYXWVUTSRQP0987654321'
 
     @responses.mock.activate
     def test_can_get_config_from_url(self):
-        obj = ThingSpeakEndpoint()
+        obj = ThingSpeakLogger()
         obj.configure(id=3, key='ZYXWVUTSRQP0987654321')
 
         with responses.RequestsMock() as r_mock:
@@ -132,7 +132,7 @@ class TestThingSpeakLogger():
 
     @responses.mock.activate
     def test_can_configure_from_url(self):
-        obj = ThingSpeakEndpoint()
+        obj = ThingSpeakLogger()
         obj.configure(id=3, key='ZYXWVUTSRQP0987654321')
 
         with responses.RequestsMock() as r_mock:
@@ -152,7 +152,7 @@ class TestThingSpeakLogger():
 
     @responses.mock.activate
     def test_send_data_to_url(self):
-        obj = ThingSpeakEndpoint()
+        obj = ThingSpeakLogger()
         obj.configure(id=3, field1='Server Temp', key='ZYXWVUTSRQP0987654321')
 
         data = {'timestamp': 1453927940, 'Server Temp': '60.0 F'}
