@@ -6,59 +6,22 @@ from sensormesh.thingspeak import *
 
 class TestThingSpeakSource():
     def test_default_key_is_none(self):
-        obj = ThingSpeakEndpoint()
-        assert obj.get_key(write=False) is None
+        obj = ThingSpeakSource()
+        assert obj._get_key(write=False) is None
 
     def test_can_configure_key(self):
-        obj = ThingSpeakEndpoint()
-        obj.configure(key='ABCDEFGHIJKLMNOPQRST')
-        assert obj.get_key(write=False) == 'ABCDEFGHIJKLMNOPQRST'
-
-    @responses.mock.activate
-    def test_can_get_config_from_url(self):
-        obj = ThingSpeakEndpoint()
-        obj.configure(id=3, key='ABCDEFGHIJKLMNOPQRST')
-
-        with responses.RequestsMock() as r_mock:
-            r_mock.add(
-                    r_mock.GET,
-                    'https://api.thingspeak.com/channels/3/feed.json',
-                    json=canned_responses['https://api.thingspeak.com/channels/3/feed.json']
-            )
-            info = obj.read_info()
-
-            assert len(r_mock.calls) == 1
-            the_request = r_mock.calls[0].request
-            assert the_request.url == 'https://api.thingspeak.com/channels/3/feed.json?results=0'
-            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ABCDEFGHIJKLMNOPQRST'
-
-        assert info['name'] == 'ioBridge Server'
-        assert info['field1'] == 'Server Temp'
-
-    @responses.mock.activate
-    def test_can_configure_from_url(self):
-        obj = ThingSpeakEndpoint()
-        obj.configure(id=3, key='ABCDEFGHIJKLMNOPQRST')
-
-        with responses.RequestsMock() as r_mock:
-            r_mock.add(
-                    r_mock.GET,
-                    'https://api.thingspeak.com/channels/3/feed.json',
-                    json=canned_responses['https://api.thingspeak.com/channels/3/feed.json']
-            )
-            obj.read_config()
-
-            assert len(r_mock.calls) == 1
-            the_request = r_mock.calls[0].request
-            assert the_request.url == 'https://api.thingspeak.com/channels/3/feed.json?results=0'
-            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ABCDEFGHIJKLMNOPQRST'
-
-        assert obj.name == 'ioBridge Server'
+        obj = ThingSpeakSource(
+                key='ABCDEFGHIJKLMNOPQRST'
+        )
+        assert obj._get_key(write=False) == 'ABCDEFGHIJKLMNOPQRST'
 
     @responses.mock.activate
     def test_can_read_data_from_url(self):
-        obj = ThingSpeakEndpoint()
-        obj.configure(id=3, field1='Server Temp', key='ABCDEFGHIJKLMNOPQRST')
+        obj = ThingSpeakSource(
+                channel=3,
+                key='ABCDEFGHIJKLMNOPQRST',
+                feeds={'field1': 'Server Temp'}
+        )
 
         with responses.RequestsMock() as r_mock:
             r_mock.add(
@@ -78,8 +41,10 @@ class TestThingSpeakSource():
 
     @responses.mock.activate
     def test_can_read_data_without_key(self):
-        obj = ThingSpeakEndpoint()
-        obj.configure(id=3, field1='Server Temp')
+        obj = ThingSpeakSource(
+                channel=3,
+                feeds={'field1': 'Server Temp'}
+        )
 
         with responses.RequestsMock() as r_mock:
             r_mock.add(
@@ -100,60 +65,21 @@ class TestThingSpeakSource():
 
 class TestThingSpeakLogger():
     def test_no_key_is_error(self):
-        obj = ThingSpeakEndpoint()
+        obj = ThingSpeakLogger()
         with pytest.raises(ConfigurationError):
-            obj.get_key(write=True)
+            obj._get_key(write=True)
 
     def test_can_configure_key(self):
-        obj = ThingSpeakEndpoint()
-        obj.configure(key='ZYXWVUTSRQP0987654321')
-        assert obj.get_key(write=True) == 'ZYXWVUTSRQP0987654321'
-
-    @responses.mock.activate
-    def test_can_get_config_from_url(self):
-        obj = ThingSpeakEndpoint()
-        obj.configure(id=3, key='ZYXWVUTSRQP0987654321')
-
-        with responses.RequestsMock() as r_mock:
-            r_mock.add(
-                    r_mock.GET,
-                    'https://api.thingspeak.com/channels/3/feed.json',
-                    json=canned_responses['https://api.thingspeak.com/channels/3/feed.json']
-            )
-            info = obj.read_info()
-
-            assert len(r_mock.calls) == 1
-            the_request = r_mock.calls[0].request
-            assert the_request.url == 'https://api.thingspeak.com/channels/3/feed.json?results=0'
-            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ZYXWVUTSRQP0987654321'
-
-        assert info['name'] == 'ioBridge Server'
-        assert info['field1'] == 'Server Temp'
-
-    @responses.mock.activate
-    def test_can_configure_from_url(self):
-        obj = ThingSpeakEndpoint()
-        obj.configure(id=3, key='ZYXWVUTSRQP0987654321')
-
-        with responses.RequestsMock() as r_mock:
-            r_mock.add(
-                    r_mock.GET,
-                    'https://api.thingspeak.com/channels/3/feed.json',
-                    json=canned_responses['https://api.thingspeak.com/channels/3/feed.json']
-            )
-            obj.read_config()
-
-            assert len(r_mock.calls) == 1
-            the_request = r_mock.calls[0].request
-            assert the_request.url == 'https://api.thingspeak.com/channels/3/feed.json?results=0'
-            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ZYXWVUTSRQP0987654321'
-
-        assert obj.name == 'ioBridge Server'
+        obj = ThingSpeakLogger(key='ZYXWVUTSRQP0987654321')
+        assert obj._get_key(write=True) == 'ZYXWVUTSRQP0987654321'
 
     @responses.mock.activate
     def test_send_data_to_url(self):
-        obj = ThingSpeakEndpoint()
-        obj.configure(id=3, field1='Server Temp', key='ZYXWVUTSRQP0987654321')
+        obj = ThingSpeakLogger(
+                channel=3,
+                key='ZYXWVUTSRQP0987654321',
+                feeds={'field1': 'Server Temp'}
+        )
 
         data = {'timestamp': 1453927940, 'Server Temp': '60.0 F'}
 
@@ -163,7 +89,7 @@ class TestThingSpeakLogger():
                     'https://api.thingspeak.com/update.json',
                     json=canned_responses['https://api.thingspeak.com/update.json']
             )
-            obj.update(**data)
+            obj.update(data)
 
             assert len(r_mock.calls) == 1
             the_request = r_mock.calls[0].request
@@ -175,20 +101,6 @@ class TestThingSpeakLogger():
 
 
 canned_responses = {
-    'https://api.thingspeak.com/channels/3/feed.json': {
-        "channel": {
-            "id": 3,
-            "name": "ioBridge Server",
-            "description": "ioBridge IO-204 connected to web server to report temperatures to ThingSpeak",
-            "field1": "Server Temp",
-            "created_at": "2010-12-03T14:26:23Z",
-            "updated_at": "2016-01-27T20:52:10Z",
-            "last_entry_id": 263592
-        },
-        "feeds": [
-            {"created_at": "2016-01-27T20:42:11Z", "entry_id": 263591, "field1": "58.3 F"},
-            {"created_at": "2016-01-27T20:52:10Z", "entry_id": 263592, "field1": "58.5 F"}
-        ]},
     'https://api.thingspeak.com/channels/3/feed/last.json': {
         "created_at": "2016-01-27T20:52:10Z", "entry_id": 263592, "field1": "58.5 F"
     },
