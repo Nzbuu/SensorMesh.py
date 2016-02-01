@@ -1,7 +1,12 @@
 sudo: false
 language: python
 python:
+  - 3.4
   - 3.5
+  - pypy3
+matrix:
+  allow_failures:
+    - python: pypy3 # Currently only Python 3.2.5 compatible
 install:
   - pip install --disable-pip-version-check --upgrade pip
   - pip install -r requirements.txt
