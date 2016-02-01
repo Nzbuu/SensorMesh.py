@@ -17,8 +17,7 @@ if __name__ == '__main__':
     app.add_logger(ConsoleLogger())
 
     # Logger 2
-    l = ThingSpeakLogger()
-    l.load_config('thingspeak.json')
+    l = ThingSpeakLogger.from_file('thingspeak.json')
     l.read_config()
     app.add_logger(l)
 
