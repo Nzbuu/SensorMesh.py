@@ -14,11 +14,11 @@ if __name__ == '__main__':
     app.add_source(s)
 
     # Logger 1
-    app.add_logger(ConsoleLogger())
+    l = ConsoleLogger()
+    app.add_logger(l)
 
     # Logger 2
     l = ThingSpeakLogger.from_file('thingspeak.json')
-    l.read_config()
     app.add_logger(l)
 
     try:

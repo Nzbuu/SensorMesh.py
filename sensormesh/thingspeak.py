@@ -41,33 +41,6 @@ class ThingSpeakEndpoint(DataSource, Logger):
             cfg_data = json.load(cfg_file)
         cls(**cfg_data)
 
-    def read_config(self):
-        info = self.read_info()
-        for k, v in info.items():
-            if k == 'name':
-                self._name = v
-            elif k.startswith('field'):
-                self.add_field(**{k: v})
-            else:
-                pass
-
-    def read_info(self):
-        if not self._channel:
-            raise ConfigurationError()
-
-        headers = self._prepare_headers(write=False)
-        params = {'results': 0}
-
-        # Fetch data from ThingSpeak
-        url = self._base_url + '/channels/' + str(self._channel) + '/feed.json'
-        response = requests.get(url, headers=headers, params=params)
-        response.raise_for_status()
-
-        data = response.json()
-        channel_data = data['channel']
-
-        return channel_data
-
     def read(self):
         if not self._channel:
             raise ConfigurationError()
