@@ -10,7 +10,7 @@ class Logger(object):
     def __init__(self):
         super().__init__()
 
-    def update(self, *args, **kwargs):
+    def update(self, data):
         raise NotImplementedError()
 
 

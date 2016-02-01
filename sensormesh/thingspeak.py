@@ -85,12 +85,9 @@ class ThingSpeakEndpoint(DataSource, Logger):
 
         return self.parse_feed(response.json())
 
-    def update(self, *args, **kwargs):
-        if args:
-            raise ValueError()
-
+    def update(self, data):
         headers = self.prepare_headers(write=True)
-        values = self.prepare_update(**kwargs)
+        values = self.prepare_update(data)
 
         # Send data to ThingSpeak
         url = self.base_url + '/update.json'
@@ -107,12 +104,8 @@ class ThingSpeakEndpoint(DataSource, Logger):
 
         return out
 
-    def prepare_update(self, **data):
-        values = {}
-
-        for field, feed in self._feeds.items():
-            if feed in data:
-                values[field] = data[feed]
+    def prepare_update(self, data):
+        values = {field: data[feed] for field, feed in self._feeds.items() if feed in data}
 
         if 'timestamp' in data and data['timestamp']:
             timestamp = data['timestamp']

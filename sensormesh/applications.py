@@ -48,4 +48,4 @@ class App(object):
             data['timestamp'] = timestamp
 
         for l in self._loggers:
-            l.update(**data)
+            l.update(data)
