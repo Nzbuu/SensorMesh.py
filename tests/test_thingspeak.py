@@ -163,7 +163,7 @@ class TestThingSpeakLogger():
                     'https://api.thingspeak.com/update.json',
                     json=canned_responses['https://api.thingspeak.com/update.json']
             )
-            obj.update(**data)
+            obj.update(data)
 
             assert len(r_mock.calls) == 1
             the_request = r_mock.calls[0].request
