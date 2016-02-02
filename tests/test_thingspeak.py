@@ -1,5 +1,6 @@
 import pytest
 import responses
+import json
 
 from sensormesh.thingspeak import *
 

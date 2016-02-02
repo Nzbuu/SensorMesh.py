@@ -1,5 +1,4 @@
 from datetime import datetime
-import json
 
 import requests
 import dateutil.parser
@@ -69,12 +68,6 @@ class ThingSpeakEndpoint(DataSource, DataTarget):
     def add_field(self, **kwargs):
         for field, feed in kwargs.items():
             self._feeds[field] = feed
-
-    @classmethod
-    def from_file(cls, filename):
-        with open(filename) as cfg_file:
-            cfg_data = json.load(cfg_file)
-        return cls(**cfg_data)
 
 
 class ThingSpeakLogger(ThingSpeakEndpoint):
