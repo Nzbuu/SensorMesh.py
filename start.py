@@ -15,11 +15,11 @@ if __name__ == '__main__':
 
     # Target 1
     t = ConsoleDisplay()
-    app.add_logger(t)
+    app.add_target(t)
 
     # Target 2
     t = ThingSpeakLogger.from_file('thingspeak.json')
-    app.add_logger(t)
+    app.add_target(t)
 
     # Start application
     try:

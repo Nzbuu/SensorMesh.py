@@ -7,7 +7,7 @@ class App(object):
     def __init__(self, name="SensorMesh", timefcn=None, delayfcn=None):
         self.name = name
         self._source = None
-        self._loggers = []
+        self._targets = []
         self._step = 20
         self._num_steps = 5
 
@@ -20,20 +20,20 @@ class App(object):
         else:
             raise ConfigurationError()
 
-    def add_logger(self, logger):
-        self._loggers.append(logger)
+    def add_target(self, logger):
+        self._targets.append(logger)
 
     def _check_for_source(self):
         if self._source is None:
             raise ConfigurationError()
 
-    def _check_for_loggers(self):
-        if self._loggers is None:
+    def _check_for_targets(self):
+        if self._targets is None:
             raise ConfigurationError()
 
     def start(self):
         self._check_for_source()
-        self._check_for_loggers()
+        self._check_for_targets()
 
         time_start_next = self._timefcn()
         for count_steps in range(self._num_steps):
@@ -51,5 +51,5 @@ class App(object):
         if not data.get('timestamp', None):
             data['timestamp'] = timestamp
 
-        for l in self._loggers:
+        for l in self._targets:
             l.update(data)
