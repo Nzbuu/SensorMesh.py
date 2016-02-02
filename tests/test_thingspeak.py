@@ -5,6 +5,10 @@ from sensormesh.thingspeak import *
 
 
 class TestThingSpeakSource:
+    def test_can_create_source(self):
+        obj = ThingSpeakSource(name='Test Source')
+        assert obj.name == 'Test Source'
+
     def test_default_key_is_none(self):
         obj = ThingSpeakSource()
         assert obj._api._get_key(write=False) is None
@@ -64,6 +68,10 @@ class TestThingSpeakSource:
 
 
 class TestThingSpeakLogger:
+    def test_can_create_logger(self):
+        obj = ThingSpeakLogger(name='Test Logger')
+        assert obj.name == 'Test Logger'
+
     def test_no_key_is_error(self):
         obj = ThingSpeakLogger()
         with pytest.raises(ConfigurationError):
