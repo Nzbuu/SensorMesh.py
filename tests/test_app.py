@@ -58,7 +58,7 @@ class TestApp:
 
     def test_can_start_with_source_and_target(self):
         a = App()
-        a.set_steps(0, 2)
+        a.set_steps(step=0, num_steps=2)
 
         s = DataSource()
         s.read = Mock()
@@ -70,3 +70,6 @@ class TestApp:
         a.add_target(t)
 
         a.start()
+
+        assert s.read.call_count == 2
+        assert t.update.call_count == 2
