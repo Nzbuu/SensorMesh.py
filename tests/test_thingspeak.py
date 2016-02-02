@@ -1,6 +1,8 @@
+import json
+from unittest.mock import Mock
+
 import pytest
 import responses
-import json
 
 from sensormesh.thingspeak import *
 
@@ -19,6 +21,17 @@ class TestThingSpeakSource:
                 key='ABCDEFGHIJKLMNOPQRST'
         )
         assert obj._api._get_key(write=False) == 'ABCDEFGHIJKLMNOPQRST'
+
+    def test_can_inject_api(self):
+        api = Mock(spec=ThingSpeakApi)
+        api._key = 'ABCDEFGHIJKLMNOPQRST'
+        obj = ThingSpeakLogger(api=api)
+        assert obj._api is api
+
+    def test_throws_with_api_and_keywords(self):
+        api = Mock(spec=ThingSpeakApi)
+        with pytest.raises(ValueError):
+            obj = ThingSpeakSource(api=api, key='ABCDEFGHIJ')
 
     @responses.mock.activate
     def test_can_read_data_from_url(self):
@@ -81,6 +94,17 @@ class TestThingSpeakLogger:
     def test_can_configure_key(self):
         obj = ThingSpeakLogger(key='ZYXWVUTSRQP0987654321')
         assert obj._api._get_key(write=True) == 'ZYXWVUTSRQP0987654321'
+
+    def test_can_inject_api(self):
+        api = Mock(spec=ThingSpeakApi)
+        api._key = 'ZYXWVUTSRQP0987654321'
+        obj = ThingSpeakLogger(api=api)
+        assert obj._api is api
+
+    def test_throws_with_api_and_keywords(self):
+        api = Mock(spec=ThingSpeakApi)
+        with pytest.raises(ValueError):
+            obj = ThingSpeakLogger(api=api, key='ZYXWVUTSRQP0987654321')
 
     @responses.mock.activate
     def test_send_data_to_url(self):

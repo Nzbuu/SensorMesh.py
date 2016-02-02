@@ -59,8 +59,10 @@ class ThingSpeakEndpoint(DataSource, DataTarget):
 
         if api is None:
             api = ThingSpeakApi(**kwargs)
-
+        elif kwargs:
+            raise ValueError("Additional keyword inputs are forbidden when using API input")
         self._api = api
+
         self._feeds = {}
         if feeds:
             self.add_field(**feeds)
