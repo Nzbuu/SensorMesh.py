@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import Mock
+
+import pytest
 
 from sensormesh.applications import *
 from sensormesh.base import DataSource, DataTarget
@@ -40,3 +41,32 @@ class TestApp:
         a.add_target(t1)
         a.add_target(t2)
         assert a.get_target_names() == ['Mock Target 1', 'Mock Target 2']
+
+    def test_cannot_start_without_target(self):
+        a = App()
+        s = DataSource()
+        a.add_source(s)
+        with pytest.raises(ConfigurationError):
+            a.start()
+
+    def test_cannot_start_without_source(self):
+        a = App()
+        t = DataTarget()
+        a.add_target(t)
+        with pytest.raises(ConfigurationError):
+            a.start()
+
+    def test_can_start_with_source_and_target(self):
+        a = App()
+        a.set_steps(0, 2)
+
+        s = DataSource()
+        s.read = Mock()
+        s.read.return_value = {'value': 0.5}
+        a.add_source(s)
+
+        t = DataTarget()
+        t.update = Mock()
+        a.add_target(t)
+
+        a.start()

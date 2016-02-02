@@ -8,11 +8,15 @@ class App(object):
         self.name = name
         self._source = None
         self._targets = []
-        self._step = 20
-        self._num_steps = 5
+        self._step = 0
+        self._num_steps = 1
 
         self._timefcn = timefcn if timefcn else time.time
         self._delayfcn = delayfcn if delayfcn else time.sleep
+
+    def set_steps(self, step, num_steps):
+        self._step = step
+        self._num_steps = num_steps
 
     def add_source(self, source):
         if self._source is None:
@@ -30,11 +34,11 @@ class App(object):
         return [t.name for t in self._targets]
 
     def _check_for_source(self):
-        if self._source is None:
+        if not self._source:
             raise ConfigurationError()
 
     def _check_for_targets(self):
-        if self._targets is None:
+        if not self._targets:
             raise ConfigurationError()
 
     def start(self):
