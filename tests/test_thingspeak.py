@@ -34,6 +34,19 @@ class TestThingSpeakSource:
             obj = ThingSpeakSource(api=api, key='ABCDEFGHIJ')
 
     @responses.mock.activate
+    def test_cannot_read_without_channel(self):
+        obj = ThingSpeakSource(
+                key='ABCDEFGHIJKLMNOPQRST',
+                feeds={'field1': 'Server Temp'}
+        )
+
+        with responses.RequestsMock() as r_mock:
+            with pytest.raises(ConfigurationError):
+                data = obj.read()
+
+            assert len(r_mock.calls) == 0
+
+    @responses.mock.activate
     def test_can_read_data_from_url(self):
         obj = ThingSpeakSource(
                 channel=3,
