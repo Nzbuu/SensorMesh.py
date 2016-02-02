@@ -49,14 +49,16 @@ class App(object):
         for count_steps in range(self._num_steps):
             self.step()
 
-            if count_steps < self._num_steps - 1:
+            if self._step <= 0:
+                pass
+            elif count_steps < self._num_steps - 1:
                 time_finish_now = self._timefcn()
                 time_start_next += self._step
                 while time_finish_now > time_start_next:
                     time_start_next += self._step
 
                 time_finish_now = self._timefcn()
-                self._delayfcn(time_start_next - time_finish_now)
+                self._delayfcn(max(time_start_next - time_finish_now, 0))
 
     def step(self):
         timestamp = self._timefcn()
