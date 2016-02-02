@@ -4,16 +4,16 @@ import responses
 from sensormesh.thingspeak import *
 
 
-class TestThingSpeakSource():
+class TestThingSpeakSource:
     def test_default_key_is_none(self):
         obj = ThingSpeakSource()
-        assert obj._get_key(write=False) is None
+        assert obj._api._get_key(write=False) is None
 
     def test_can_configure_key(self):
         obj = ThingSpeakSource(
                 key='ABCDEFGHIJKLMNOPQRST'
         )
-        assert obj._get_key(write=False) == 'ABCDEFGHIJKLMNOPQRST'
+        assert obj._api._get_key(write=False) == 'ABCDEFGHIJKLMNOPQRST'
 
     @responses.mock.activate
     def test_can_read_data_from_url(self):
@@ -63,15 +63,15 @@ class TestThingSpeakSource():
         assert data['Server Temp'] == '58.5 F'
 
 
-class TestThingSpeakLogger():
+class TestThingSpeakLogger:
     def test_no_key_is_error(self):
         obj = ThingSpeakLogger()
         with pytest.raises(ConfigurationError):
-            obj._get_key(write=True)
+            obj._api._get_key(write=True)
 
     def test_can_configure_key(self):
         obj = ThingSpeakLogger(key='ZYXWVUTSRQP0987654321')
-        assert obj._get_key(write=True) == 'ZYXWVUTSRQP0987654321'
+        assert obj._api._get_key(write=True) == 'ZYXWVUTSRQP0987654321'
 
     @responses.mock.activate
     def test_send_data_to_url(self):
