@@ -1,22 +1,40 @@
 class DataSource(object):
-    def __init__(self):
+    def __init__(self, name=''):
         super().__init__()
+        self._name = name
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, u):
+        self._name = u
 
     def read(self):
         raise NotImplementedError()
 
 
-class Logger(object):
-    def __init__(self):
+class DataTarget(object):
+    def __init__(self, name=''):
         super().__init__()
+        self._name = name
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, u):
+        self._name = u
 
     def update(self, data):
         raise NotImplementedError()
 
 
 class DataSourceWrapper(DataSource):
-    def __init__(self, *args, **kwargs):
-        super().__init__()
+    def __init__(self, name='', *args, **kwargs):
+        super().__init__(name=name)
         if args:
             raise ValueError()
 

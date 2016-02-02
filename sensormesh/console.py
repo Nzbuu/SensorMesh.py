@@ -1,8 +1,8 @@
 from datetime import datetime
-from .base import Logger
+from .base import DataTarget
 
 
-class ConsoleLogger(Logger):
+class ConsoleDisplay(DataTarget):
     def __init__(self):
         super().__init__()
 

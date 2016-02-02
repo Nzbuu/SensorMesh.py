@@ -5,7 +5,7 @@ import requests
 import dateutil.parser
 
 from .base import DataSource
-from .base import Logger
+from .base import DataTarget
 from .exceptions import ConfigurationError
 
 
@@ -54,26 +54,17 @@ class ThingSpeakApi:
             return None
 
 
-class ThingSpeakEndpoint(DataSource, Logger):
+class ThingSpeakEndpoint(DataSource, DataTarget):
     def __init__(self, name='', feeds=None, api=None, **kwargs):
-        super().__init__()
+        super().__init__(name=name)
 
         if api is None:
             api = ThingSpeakApi(**kwargs)
 
         self._api = api
-        self._name = name
         self._feeds = {}
         if feeds:
             self.add_field(**feeds)
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def channel(self):
-        return self._api.channel
 
     def add_field(self, **kwargs):
         for field, feed in kwargs.items():
@@ -85,22 +76,11 @@ class ThingSpeakEndpoint(DataSource, Logger):
             cfg_data = json.load(cfg_file)
         return cls(**cfg_data)
 
-    def read(self):
-        content = self._api.get_last()
-        return self._parse_feed(content)
 
+class ThingSpeakLogger(ThingSpeakEndpoint):
     def update(self, data):
         content = self._prepare_update(data)
         self._api.post_update(content)
-
-    def _parse_feed(self, content):
-        data = {feed: content[field] for field, feed in self._feeds.items() if field in content}
-
-        if 'timestamp' not in data:
-            ts = dateutil.parser.parse(content['created_at'])
-            data['timestamp'] = ts.timestamp()
-
-        return data
 
     def _prepare_update(self, data):
         values = {field: data[feed] for field, feed in self._feeds.items() if feed in data}
@@ -113,9 +93,16 @@ class ThingSpeakEndpoint(DataSource, Logger):
         return values
 
 
-class ThingSpeakLogger(ThingSpeakEndpoint):
-    pass
-
-
 class ThingSpeakSource(ThingSpeakEndpoint):
-    pass
+    def read(self):
+        content = self._api.get_last()
+        return self._parse_feed(content)
+
+    def _parse_feed(self, content):
+        data = {feed: content[field] for field, feed in self._feeds.items() if field in content}
+
+        if 'timestamp' not in data:
+            ts = dateutil.parser.parse(content['created_at'])
+            data['timestamp'] = ts.timestamp()
+
+        return data
