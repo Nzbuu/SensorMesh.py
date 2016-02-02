@@ -99,11 +99,6 @@ class TestThingSpeakLogger:
         obj = ThingSpeakLogger(name='Test Logger')
         assert obj.name == 'Test Logger'
 
-    def test_no_key_is_error(self):
-        obj = ThingSpeakLogger()
-        with pytest.raises(ConfigurationError):
-            obj._api._get_key(write=True)
-
     def test_can_configure_key(self):
         obj = ThingSpeakLogger(key='ZYXWVUTSRQP0987654321')
         assert obj._api._get_key(write=True) == 'ZYXWVUTSRQP0987654321'
@@ -118,6 +113,19 @@ class TestThingSpeakLogger:
         api = Mock(spec=ThingSpeakApi)
         with pytest.raises(ValueError):
             obj = ThingSpeakLogger(api=api, key='ZYXWVUTSRQP0987654321')
+
+    @responses.mock.activate
+    def test_cannot_update_without_key(self):
+        obj = ThingSpeakLogger(
+                channel=3,
+                feeds={'field1': 'Server Temp'}
+        )
+
+        with responses.RequestsMock() as r_mock:
+            with pytest.raises(ConfigurationError):
+                obj.update({'Server Temp': 20})
+
+            assert len(r_mock.calls) == 0
 
     @responses.mock.activate
     def test_send_data_to_url(self):
