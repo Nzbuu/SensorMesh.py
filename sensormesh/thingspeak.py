@@ -5,7 +5,7 @@ import requests
 import dateutil.parser
 
 from .base import DataSource
-from .base import Logger
+from .base import DataTarget
 from .exceptions import ConfigurationError
 
 
@@ -54,7 +54,7 @@ class ThingSpeakApi:
             return None
 
 
-class ThingSpeakEndpoint(DataSource, Logger):
+class ThingSpeakEndpoint(DataSource, DataTarget):
     def __init__(self, name='', feeds=None, api=None, **kwargs):
         super().__init__()
 

@@ -6,7 +6,7 @@ class DataSource(object):
         raise NotImplementedError()
 
 
-class Logger(object):
+class DataTarget(object):
     def __init__(self):
         super().__init__()
 

@@ -2,7 +2,7 @@ import random
 
 from sensormesh.applications import App
 from sensormesh.base import DataSourceWrapper
-from sensormesh.console import ConsoleLogger
+from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 
 
@@ -13,14 +13,15 @@ if __name__ == '__main__':
     s = DataSourceWrapper(value=random.random)
     app.add_source(s)
 
-    # Logger 1
-    l = ConsoleLogger()
-    app.add_logger(l)
+    # Target 1
+    t = ConsoleDisplay()
+    app.add_logger(t)
 
-    # Logger 2
-    l = ThingSpeakLogger.from_file('thingspeak.json')
-    app.add_logger(l)
+    # Target 2
+    t = ThingSpeakLogger.from_file('thingspeak.json')
+    app.add_logger(t)
 
+    # Start application
     try:
         app.start()
     except KeyboardInterrupt:
