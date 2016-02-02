@@ -9,39 +9,14 @@ from .base import Logger
 from .exceptions import ConfigurationError
 
 
-class ThingSpeakEndpoint(DataSource, Logger):
-    def __init__(self, key=None, channel=None, name='', feeds=None,
-                 base_url='https://api.thingspeak.com'):
+class ThingSpeakApi:
+    def __init__(self, key=None, channel=None, base_url='https://api.thingspeak.com'):
         super().__init__()
-
         self._base_url = base_url
         self._key = key
         self._channel = channel
-        self._name = name
 
-        self._feeds = {}
-        if feeds:
-            self.add_field(**feeds)
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def channel(self):
-        return self._channel
-
-    def add_field(self, **kwargs):
-        for field, feed in kwargs.items():
-            self._feeds[field] = feed
-
-    @classmethod
-    def from_file(cls, filename):
-        with open(filename) as cfg_file:
-            cfg_data = json.load(cfg_file)
-        cls(**cfg_data)
-
-    def read(self):
+    def get_last(self):
         if not self._channel:
             raise ConfigurationError()
 
@@ -52,16 +27,71 @@ class ThingSpeakEndpoint(DataSource, Logger):
         response = requests.get(url, headers=headers)
         response.raise_for_status()
 
-        return self._parse_feed(response.json())
+        return response.json()
 
-    def update(self, data):
+    def post_update(self, content):
         headers = self._prepare_headers(write=True)
-        values = self._prepare_update(data)
 
         # Send data to ThingSpeak
         url = self._base_url + '/update.json'
-        response = requests.post(url, headers=headers, json=values)
+        response = requests.post(url, headers=headers, json=content)
         response.raise_for_status()
+
+    def _prepare_headers(self, write=False):
+        key = self._get_key(write=write)
+        headers = {}
+        if key:
+            headers['X-THINGSPEAKAPIKEY'] = key
+
+        return headers
+
+    def _get_key(self, write=False):
+        if self._key:
+            return self._key
+        elif write:
+            raise ConfigurationError()
+        else:
+            return None
+
+
+class ThingSpeakEndpoint(DataSource, Logger):
+    def __init__(self, name='', feeds=None, api=None, **kwargs):
+        super().__init__()
+
+        if api is None:
+            api = ThingSpeakApi(**kwargs)
+
+        self._api = api
+        self._name = name
+        self._feeds = {}
+        if feeds:
+            self.add_field(**feeds)
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def channel(self):
+        return self._api.channel
+
+    def add_field(self, **kwargs):
+        for field, feed in kwargs.items():
+            self._feeds[field] = feed
+
+    @classmethod
+    def from_file(cls, filename):
+        with open(filename) as cfg_file:
+            cfg_data = json.load(cfg_file)
+        return cls(**cfg_data)
+
+    def read(self):
+        content = self._api.get_last()
+        return self._parse_feed(content)
+
+    def update(self, data):
+        content = self._prepare_update(data)
+        self._api.post_update(content)
 
     def _parse_feed(self, content):
         data = {feed: content[field] for field, feed in self._feeds.items() if field in content}
@@ -81,22 +111,6 @@ class ThingSpeakEndpoint(DataSource, Logger):
             values['created_at'] = ts.isoformat()
 
         return values
-
-    def _prepare_headers(self, write=False):
-        key = self._get_key(write=write)
-        headers = {}
-        if key:
-            headers['X-THINGSPEAKAPIKEY'] = key
-
-        return headers
-
-    def _get_key(self, write=False):
-        if self._key:
-            return self._key
-        elif write:
-            raise ConfigurationError()
-        else:
-            return None
 
 
 class ThingSpeakLogger(ThingSpeakEndpoint):
