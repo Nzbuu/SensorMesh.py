@@ -23,6 +23,12 @@ class App(object):
     def add_target(self, logger):
         self._targets.append(logger)
 
+    def get_source_name(self):
+        return self._source.name if self._source else None
+
+    def get_target_names(self):
+        return [t.name for t in self._targets]
+
     def _check_for_source(self):
         if self._source is None:
             raise ConfigurationError()
@@ -44,7 +50,7 @@ class App(object):
             time_start_prev = time_start_now
 
             self.step()
-            
+
             if count_steps < self._num_steps - 1:
                 time_finish_now = self._timefcn()
                 time_start_next += self._step
