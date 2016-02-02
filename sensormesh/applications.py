@@ -45,14 +45,8 @@ class App(object):
         self._check_for_source()
         self._check_for_targets()
 
-        time_start_prev = self._timefcn()
         time_start_next = self._timefcn()
         for count_steps in range(self._num_steps):
-            time_start_now = self._timefcn()
-            print('step =', '{:f}'.format(time_start_now - time_start_prev))
-            print('accuracy =', '{:f}'.format(time_start_now - time_start_next))
-            time_start_prev = time_start_now
-
             self.step()
 
             if count_steps < self._num_steps - 1:
