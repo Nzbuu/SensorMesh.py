@@ -58,7 +58,7 @@ class TestApp:
 
     def test_runs_with_zero_step(self):
         tf = Mock()
-        tf.return_value = 1453928000
+        tf.side_effect = [1453928000, 1453928000.1, 1453928000.2]
         df = Mock()
 
         a = App(timefcn=tf, delayfcn=df)
@@ -78,7 +78,27 @@ class TestApp:
 
     def test_runs_with_nonzero_step(self):
         tf = Mock()
-        tf.return_value = 1453928000
+        tf.side_effect = [1453928000, 1453928000.1, 1453928001.1]
+        df = Mock()
+
+        a = App(timefcn=tf, delayfcn=df)
+        a.set_steps(step=1, num_steps=2)
+        a.step = Mock()
+
+        s = DataSource()
+        a.add_source(s)
+
+        t = DataTarget()
+        a.add_target(t)
+
+        a.start()
+
+        assert a.step.call_count == 2
+        assert df.call_count == 1  # Don't delay after final step
+
+    def test_skips_missing_steps(self):
+        tf = Mock()
+        tf.side_effect = [1453928000, 1453928001.1, 1453928003.1]
         df = Mock()
 
         a = App(timefcn=tf, delayfcn=df)
@@ -98,7 +118,7 @@ class TestApp:
 
     def test_step_calls_read_and_update(self):
         tf = Mock()
-        tf.return_value = 1453928000
+        tf.side_effect = [1453928000, 1453928000.1, 1453928001.1]
         df = Mock()
 
         a = App(timefcn=tf, delayfcn=df)
@@ -116,3 +136,4 @@ class TestApp:
 
         assert s.read.call_count == 1
         assert t.update.call_count == 1
+

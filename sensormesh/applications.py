@@ -57,7 +57,6 @@ class App(object):
                 while time_finish_now > time_start_next:
                     time_start_next += self._step
 
-                time_finish_now = self._timefcn()
                 self._delayfcn(max(time_start_next - time_finish_now, 0))
 
     def step(self):
