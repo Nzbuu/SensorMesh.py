@@ -7,7 +7,7 @@ class ConsoleLogger(Logger):
         super().__init__()
 
     def update(self, data):
-        timestamp = data.pop('timestamp', None)
+        timestamp = data.get('timestamp', None)
         if timestamp is None:
             str_time = 'None'
         else:
