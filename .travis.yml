@@ -11,7 +11,9 @@ install:
   - pip install --disable-pip-version-check --upgrade pip
   - pip install -r requirements.txt
   - pip install python-coveralls
+  - pip install codacy-coverage
 script:
-  - python -m pytest --cov=sensormesh
+  - python -m pytest --cov=sensormesh --cov-report term --cov-report xml
 after_success:
   - coveralls
+  - python-codacy-coverage -r coverage.xml

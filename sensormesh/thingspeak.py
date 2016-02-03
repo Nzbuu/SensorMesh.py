@@ -8,7 +8,7 @@ from .base import DataTarget
 from .exceptions import ConfigurationError
 
 
-class ThingSpeakApi:
+class ThingSpeakApi(object):
     def __init__(self, key=None, channel=None, base_url='https://api.thingspeak.com'):
         super().__init__()
         self._base_url = base_url
