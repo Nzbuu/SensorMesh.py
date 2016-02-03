@@ -43,3 +43,35 @@ class DataSourceWrapper(DataSource):
     def read(self):
         data = {k: v() for k, v in self._dict.items()}
         return data
+
+
+class DataAdapter(object):
+    def __init__(self, feeds=None):
+        super().__init__()
+
+        self._local_names = {}
+        self._remote_names = {}
+        if feeds:
+            self.add_field(**feeds)
+
+    def add_field(self, **kwargs):
+        for remote_name, local_name in kwargs.items():
+            if local_name in self._remote_names:
+                remote_old = self._remote_names[local_name]
+                del self._local_names[remote_old]
+
+            if remote_name in self._local_names:
+                local_old = self._local_names[remote_name]
+                del self._remote_names[local_old]
+
+            self._local_names[remote_name] = local_name
+            self._remote_names[local_name] = remote_name
+
+    def parse_local(self, local_data):
+        return self._rename_fields(local_data, self._remote_names)
+
+    def parse_remote(self, remote_data):
+        return self._rename_fields(remote_data, self._local_names)
+
+    def _rename_fields(self, data, names):
+        return {names[k]: data[k] for k in names if k in data}

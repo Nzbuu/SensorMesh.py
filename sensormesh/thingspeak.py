@@ -3,8 +3,8 @@ from datetime import datetime
 import requests
 import dateutil.parser
 
-from .base import DataSource
-from .base import DataTarget
+from .base import DataSource, DataAdapter
+from .rest import RestTarget
 from .exceptions import ConfigurationError
 
 
@@ -15,7 +15,7 @@ class ThingSpeakApi(object):
         self._key = key
         self._channel = channel
 
-    def get_last(self):
+    def get_data(self):
         if not self._channel:
             raise ConfigurationError()
 
@@ -53,7 +53,29 @@ class ThingSpeakApi(object):
             return None
 
 
-class ThingSpeakEndpoint(DataSource, DataTarget):
+class ThingSpeakLogger(RestTarget):
+    def __init__(self, name='', feeds=None, api=None, **kwargs):
+        if api is None:
+            api = ThingSpeakApi(**kwargs)
+        elif kwargs:
+            raise ValueError("Additional keyword inputs are forbidden when using API input")
+
+        super().__init__(name=name, api=api)
+
+        self._adapter = DataAdapter(feeds)
+
+    def _prepare_update(self, data):
+        content = self._adapter.parse_local(data)
+
+        if 'timestamp' in data and data['timestamp']:
+            timestamp = data['timestamp']
+            ts = datetime.fromtimestamp(timestamp)
+            content['created_at'] = ts.isoformat()
+
+        return content
+
+
+class ThingSpeakSource(DataSource):
     def __init__(self, name='', feeds=None, api=None, **kwargs):
         super().__init__(name=name)
 
@@ -63,38 +85,14 @@ class ThingSpeakEndpoint(DataSource, DataTarget):
             raise ValueError("Additional keyword inputs are forbidden when using API input")
         self._api = api
 
-        self._feeds = {}
-        if feeds:
-            self.add_field(**feeds)
+        self._adapter = DataAdapter(feeds)
 
-    def add_field(self, **kwargs):
-        for field, feed in kwargs.items():
-            self._feeds[field] = feed
-
-
-class ThingSpeakLogger(ThingSpeakEndpoint):
-    def update(self, data):
-        content = self._prepare_update(data)
-        self._api.post_update(content)
-
-    def _prepare_update(self, data):
-        values = {field: data[feed] for field, feed in self._feeds.items() if feed in data}
-
-        if 'timestamp' in data and data['timestamp']:
-            timestamp = data['timestamp']
-            ts = datetime.fromtimestamp(timestamp)
-            values['created_at'] = ts.isoformat()
-
-        return values
-
-
-class ThingSpeakSource(ThingSpeakEndpoint):
     def read(self):
-        content = self._api.get_last()
+        content = self._api.get_data()
         return self._parse_feed(content)
 
     def _parse_feed(self, content):
-        data = {feed: content[field] for field, feed in self._feeds.items() if field in content}
+        data = self._adapter.parse_remote(content)
 
         if 'timestamp' not in data:
             ts = dateutil.parser.parse(content['created_at'])

@@ -12,15 +12,9 @@ class TestThingSpeakSource:
         obj = ThingSpeakSource(name='Test Source')
         assert obj.name == 'Test Source'
 
-    def test_default_key_is_none(self):
-        obj = ThingSpeakSource()
-        assert obj._api._get_key(write=False) is None
-
     def test_can_configure_key(self):
-        obj = ThingSpeakSource(
-                key='ABCDEFGHIJKLMNOPQRST'
-        )
-        assert obj._api._get_key(write=False) == 'ABCDEFGHIJKLMNOPQRST'
+        obj = ThingSpeakSource(key='ABCDEFGHIJKLMNOPQRST')
+        assert obj._api._key == 'ABCDEFGHIJKLMNOPQRST'
 
     def test_can_inject_api(self):
         api = Mock(spec=ThingSpeakApi)
@@ -33,65 +27,24 @@ class TestThingSpeakSource:
         with pytest.raises(ValueError):
             obj = ThingSpeakSource(api=api, key='ABCDEFGHIJ')
 
-    @responses.mock.activate
-    def test_cannot_read_without_channel(self):
+    def test_can_read_with_api(self):
+        mock_api = Mock()
+        mock_api.get_data.return_value = canned_responses['last.json']
+
         obj = ThingSpeakSource(
-                key='ABCDEFGHIJKLMNOPQRST',
+                api=mock_api,
                 feeds={'field1': 'Server Temp'}
         )
 
-        with responses.RequestsMock() as r_mock:
-            with pytest.raises(ConfigurationError):
-                data = obj.read()
+        data = obj.read()
 
-            assert len(r_mock.calls) == 0
+        assert mock_api.get_data.call_count == 1
+        mock_api.get_data.assert_called_with()
 
-    @responses.mock.activate
-    def test_can_read_data_from_url(self):
-        obj = ThingSpeakSource(
-                channel=3,
-                key='ABCDEFGHIJKLMNOPQRST',
-                feeds={'field1': 'Server Temp'}
-        )
-
-        with responses.RequestsMock() as r_mock:
-            r_mock.add(
-                    r_mock.GET,
-                    'https://api.thingspeak.com/channels/3/feed/last.json',
-                    json=canned_responses['https://api.thingspeak.com/channels/3/feed/last.json']
-            )
-            data = obj.read()
-
-            assert len(r_mock.calls) == 1
-            the_request = r_mock.calls[0].request
-            assert the_request.url == 'https://api.thingspeak.com/channels/3/feed/last.json'
-            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ABCDEFGHIJKLMNOPQRST'
-
-        assert data['timestamp'] == 1453927930
-        assert data['Server Temp'] == '58.5 F'
-
-    @responses.mock.activate
-    def test_can_read_data_without_key(self):
-        obj = ThingSpeakSource(
-                channel=3,
-                feeds={'field1': 'Server Temp'}
-        )
-
-        with responses.RequestsMock() as r_mock:
-            r_mock.add(
-                    r_mock.GET,
-                    'https://api.thingspeak.com/channels/3/feed/last.json',
-                    json=canned_responses['https://api.thingspeak.com/channels/3/feed/last.json']
-            )
-            data = obj.read()
-
-            assert len(r_mock.calls) == 1
-            the_request = r_mock.calls[0].request
-            assert the_request.url == 'https://api.thingspeak.com/channels/3/feed/last.json'
-            assert 'X-THINGSPEAKAPIKEY' not in the_request.headers
-
-        assert data['timestamp'] == 1453927930
-        assert data['Server Temp'] == '58.5 F'
+        assert data == {
+            'timestamp': 1453927930,
+            'Server Temp': '58.5 F',
+        }
 
 
 class TestThingSpeakLogger:
@@ -101,7 +54,7 @@ class TestThingSpeakLogger:
 
     def test_can_configure_key(self):
         obj = ThingSpeakLogger(key='ZYXWVUTSRQP0987654321')
-        assert obj._api._get_key(write=True) == 'ZYXWVUTSRQP0987654321'
+        assert obj._api._key == 'ZYXWVUTSRQP0987654321'
 
     def test_can_inject_api(self):
         api = Mock(spec=ThingSpeakApi)
@@ -114,52 +67,164 @@ class TestThingSpeakLogger:
         with pytest.raises(ValueError):
             obj = ThingSpeakLogger(api=api, key='ZYXWVUTSRQP0987654321')
 
-    @responses.mock.activate
-    def test_cannot_update_without_key(self):
+    def test_can_update_with_api(self):
+        mock_api = Mock()
+        mock_api.post_update.return_value = canned_responses['update.json']
+
         obj = ThingSpeakLogger(
-                channel=3,
+                api=mock_api,
                 feeds={'field1': 'Server Temp'}
+        )
+
+        data = {
+            'timestamp': 1453927940,
+            'Server Temp': '60.0 F',
+        }
+        obj.update(data)
+
+        assert mock_api.post_update.call_count == 1
+        mock_api.post_update.assert_called_with({
+            "created_at": "2016-01-27T20:52:20", "field1": "60.0 F"})
+
+
+class TestThingSpeakApi:
+    def test_default_properties(self):
+        api = ThingSpeakApi()
+        assert api._key is None
+        assert api._channel is None
+        assert api._base_url == 'https://api.thingspeak.com'
+
+    def test_can_configure_properties(self):
+        api = ThingSpeakApi(
+                key='ABCDEFGHIJ1234567890',
+                channel=700,
+                base_url='https://api.example.com:6666'
+        )
+        assert api._key == 'ABCDEFGHIJ1234567890'
+        assert api._channel == 700
+        assert api._base_url == 'https://api.example.com:6666'
+
+    def test_can_get_data_with_url(self):
+        api = ThingSpeakApi(
+                key='ABCDEFGHIJKLMNOPQRST',
+                channel=666,
+                base_url='https://api.example.com:6666'
+        )
+
+        with responses.RequestsMock() as r_mock:
+            r_mock.add(
+                    r_mock.GET,
+                    'https://api.example.com:6666/channels/666/feed/last.json',
+                    json=canned_responses['last.json']
+            )
+            data = api.get_data()
+
+            assert len(r_mock.calls) == 1
+            the_request = r_mock.calls[0].request
+            assert the_request.url == 'https://api.example.com:6666/channels/666/feed/last.json'
+            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ABCDEFGHIJKLMNOPQRST'
+
+        assert data['created_at'] == '2016-01-27T20:52:10Z'
+        assert data['field1'] == '58.5 F'
+
+    def test_cannot_get_data_without_channel(self):
+        api = ThingSpeakApi(
+                key='ABCDEFGHIJKLMNOPQRST',
+                base_url='https://api.example.com:6666'
         )
 
         with responses.RequestsMock() as r_mock:
             with pytest.raises(ConfigurationError):
-                obj.update({'Server Temp': 20})
+                data = api.get_data()
 
-            assert len(r_mock.calls) == 0
+        assert len(r_mock.calls) == 0
 
-    @responses.mock.activate
-    def test_send_data_to_url(self):
-        obj = ThingSpeakLogger(
-                channel=3,
-                key='ZYXWVUTSRQP0987654321',
-                feeds={'field1': 'Server Temp'}
+    def test_can_get_data_without_key(self):
+        api = ThingSpeakApi(
+                channel=666,
+                base_url='https://api.example.com:6666'
         )
 
-        data = {'timestamp': 1453927940, 'Server Temp': '60.0 F'}
+        with responses.RequestsMock() as r_mock:
+            r_mock.add(
+                    r_mock.GET,
+                    'https://api.example.com:6666/channels/666/feed/last.json',
+                    json=canned_responses['last.json']
+            )
+            data = api.get_data()
+
+            assert len(r_mock.calls) == 1
+            the_request = r_mock.calls[0].request
+            assert the_request.url == 'https://api.example.com:6666/channels/666/feed/last.json'
+            assert 'X-THINGSPEAKAPIKEY' not in the_request.headers
+
+        assert data['created_at'] == '2016-01-27T20:52:10Z'
+        assert data['field1'] == '58.5 F'
+
+    def test_can_post_update_with_url(self):
+        api = ThingSpeakApi(
+                key='ZYXWVUTSRQP0987654321',
+                channel=666,
+                base_url='https://api.example.com:6666'
+        )
+        data = {"created_at": "2016-01-27T20:52:20", "field1": "60.0 F"}
 
         with responses.RequestsMock() as r_mock:
             r_mock.add(
                     r_mock.POST,
-                    'https://api.thingspeak.com/update.json',
-                    json=canned_responses['https://api.thingspeak.com/update.json']
+                    'https://api.example.com:6666/update.json',
+                    json=canned_responses['update.json']
             )
-            obj.update(data)
+            api.post_update(data)
 
             assert len(r_mock.calls) == 1
             the_request = r_mock.calls[0].request
-            assert the_request.url == 'https://api.thingspeak.com/update.json'
+            assert the_request.url == 'https://api.example.com:6666/update.json'
             assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ZYXWVUTSRQP0987654321'
-            assert (
-                json.loads(the_request.body) ==
-                {"created_at": "2016-01-27T20:52:20", "field1": "60.0 F"})
+            assert json.loads(the_request.body) == data
+
+    def test_can_post_update_without_channel(self):
+        api = ThingSpeakApi(
+                key='ZYXWVUTSRQP0987654321',
+                base_url='https://api.example.com:6666'
+        )
+        data = {"created_at": "2016-01-27T20:52:20", "field1": "60.0 F"}
+
+        with responses.RequestsMock() as r_mock:
+            r_mock.add(
+                    r_mock.POST,
+                    'https://api.example.com:6666/update.json',
+                    json=canned_responses['update.json']
+            )
+            api.post_update(data)
+
+            assert len(r_mock.calls) == 1
+            the_request = r_mock.calls[0].request
+            assert the_request.url == 'https://api.example.com:6666/update.json'
+            assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ZYXWVUTSRQP0987654321'
+            assert json.loads(the_request.body) == data
+
+    def test_cannot_post_update_without_key(self):
+        api = ThingSpeakApi(
+                channel=666,
+                base_url='https://api.example.com:6666'
+        )
+        data = {"created_at": "2016-01-27T20:52:20", "field1": "60.0 F"}
+
+        with responses.RequestsMock() as r_mock:
+            with pytest.raises(ConfigurationError):
+                api.post_update(data)
+
+            assert len(r_mock.calls) == 0
 
 
 canned_responses = {
-    'https://api.thingspeak.com/channels/3/feed/last.json': {
+    'last.json': {
         "created_at": "2016-01-27T20:52:10Z", "entry_id": 263592, "field1": "58.5 F"
     },
-    'https://api.thingspeak.com/update.json': {
-        "created_at": "2016-01-27T20:52:20Z", "entry_id": 263593, "field1": "60.0 F",
-        "field2": None, "field3": None, "field4": None, "field5": None, "field6": None, "field7": None, "field8": None,
+    'update.json': {
+        "created_at": "2016-01-27T20:52:20Z", "entry_id": 263593,
+        "field1": "60.0 F", "field2": None, "field3": None, "field4": None,
+        "field5": None, "field6": None, "field7": None, "field8": None,
     },
 }
