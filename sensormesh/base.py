@@ -56,6 +56,14 @@ class DataAdapter(object):
 
     def add_field(self, **kwargs):
         for remote_name, local_name in kwargs.items():
+            if local_name in self._remote_names:
+                remote_old = self._remote_names[local_name]
+                del self._local_names[remote_old]
+
+            if remote_name in self._local_names:
+                local_old = self._local_names[remote_name]
+                del self._remote_names[local_old]
+
             self._local_names[remote_name] = local_name
             self._remote_names[local_name] = remote_name
 
