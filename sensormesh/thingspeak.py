@@ -15,7 +15,7 @@ class ThingSpeakApi(object):
         self._key = key
         self._channel = channel
 
-    def get_last(self):
+    def get_data(self):
         if not self._channel:
             raise ConfigurationError()
 
@@ -88,7 +88,7 @@ class ThingSpeakSource(DataSource):
         self._adapter = DataAdapter(feeds)
 
     def read(self):
-        content = self._api.get_last()
+        content = self._api.get_data()
         return self._parse_feed(content)
 
     def _parse_feed(self, content):
