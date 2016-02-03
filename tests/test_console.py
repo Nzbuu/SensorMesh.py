@@ -33,9 +33,9 @@ class TestConsoleDisplay:
 
         with patch("builtins.print", autospec=True) as mock_print:
             t.update(data)
-            mock_print.assert_called_once_with('2016-01-27T20:52:20', ':', {'value1': 1, 'value2': 'kevin'})
+            mock_print.assert_called_once_with('2016-01-27T20:52:20', ':', {'value': 1})
 
             # Check second call is not missing data
             mock_print.reset_mock()
             t.update(data)
-            mock_print.assert_called_once_with('2016-01-27T20:52:20', ':', {'value1': 1, 'value2': 'kevin'})
+            mock_print.assert_called_once_with('2016-01-27T20:52:20', ':', {'value': 1})
