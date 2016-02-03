@@ -7,7 +7,7 @@ class TestConsoleDisplay:
     def test_can_create_target(self):
         with patch("builtins.print", autospec=True) as mock_print:
             t = ConsoleDisplay()
-            mock_print.assert_not_called()
+            assert not mock_print.called
 
     def test_update_one_value_no_timestamp(self):
         t = ConsoleDisplay()
