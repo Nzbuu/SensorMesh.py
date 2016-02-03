@@ -16,7 +16,7 @@ class TestRestTarget:
         o = RestTarget(api=mock_api)
         assert o._api is mock_api
 
-    def test_update_without_api_throws(self):
+    def test_cannot_update_without_api(self):
         o = RestTarget()
         with pytest.raises(ConfigurationError):
             o.update({'value': 1})
