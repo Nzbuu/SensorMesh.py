@@ -1,3 +1,6 @@
+import json
+from unittest.mock import Mock
+
 import pytest
 import responses
 
@@ -18,6 +21,30 @@ class TestThingSpeakSource:
                 key='ABCDEFGHIJKLMNOPQRST'
         )
         assert obj._api._get_key(write=False) == 'ABCDEFGHIJKLMNOPQRST'
+
+    def test_can_inject_api(self):
+        api = Mock(spec=ThingSpeakApi)
+        api._key = 'ABCDEFGHIJKLMNOPQRST'
+        obj = ThingSpeakLogger(api=api)
+        assert obj._api is api
+
+    def test_throws_with_api_and_keywords(self):
+        api = Mock(spec=ThingSpeakApi)
+        with pytest.raises(ValueError):
+            obj = ThingSpeakSource(api=api, key='ABCDEFGHIJ')
+
+    @responses.mock.activate
+    def test_cannot_read_without_channel(self):
+        obj = ThingSpeakSource(
+                key='ABCDEFGHIJKLMNOPQRST',
+                feeds={'field1': 'Server Temp'}
+        )
+
+        with responses.RequestsMock() as r_mock:
+            with pytest.raises(ConfigurationError):
+                data = obj.read()
+
+            assert len(r_mock.calls) == 0
 
     @responses.mock.activate
     def test_can_read_data_from_url(self):
@@ -72,14 +99,33 @@ class TestThingSpeakLogger:
         obj = ThingSpeakLogger(name='Test Logger')
         assert obj.name == 'Test Logger'
 
-    def test_no_key_is_error(self):
-        obj = ThingSpeakLogger()
-        with pytest.raises(ConfigurationError):
-            obj._api._get_key(write=True)
-
     def test_can_configure_key(self):
         obj = ThingSpeakLogger(key='ZYXWVUTSRQP0987654321')
         assert obj._api._get_key(write=True) == 'ZYXWVUTSRQP0987654321'
+
+    def test_can_inject_api(self):
+        api = Mock(spec=ThingSpeakApi)
+        api._key = 'ZYXWVUTSRQP0987654321'
+        obj = ThingSpeakLogger(api=api)
+        assert obj._api is api
+
+    def test_throws_with_api_and_keywords(self):
+        api = Mock(spec=ThingSpeakApi)
+        with pytest.raises(ValueError):
+            obj = ThingSpeakLogger(api=api, key='ZYXWVUTSRQP0987654321')
+
+    @responses.mock.activate
+    def test_cannot_update_without_key(self):
+        obj = ThingSpeakLogger(
+                channel=3,
+                feeds={'field1': 'Server Temp'}
+        )
+
+        with responses.RequestsMock() as r_mock:
+            with pytest.raises(ConfigurationError):
+                obj.update({'Server Temp': 20})
+
+            assert len(r_mock.calls) == 0
 
     @responses.mock.activate
     def test_send_data_to_url(self):

@@ -1,4 +1,5 @@
 import time
+import json
 
 from .exceptions import ConfigurationError
 
@@ -68,3 +69,9 @@ class App(object):
 
         for l in self._targets:
             l.update(data)
+
+
+def load_config_file(filename):
+    with open(filename) as cfg_file:
+        cfg_data = json.load(cfg_file)
+    return cfg_data
