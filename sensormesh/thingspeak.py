@@ -3,7 +3,8 @@ from datetime import datetime
 import requests
 import dateutil.parser
 
-from .base import DataSource, DataTarget, DataAdapter
+from .base import DataSource, DataAdapter
+from .rest import RestTarget
 from .exceptions import ConfigurationError
 
 
@@ -52,21 +53,16 @@ class ThingSpeakApi(object):
             return None
 
 
-class ThingSpeakLogger(DataTarget):
+class ThingSpeakLogger(RestTarget):
     def __init__(self, name='', feeds=None, api=None, **kwargs):
-        super().__init__(name=name)
-
         if api is None:
             api = ThingSpeakApi(**kwargs)
         elif kwargs:
             raise ValueError("Additional keyword inputs are forbidden when using API input")
-        self._api = api
+
+        super().__init__(name=name, api=api)
 
         self._adapter = DataAdapter(feeds)
-
-    def update(self, data):
-        content = self._prepare_update(data)
-        self._api.post_update(content)
 
     def _prepare_update(self, data):
         content = self._adapter.parse_local(data)
