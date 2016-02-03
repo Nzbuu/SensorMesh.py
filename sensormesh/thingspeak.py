@@ -53,15 +53,9 @@ class ThingSpeakApi(object):
             return None
 
 
-class ThingSpeakEndpoint(DataSource, DataTarget):
-    def __init__(self, name='', feeds=None, api=None, **kwargs):
-        super().__init__(name=name)
-
-        if api is None:
-            api = ThingSpeakApi(**kwargs)
-        elif kwargs:
-            raise ValueError("Additional keyword inputs are forbidden when using API input")
-        self._api = api
+class ThingSpeakEndpoint(object):
+    def __init__(self, feeds=None, **kwargs):
+        super().__init__(**kwargs)
 
         self._feeds = {}
         if feeds:
@@ -72,7 +66,16 @@ class ThingSpeakEndpoint(DataSource, DataTarget):
             self._feeds[field] = feed
 
 
-class ThingSpeakLogger(ThingSpeakEndpoint):
+class ThingSpeakLogger(ThingSpeakEndpoint, DataTarget):
+    def __init__(self, name='', feeds=None, api=None, **kwargs):
+        super().__init__(name=name, feeds=feeds)
+
+        if api is None:
+            api = ThingSpeakApi(**kwargs)
+        elif kwargs:
+            raise ValueError("Additional keyword inputs are forbidden when using API input")
+        self._api = api
+
     def update(self, data):
         content = self._prepare_update(data)
         self._api.post_update(content)
@@ -88,7 +91,16 @@ class ThingSpeakLogger(ThingSpeakEndpoint):
         return values
 
 
-class ThingSpeakSource(ThingSpeakEndpoint):
+class ThingSpeakSource(ThingSpeakEndpoint, DataSource):
+    def __init__(self, name='', feeds=None, api=None, **kwargs):
+        super().__init__(name=name, feeds=feeds)
+
+        if api is None:
+            api = ThingSpeakApi(**kwargs)
+        elif kwargs:
+            raise ValueError("Additional keyword inputs are forbidden when using API input")
+        self._api = api
+
     def read(self):
         content = self._api.get_last()
         return self._parse_feed(content)
