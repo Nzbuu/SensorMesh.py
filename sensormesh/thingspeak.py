@@ -9,7 +9,8 @@ from .exceptions import ConfigurationError
 
 
 class ThingSpeakApi(object):
-    def __init__(self, key=None, channel=None, base_url='https://api.thingspeak.com'):
+    def __init__(self, key=None, channel=None,
+                 base_url='https://api.thingspeak.com'):
         super().__init__()
         self._base_url = base_url
         self._key = key
@@ -22,7 +23,8 @@ class ThingSpeakApi(object):
         headers = self._prepare_headers(write=False)
 
         # Fetch data from ThingSpeak
-        url = self._base_url + '/channels/' + str(self._channel) + '/feed/last.json'
+        url = (self._base_url + '/channels/' + str(self._channel) +
+               '/feed/last.json')
         response = requests.get(url, headers=headers)
         response.raise_for_status()
 
@@ -58,7 +60,9 @@ class ThingSpeakLogger(RestTarget):
         if api is None:
             api = ThingSpeakApi(**kwargs)
         elif kwargs:
-            raise ValueError("Additional keyword inputs are forbidden when using API input")
+            raise ValueError(
+                    "Additional keyword inputs are forbidden when using "
+                    "API input")
 
         super().__init__(name=name, api=api)
 
@@ -82,7 +86,9 @@ class ThingSpeakSource(DataSource):
         if api is None:
             api = ThingSpeakApi(**kwargs)
         elif kwargs:
-            raise ValueError("Additional keyword inputs are forbidden when using API input")
+            raise ValueError(
+                    "Additional keyword inputs are forbidden when using "
+                    "API input")
         self._api = api
 
         self._adapter = DataAdapter(feeds)

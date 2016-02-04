@@ -64,10 +64,12 @@ class DataAdapter(object):
                     # already have remote_name <-> local_name
                     pass
                 else:
-                    # already have remote_name but doesn't correspond to local_name
+                    # already have remote_name but doesn't correspond to
+                    # local_name
                     raise KeyError('Local and Remote names must be unique.')
             elif local_name in self._remote_names:
-                    # already have local_name but doesn't correspond to remote_name
+                    # already have local_name but doesn't correspond to
+                    # remote_name
                 raise KeyError('Local and Remote names must be unique.')
             else:
                 self._local_names[remote_name] = local_name
