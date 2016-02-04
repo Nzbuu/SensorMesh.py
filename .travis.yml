@@ -1,19 +1,26 @@
 sudo: false
+
 language: python
+
 python:
-  - 3.4
   - 3.5
+  - 3.4
   - pypy3
+
 matrix:
   allow_failures:
     - python: pypy3 # Currently only Python 3.2.5 compatible
+
 install:
   - pip install --disable-pip-version-check --upgrade pip
   - pip install -r requirements.txt
-  - pip install python-coveralls
-  - pip install codacy-coverage
+
 script:
   - python -m pytest --cov=sensormesh --cov-report term --cov-report xml
+
 after_success:
+  - pip install python-coveralls
   - coveralls
+
+  - pip install codacy-coverage
   - python-codacy-coverage -r coverage.xml
