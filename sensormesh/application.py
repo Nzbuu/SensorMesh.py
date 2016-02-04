@@ -4,7 +4,7 @@ import json
 from .exceptions import ConfigurationError
 
 
-class App(object):
+class Controller(object):
     def __init__(self, name="SensorMesh", timefcn=None, delayfcn=None):
         self.name = name
         self._source = None

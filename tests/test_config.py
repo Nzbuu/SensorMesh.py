@@ -2,7 +2,7 @@ from unittest.mock import patch, mock_open
 import json
 import builtins
 
-from sensormesh.applications import load_config_file
+from sensormesh.application import load_config_file
 
 
 class TestConfig:

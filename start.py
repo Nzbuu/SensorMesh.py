@@ -1,12 +1,12 @@
 import random
 
-from sensormesh.applications import App, load_config_file
+from sensormesh.application import Controller, load_config_file
 from sensormesh.base import DataSourceWrapper
 from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 
 # Configure App
-app = App()
+app = Controller()
 app.set_steps(step=20, num_steps=5)
 
 # Source
