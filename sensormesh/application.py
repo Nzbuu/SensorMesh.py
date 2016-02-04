@@ -79,9 +79,9 @@ class ConfigManager(object):
         }
 
     def load_config_file(self, filename):
-        _, fileext = os.path.split(filename)
+        _, fileext = os.path.splitext(filename)
         load_fcn = self._map[fileext]
-        load_fcn(filename)
+        return load_fcn(filename)
 
     def load_json_file(self, filename):
         with open(filename) as cfg_file:
