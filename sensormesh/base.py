@@ -56,16 +56,19 @@ class DataAdapter(object):
 
     def add_field(self, **kwargs):
         for remote_name, local_name in kwargs.items():
-            if local_name in self._remote_names:
-                remote_old = self._remote_names[local_name]
-                del self._local_names[remote_old]
-
             if remote_name in self._local_names:
-                local_old = self._local_names[remote_name]
-                del self._remote_names[local_old]
-
-            self._local_names[remote_name] = local_name
-            self._remote_names[local_name] = remote_name
+                if self._local_names[remote_name] == local_name:
+                    # already have remote_name <-> local_name
+                    pass
+                else:
+                    # already have remote_name but doesn't correspond to local_name
+                    raise KeyError('Local and Remote names must be unique.')
+            elif local_name in self._remote_names:
+                    # already have local_name but doesn't correspond to remote_name
+                raise KeyError('Local and Remote names must be unique.')
+            else:
+                self._local_names[remote_name] = local_name
+                self._remote_names[local_name] = remote_name
 
     def parse_local(self, local_data):
         return self._rename_fields(local_data, self._remote_names)
