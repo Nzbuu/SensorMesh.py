@@ -56,6 +56,9 @@ class DataAdapter(object):
 
     def add_field(self, **kwargs):
         for remote_name, local_name in kwargs.items():
+            if not remote_name or not local_name:
+                raise ValueError('Inputs must be non-empty strings')
+
             if remote_name in self._local_names:
                 if self._local_names[remote_name] == local_name:
                     # already have remote_name <-> local_name
