@@ -1,3 +1,5 @@
+import pytest
+
 from sensormesh.base import DataAdapter
 
 
@@ -19,19 +21,25 @@ class TestDataAdapter:
         assert o._local_names == {'r1': 'l1', 'r2': 'l2'}
         assert o._remote_names == {'l1': 'r1', 'l2': 'r2'}
 
-    def test_can_change_local_name(self):
+    def test_cannot_add_empty_local_name(self):
+        with pytest.raises(ValueError):
+            o = DataAdapter(feeds={'a': ''})
+
+    def test_cannot_add_empty_remote_name(self):
+        with pytest.raises(ValueError):
+            o = DataAdapter(feeds={'': 'a'})
+
+    def test_cannot_duplicate_remote_name(self):
         o = DataAdapter(feeds={'r': 'l2'})
-        o.add_field(r='l1')
-        assert o._local_names == {'r': 'l1'}
-        assert o._remote_names == {'l1': 'r'}
+        with pytest.raises(KeyError):
+            o.add_field(r='l1')
 
-    def test_can_change_remote_name(self):
+    def test_cannot_duplicate_local_name(self):
         o = DataAdapter(feeds={'r2': 'l'})
-        o.add_field(r1='l')
-        assert o._local_names == {'r1': 'l'}
-        assert o._remote_names == {'l': 'r1'}
+        with pytest.raises(KeyError):
+            o.add_field(r1='l')
 
-    def test_can_duplicate_entry(self):
+    def test_can_duplicate_whole_entry(self):
         o = DataAdapter(feeds={'r': 'l'})
         o.add_field(r='l')
         assert o._local_names == {'r': 'l'}
