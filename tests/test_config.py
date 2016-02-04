@@ -23,10 +23,13 @@ class TestConfigManager:
         assert cfg_data == test_data
 
     def test_selects_correct_loader(self):
+        mock_test = Mock(return_value={})
+        mock_cnfg = Mock(return_value={})
+
         cfg_man = ConfigManager()
-        mock_load = Mock(return_value={})
-        cfg_man._map['.test'] = mock_load
-        cfg_data = cfg_man.load_config_file('/folder/config.test')
+        cfg_man._map = {'.test': mock_test, '.cnfg': mock_cnfg}
+        cfg_data = cfg_man.load_config_file('/folder/config.cnfg')
 
         assert cfg_data == {}
-        mock_load.assert_called_once_with('/folder/config.test')
+        mock_cnfg.assert_called_once_with('/folder/config.cnfg')
+        assert not mock_test.called
