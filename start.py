@@ -1,12 +1,15 @@
 import random
 
-from sensormesh.applications import App, load_config_file
+from sensormesh.application import Controller, ConfigManager
 from sensormesh.base import DataSourceWrapper
 from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 
+# Configuration loader class
+cfg_man = ConfigManager()
+
 # Configure App
-app = App()
+app = Controller()
 app.set_steps(step=20, num_steps=5)
 
 # Source
@@ -18,7 +21,7 @@ t = ConsoleDisplay()
 app.add_target(t)
 
 # Target 2
-tsl_config = load_config_file('thingspeak.json')
+tsl_config = cfg_man.load_config_file('thingspeak.json')
 t = ThingSpeakLogger(**tsl_config)
 app.add_target(t)
 

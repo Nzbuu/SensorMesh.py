@@ -1,10 +1,11 @@
+import os.path
 import time
 import json
 
 from .exceptions import ConfigurationError
 
 
-class App(object):
+class Controller(object):
     def __init__(self, name="SensorMesh", timefcn=None, delayfcn=None):
         self.name = name
         self._source = None
@@ -71,7 +72,18 @@ class App(object):
             l.update(data)
 
 
-def load_config_file(filename):
-    with open(filename) as cfg_file:
-        cfg_data = json.load(cfg_file)
-    return cfg_data
+class ConfigManager(object):
+    def __init__(self):
+        self._map = {
+            '.json': self.load_json_file,
+        }
+
+    def load_config_file(self, filename):
+        _, fileext = os.path.splitext(filename)
+        load_fcn = self._map[fileext]
+        return load_fcn(filename)
+
+    def load_json_file(self, filename):
+        with open(filename) as cfg_file:
+            cfg_data = json.load(cfg_file)
+        return cfg_data
