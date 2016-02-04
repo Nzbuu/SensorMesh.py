@@ -1,4 +1,4 @@
-from unittest.mock import patch, mock_open
+from unittest.mock import patch, mock_open, Mock
 import json
 import builtins
 
@@ -21,3 +21,15 @@ class TestConfigManager:
             cfg_data = cfg_man.load_config_file('config.json')
 
         assert cfg_data == test_data
+
+    def test_selects_correct_loader(self):
+        mock_test = Mock(return_value={})
+        mock_cnfg = Mock(return_value={})
+
+        cfg_man = ConfigManager()
+        cfg_man._map = {'.test': mock_test, '.cnfg': mock_cnfg}
+        cfg_data = cfg_man.load_config_file('/folder/config.cnfg')
+
+        assert cfg_data == {}
+        mock_cnfg.assert_called_once_with('/folder/config.cnfg')
+        assert not mock_test.called

@@ -1,4 +1,5 @@
 from datetime import datetime
+from string import Template
 
 import requests
 import dateutil.parser
@@ -9,20 +10,39 @@ from .exceptions import ConfigurationError
 
 
 class ThingSpeakApi(object):
-    def __init__(self, key=None, channel=None, base_url='https://api.thingspeak.com'):
+    def __init__(self, key=None, channel=None,
+                 base_url='https://api.thingspeak.com'):
         super().__init__()
-        self._base_url = base_url
-        self._key = key
-        self._channel = channel
+        self._props = {
+            'base_url': base_url,
+            'key': key,
+            'channel': channel,
+        }
+        self._templates = {
+            'update': Template(r'$base_url/update.json'),
+            'last': Template(r'$base_url/channels/$channel/feed/last.json'),
+        }
+
+    @property
+    def base_url(self):
+        return self._props['base_url']
+
+    @property
+    def key(self):
+        return self._props['key']
+
+    @property
+    def channel(self):
+        return self._props['channel']
 
     def get_data(self):
-        if not self._channel:
+        if not self.channel:
             raise ConfigurationError()
 
         headers = self._prepare_headers(write=False)
 
         # Fetch data from ThingSpeak
-        url = self._base_url + '/channels/' + str(self._channel) + '/feed/last.json'
+        url = self._get_url('last')
         response = requests.get(url, headers=headers)
         response.raise_for_status()
 
@@ -32,9 +52,13 @@ class ThingSpeakApi(object):
         headers = self._prepare_headers(write=True)
 
         # Send data to ThingSpeak
-        url = self._base_url + '/update.json'
+        url = self._get_url('update')
         response = requests.post(url, headers=headers, json=content)
         response.raise_for_status()
+
+    def _get_url(self, name):
+        t = self._templates[name]
+        return t.substitute(self._props)
 
     def _prepare_headers(self, write=False):
         key = self._get_key(write=write)
@@ -45,8 +69,8 @@ class ThingSpeakApi(object):
         return headers
 
     def _get_key(self, write=False):
-        if self._key:
-            return self._key
+        if self.key:
+            return self.key
         elif write:
             raise ConfigurationError()
         else:
@@ -58,7 +82,9 @@ class ThingSpeakLogger(RestTarget):
         if api is None:
             api = ThingSpeakApi(**kwargs)
         elif kwargs:
-            raise ValueError("Additional keyword inputs are forbidden when using API input")
+            raise ValueError(
+                    "Additional keyword inputs are forbidden when using "
+                    "API input")
 
         super().__init__(name=name, api=api)
 
@@ -82,7 +108,9 @@ class ThingSpeakSource(DataSource):
         if api is None:
             api = ThingSpeakApi(**kwargs)
         elif kwargs:
-            raise ValueError("Additional keyword inputs are forbidden when using API input")
+            raise ValueError(
+                    "Additional keyword inputs are forbidden when using "
+                    "API input")
         self._api = api
 
         self._adapter = DataAdapter(feeds)

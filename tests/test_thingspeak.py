@@ -14,11 +14,10 @@ class TestThingSpeakSource:
 
     def test_can_configure_key(self):
         obj = ThingSpeakSource(key='ABCDEFGHIJKLMNOPQRST')
-        assert obj._api._key == 'ABCDEFGHIJKLMNOPQRST'
+        assert obj._api.key == 'ABCDEFGHIJKLMNOPQRST'
 
     def test_can_inject_api(self):
         api = Mock(spec=ThingSpeakApi)
-        api._key = 'ABCDEFGHIJKLMNOPQRST'
         obj = ThingSpeakLogger(api=api)
         assert obj._api is api
 
@@ -54,11 +53,10 @@ class TestThingSpeakLogger:
 
     def test_can_configure_key(self):
         obj = ThingSpeakLogger(key='ZYXWVUTSRQP0987654321')
-        assert obj._api._key == 'ZYXWVUTSRQP0987654321'
+        assert obj._api.key == 'ZYXWVUTSRQP0987654321'
 
     def test_can_inject_api(self):
         api = Mock(spec=ThingSpeakApi)
-        api._key = 'ZYXWVUTSRQP0987654321'
         obj = ThingSpeakLogger(api=api)
         assert obj._api is api
 
@@ -90,9 +88,9 @@ class TestThingSpeakLogger:
 class TestThingSpeakApi:
     def test_default_properties(self):
         api = ThingSpeakApi()
-        assert api._key is None
-        assert api._channel is None
-        assert api._base_url == 'https://api.thingspeak.com'
+        assert api.base_url == 'https://api.thingspeak.com'
+        assert api.key is None
+        assert api.channel is None
 
     def test_can_configure_properties(self):
         api = ThingSpeakApi(
@@ -100,9 +98,27 @@ class TestThingSpeakApi:
                 channel=700,
                 base_url='https://api.example.com:6666'
         )
-        assert api._key == 'ABCDEFGHIJ1234567890'
-        assert api._channel == 700
-        assert api._base_url == 'https://api.example.com:6666'
+        assert api.base_url == 'https://api.example.com:6666'
+        assert api.key == 'ABCDEFGHIJ1234567890'
+        assert api.channel == 700
+
+    def test_url_for_update(self):
+        api = ThingSpeakApi(
+                key='ABCDEFGHIJ1234567890',
+                channel=700,
+                base_url='https://api.example.com:6666'
+        )
+        assert (api._get_url('update') ==
+                'https://api.example.com:6666/update.json')
+
+    def test_url_for_last(self):
+        api = ThingSpeakApi(
+                key='ABCDEFGHIJ1234567890',
+                channel=700,
+                base_url='https://api.example.com:6666'
+        )
+        assert (api._get_url('last') ==
+                'https://api.example.com:6666/channels/700/feed/last.json')
 
     def test_can_get_data_with_url(self):
         api = ThingSpeakApi(
