@@ -114,7 +114,11 @@ class ThingSpeakSource(DataSource):
                     "API input")
         self._api = api
 
-        self._adapter = DataAdapter(feeds)
+        self._adapter = DataAdapter()
+        if feeds:
+            for name_remote, name_local in feeds.items():
+                self._add_field(name_local)
+                self._adapter.add_field(**{name_remote: name_local})
 
     def read(self):
         content = self._api.get_data()

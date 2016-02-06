@@ -2,6 +2,7 @@ class DataSource(object):
     def __init__(self, name=''):
         super().__init__()
         self._name = name
+        self._fields = []
 
     @property
     def name(self):
@@ -10,6 +11,13 @@ class DataSource(object):
     @name.setter
     def name(self, u):
         self._name = u
+
+    @property
+    def fields(self):
+        return self._fields
+
+    def _add_field(self, name_local):
+        self._fields.append(name_local)
 
     def read(self):
         raise NotImplementedError()
