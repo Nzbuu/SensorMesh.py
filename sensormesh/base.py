@@ -1,3 +1,4 @@
+from .utils import DataAdapter
 from .exceptions import ConfigurationError
 
 
@@ -5,7 +6,7 @@ class Base(object):
     def __init__(self, name=''):
         super().__init__()
         self._name = name
-        self._fields = []
+        self._adapter = DataAdapter()
 
     @property
     def name(self):
@@ -17,10 +18,16 @@ class Base(object):
 
     @property
     def fields(self):
-        return self._fields
+        return list(self._adapter.local_names)
 
-    def _add_field(self, name_local):
-        self._fields.append(name_local)
+    def _add_field(self, local_name, remote_name=None):
+        if not remote_name:
+            remote_name = local_name
+
+        self._adapter.add_field(
+                local_name=local_name,
+                remote_name=remote_name
+        )
 
 
 class DataSource(Base):
@@ -62,11 +69,11 @@ class DataSourceWrapper(DataSource):
     def read(self):
         if self._source:
             values = self._source()
-            if len(self._fields) == 1:
-                data = {self._fields[0]: values}
+            if len(self.fields) == 1:
+                data = {self.fields[0]: values}
             else:
                 data = {name: value
-                        for name, value in zip(self._fields, values)}
+                        for name, value in zip(self.fields, values)}
         else:
             data = {name: source() for name, source in self._dict.items()}
 

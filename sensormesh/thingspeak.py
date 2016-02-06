@@ -89,12 +89,11 @@ class ThingSpeakLogger(RestTarget):
 
         super().__init__(name=name, api=api)
 
-        self._adapter = DataAdapter()
         if feeds:
-            for name_remote, name_local in feeds.items():
-                self._add_field(name_local)
-                self._adapter.add_field(local_name=name_local,
-                                        remote_name=name_remote)
+            for remote_name, local_name in feeds.items():
+                self._add_field(
+                        local_name=local_name,
+                        remote_name=remote_name)
 
     def _prepare_update(self, data):
         content = self._adapter.create_remote_struct(data)
@@ -119,12 +118,11 @@ class ThingSpeakSource(DataSource):
                     "API input")
         self._api = api
 
-        self._adapter = DataAdapter()
         if feeds:
-            for name_remote, name_local in feeds.items():
-                self._add_field(name_local)
-                self._adapter.add_field(local_name=name_local,
-                                        remote_name=name_remote)
+            for remote_name, local_name in feeds.items():
+                self._add_field(
+                        local_name=local_name,
+                        remote_name=remote_name)
 
     def read(self):
         content = self._api.get_data()
