@@ -4,8 +4,9 @@ from string import Template
 import requests
 import dateutil.parser
 
-from .base import DataSource, DataAdapter
+from .base import DataSource
 from .rest import RestTarget
+from .utils import DataAdapter
 from .exceptions import ConfigurationError
 
 

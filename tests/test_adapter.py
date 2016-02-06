@@ -1,6 +1,6 @@
 import pytest
 
-from sensormesh.base import DataAdapter
+from sensormesh.utils import DataAdapter
 
 
 class TestDataAdapter:
