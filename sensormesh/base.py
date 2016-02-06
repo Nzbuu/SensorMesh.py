@@ -1,7 +1,7 @@
 from .exceptions import ConfigurationError
 
 
-class DataSource(object):
+class Base(object):
     def __init__(self, name=''):
         super().__init__()
         self._name = name
@@ -22,22 +22,18 @@ class DataSource(object):
     def _add_field(self, name_local):
         self._fields.append(name_local)
 
+
+class DataSource(Base):
+    def __init__(self, name=''):
+        super().__init__(name=name)
+
     def read(self):
         raise NotImplementedError()
 
 
-class DataTarget(object):
+class DataTarget(Base):
     def __init__(self, name=''):
-        super().__init__()
-        self._name = name
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, u):
-        self._name = u
+        super().__init__(name=name)
 
     def update(self, data):
         raise NotImplementedError()
