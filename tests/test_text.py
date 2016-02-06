@@ -40,7 +40,7 @@ class TestTextLogger:
         assert mock_isfile.call_count == 1
 
         assert mock_file.call_count == 1
-        mock_file.assert_called_with('temp_file.txt', 'a')
+        mock_file.assert_called_with('temp_file.txt', 'a', newline='')
 
         file_handle = mock_file()
         assert file_handle.write.call_count == 2
@@ -65,7 +65,7 @@ class TestTextLogger:
         assert mock_isfile.call_count == 1
 
         assert mock_file.call_count == 1
-        mock_file.assert_called_with('temp_file.txt', 'a')
+        mock_file.assert_called_with('temp_file.txt', 'a', newline='')
 
         file_handle = mock_file()
         assert file_handle.write.call_count == 1
@@ -87,7 +87,7 @@ class TestTextLogger:
         assert mock_isfile.call_count == 1
 
         assert mock_file.call_count == 1
-        mock_file.assert_called_with('temp_file.txt', 'a')
+        mock_file.assert_called_with('temp_file.txt', 'a', newline='')
 
         file_handle = mock_file()
         assert file_handle.write.call_count == 2
@@ -112,7 +112,7 @@ class TestTextLogger:
         assert mock_isfile.call_count == 1
 
         assert mock_file.call_count == 1
-        mock_file.assert_called_with('temp_file.txt', 'a')
+        mock_file.assert_called_with('temp_file.txt', 'a', newline='')
 
         file_handle = mock_file()
         assert file_handle.write.call_count == 2
@@ -137,7 +137,7 @@ class TestTextLogger:
         assert mock_isfile.call_count == 1
 
         assert mock_file.call_count == 1
-        mock_file.assert_called_with('temp_file.txt', 'a')
+        mock_file.assert_called_with('temp_file.txt', 'a', newline='')
 
         file_handle = mock_file()
         assert file_handle.write.call_count == 2

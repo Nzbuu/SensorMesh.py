@@ -18,7 +18,7 @@ class TextLogger(DataTarget):
         content = self._adapter.create_remote_struct(data)
 
         did_exist = os.path.isfile(self._filename)
-        with open(self._filename, 'a') as fp:
+        with open(self._filename, 'a', newline='') as fp:
             csv_file = csv.DictWriter(
                     fp,
                     fieldnames=list(self._adapter.remote_names),
