@@ -1,9 +1,20 @@
+from collections import OrderedDict
+
+
 class DataAdapter(object):
     def __init__(self):
         super().__init__()
 
-        self._remote_to_local = {}
-        self._local_to_remote = {}
+        self._remote_to_local = OrderedDict()
+        self._local_to_remote = OrderedDict()
+
+    @property
+    def local_names(self):
+        return self._local_to_remote.keys()
+
+    @property
+    def remote_names(self):
+        return self._remote_to_local.keys()
 
     def add_field(self, local_name, remote_name):
         if not remote_name or not local_name:
