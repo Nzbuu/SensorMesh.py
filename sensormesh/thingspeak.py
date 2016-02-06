@@ -6,7 +6,6 @@ import dateutil.parser
 
 from .base import DataSource
 from .rest import RestTarget
-from .utils import DataAdapter
 from .exceptions import ConfigurationError
 
 
