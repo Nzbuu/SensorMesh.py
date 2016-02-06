@@ -6,7 +6,6 @@ import dateutil.parser
 
 from .base import DataSource
 from .rest import RestTarget
-from .utils import DataAdapter
 from .exceptions import ConfigurationError
 
 
@@ -79,7 +78,7 @@ class ThingSpeakApi(object):
 
 
 class ThingSpeakLogger(RestTarget):
-    def __init__(self, name='', feeds=None, api=None, **kwargs):
+    def __init__(self, name='', feeds=None, fields=None, api=None, **kwargs):
         if api is None:
             api = ThingSpeakApi(**kwargs)
         elif kwargs:
@@ -87,17 +86,10 @@ class ThingSpeakLogger(RestTarget):
                     "Additional keyword inputs are forbidden when using "
                     "API input")
 
-        super().__init__(name=name, api=api)
-
-        self._adapter = DataAdapter()
-        if feeds:
-            for name_remote, name_local in feeds.items():
-                self._add_field(name_local)
-                self._adapter.add_field(local_name=name_local,
-                                        remote_name=name_remote)
+        super().__init__(name=name, feeds=feeds, fields=fields, api=api)
 
     def _prepare_update(self, data):
-        content = self._adapter.parse_local(data)
+        content = self._adapter.create_remote_struct(data)
 
         if 'timestamp' in data and data['timestamp']:
             timestamp = data['timestamp']
@@ -108,8 +100,8 @@ class ThingSpeakLogger(RestTarget):
 
 
 class ThingSpeakSource(DataSource):
-    def __init__(self, name='', feeds=None, api=None, **kwargs):
-        super().__init__(name=name)
+    def __init__(self, name='', feeds=None, fields=None, api=None, **kwargs):
+        super().__init__(name=name, feeds=feeds, fields=fields)
 
         if api is None:
             api = ThingSpeakApi(**kwargs)
@@ -119,19 +111,12 @@ class ThingSpeakSource(DataSource):
                     "API input")
         self._api = api
 
-        self._adapter = DataAdapter()
-        if feeds:
-            for name_remote, name_local in feeds.items():
-                self._add_field(name_local)
-                self._adapter.add_field(local_name=name_local,
-                                        remote_name=name_remote)
-
     def read(self):
         content = self._api.get_data()
         return self._parse_feed(content)
 
     def _parse_feed(self, content):
-        data = self._adapter.parse_remote(content)
+        data = self._adapter.create_local_struct(content)
 
         if 'timestamp' not in data:
             ts = dateutil.parser.parse(content['created_at'])

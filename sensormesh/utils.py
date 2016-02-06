@@ -1,9 +1,25 @@
+from collections import OrderedDict
+
+
 class DataAdapter(object):
     def __init__(self):
         super().__init__()
 
-        self._remote_to_local = {}
-        self._local_to_remote = {}
+        self._remote_to_local = OrderedDict()
+        self._local_to_remote = OrderedDict()
+        self.create_missing = False
+
+    @property
+    def count(self):
+        return len(self._remote_to_local)
+
+    @property
+    def local_names(self):
+        return self._local_to_remote.keys()
+
+    @property
+    def remote_names(self):
+        return self._remote_to_local.keys()
 
     def add_field(self, local_name, remote_name):
         if not remote_name or not local_name:
@@ -18,19 +34,22 @@ class DataAdapter(object):
                 # local_name
                 raise KeyError('Local and Remote names must be unique.')
         elif local_name in self._local_to_remote:
-                # already have local_name but doesn't correspond to
-                # remote_name
+            # already have local_name but doesn't correspond to
+            # remote_name
             raise KeyError('Local and Remote names must be unique.')
         else:
             self._remote_to_local[remote_name] = local_name
             self._local_to_remote[local_name] = remote_name
 
-    def parse_local(self, local_data):
+    def create_remote_struct(self, local_data):
         return self._rename_fields(local_data, self._local_to_remote)
 
-    def parse_remote(self, remote_data):
+    def create_local_struct(self, remote_data):
         return self._rename_fields(remote_data, self._remote_to_local)
 
     def _rename_fields(self, data, names):
-        return {names[k]: data[k] for k in names if k in data}
-
+        if self.create_missing:
+            out = {names[k]: data[k] if k in data else None for k in names}
+        else:
+            out = {names[k]: data[k] for k in names if k in data}
+        return out

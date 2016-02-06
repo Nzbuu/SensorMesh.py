@@ -8,7 +8,7 @@ from sensormesh.text import *
 class TestTextLogger:
     def test_cannot_create_without_filename(self):
         with pytest.raises(TypeError):
-            _ = TextLogger(feeds=['timestamp', 'values'])
+            _ = TextLogger(fields=['timestamp', 'values'])
 
     def test_cannot_create_without_feeds(self):
         with pytest.raises(TypeError):
@@ -18,7 +18,7 @@ class TestTextLogger:
         l = TextLogger(
                 filename='temp_logfile.txt',
                 name='CsvLogger',
-                feeds=['timestamp', 'values']
+                fields=['timestamp', 'values']
         )
         assert l.name == 'CsvLogger'
         assert l.filename == 'temp_logfile.txt'
@@ -32,7 +32,7 @@ class TestTextLogger:
             with mock.patch('builtins.open', mock_file):
                 o = TextLogger(
                         filename='temp_file.txt',
-                        feeds=['timestamp', 'value']
+                        fields=['timestamp', 'value']
                 )
                 data = {'timestamp': 100, 'value': 200}
                 o.update(data)
@@ -57,7 +57,7 @@ class TestTextLogger:
             with mock.patch('builtins.open', mock_file):
                 o = TextLogger(
                         filename='temp_file.txt',
-                        feeds=['timestamp', 'value']
+                        fields=['timestamp', 'value']
                 )
                 data = {'timestamp': 150, 'value': 250}
                 o.update(data)

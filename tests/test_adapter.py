@@ -17,6 +17,15 @@ class TestDataAdapter:
         assert o._remote_to_local == {'r1': 'l1', 'r2': 'l2'}
         assert o._local_to_remote == {'l1': 'r1', 'l2': 'r2'}
 
+    def test_names_are_ordered(self):
+        o = DataAdapter()
+        o.add_field('l5', 'r1')
+        o.add_field('l2', 'r2')
+        o.add_field('l6', 'r4')
+        o.add_field('l4', 'r3')
+        assert list(o.local_names) == ['l5', 'l2', 'l6', 'l4']
+        assert list(o.remote_names) == ['r1', 'r2', 'r4', 'r3']
+
     def test_cannot_add_empty_local_name(self):
         o = DataAdapter()
         with pytest.raises(ValueError):
@@ -52,7 +61,7 @@ class TestDataAdapter:
         o.add_field('l1', 'r1')
         o.add_field('l2', 'r2')
 
-        remote = o.parse_local({'l1': 5, 'l2': 3})
+        remote = o.create_remote_struct({'l1': 5, 'l2': 3})
         assert remote == {'r1': 5, 'r2': 3}
 
     def test_ignore_missing_local_data(self):
@@ -60,14 +69,23 @@ class TestDataAdapter:
         o.add_field('l1', 'r1')
         o.add_field('l2', 'r2')
 
-        remote = o.parse_local({'l1': 5})
+        remote = o.create_remote_struct({'l1': 5})
         assert remote == {'r1': 5}
 
-    def test_ignore_missing_local_field(self):
+    def test_create_missing_local_data_as_option(self):
+        o = DataAdapter()
+        o.create_missing = True
+        o.add_field('l1', 'r1')
+        o.add_field('l2', 'r2')
+
+        remote = o.create_remote_struct({'l1': 5})
+        assert remote == {'r1': 5, 'r2': None}
+
+    def test_ignore_extra_local_field(self):
         o = DataAdapter()
         o.add_field('l2', 'r2')
 
-        remote = o.parse_local({'l1': 5, 'l2': 3})
+        remote = o.create_remote_struct({'l1': 5, 'l2': 3})
         assert remote == {'r2': 3}
 
     def test_can_convert_remote_data(self):
@@ -75,7 +93,7 @@ class TestDataAdapter:
         o.add_field('l1', 'r1')
         o.add_field('l2', 'r2')
 
-        local = o.parse_remote({'r1': -3, 'r2': 4})
+        local = o.create_local_struct({'r1': -3, 'r2': 4})
         assert local == {'l1': -3, 'l2': 4}
 
     def test_ignore_missing_remote_data(self):
@@ -83,12 +101,21 @@ class TestDataAdapter:
         o.add_field('l1', 'r1')
         o.add_field('l2', 'r2')
 
-        local = o.parse_remote({'r1': -3})
+        local = o.create_local_struct({'r1': -3})
         assert local == {'l1': -3}
 
-    def test_ignore_missing_remote_field(self):
+    def test_create_missing_remote_data_as_option(self):
+        o = DataAdapter()
+        o.create_missing = True
+        o.add_field('l1', 'r1')
+        o.add_field('l2', 'r2')
+
+        local = o.create_local_struct({'r1': -3})
+        assert local == {'l1': -3, 'l2': None}
+
+    def test_ignore_extra_remote_field(self):
         o = DataAdapter()
         o.add_field('l2', 'r2')
 
-        local = o.parse_remote({'r1': -3, 'r2': 4})
+        local = o.create_local_struct({'r1': -3, 'r2': 4})
         assert local == {'l2': 4}
