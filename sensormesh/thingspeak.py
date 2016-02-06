@@ -97,7 +97,7 @@ class ThingSpeakLogger(RestTarget):
                                         remote_name=name_remote)
 
     def _prepare_update(self, data):
-        content = self._adapter.parse_local(data)
+        content = self._adapter.create_remote_struct(data)
 
         if 'timestamp' in data and data['timestamp']:
             timestamp = data['timestamp']
@@ -131,7 +131,7 @@ class ThingSpeakSource(DataSource):
         return self._parse_feed(content)
 
     def _parse_feed(self, content):
-        data = self._adapter.parse_remote(content)
+        data = self._adapter.create_local_struct(content)
 
         if 'timestamp' not in data:
             ts = dateutil.parser.parse(content['created_at'])

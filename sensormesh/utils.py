@@ -36,10 +36,10 @@ class DataAdapter(object):
             self._remote_to_local[remote_name] = local_name
             self._local_to_remote[local_name] = remote_name
 
-    def parse_local(self, local_data):
+    def create_remote_struct(self, local_data):
         return self._rename_fields(local_data, self._local_to_remote)
 
-    def parse_remote(self, remote_data):
+    def create_local_struct(self, remote_data):
         return self._rename_fields(remote_data, self._remote_to_local)
 
     def _rename_fields(self, data, names):
