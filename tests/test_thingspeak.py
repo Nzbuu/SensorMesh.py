@@ -1,5 +1,5 @@
 import json
-from unittest.mock import Mock
+import unittest.mock as mock
 
 import pytest
 import responses
@@ -17,17 +17,17 @@ class TestThingSpeakSource:
         assert obj._api.key == 'ABCDEFGHIJKLMNOPQRST'
 
     def test_can_inject_api(self):
-        api = Mock(spec=ThingSpeakApi)
+        api = mock.Mock(spec=ThingSpeakApi)
         obj = ThingSpeakLogger(api=api)
         assert obj._api is api
 
     def test_throws_with_api_and_keywords(self):
-        api = Mock(spec=ThingSpeakApi)
+        api = mock.Mock(spec=ThingSpeakApi)
         with pytest.raises(ValueError):
             obj = ThingSpeakSource(api=api, key='ABCDEFGHIJ')
 
     def test_can_read_with_api(self):
-        mock_api = Mock()
+        mock_api = mock.Mock()
         mock_api.get_data.return_value = canned_responses['last.json']
 
         obj = ThingSpeakSource(
@@ -56,17 +56,17 @@ class TestThingSpeakLogger:
         assert obj._api.key == 'ZYXWVUTSRQP0987654321'
 
     def test_can_inject_api(self):
-        api = Mock(spec=ThingSpeakApi)
+        api = mock.Mock(spec=ThingSpeakApi)
         obj = ThingSpeakLogger(api=api)
         assert obj._api is api
 
     def test_throws_with_api_and_keywords(self):
-        api = Mock(spec=ThingSpeakApi)
+        api = mock.Mock(spec=ThingSpeakApi)
         with pytest.raises(ValueError):
             obj = ThingSpeakLogger(api=api, key='ZYXWVUTSRQP0987654321')
 
     def test_can_update_with_api(self):
-        mock_api = Mock()
+        mock_api = mock.Mock()
         mock_api.post_update.return_value = canned_responses['update.json']
 
         obj = ThingSpeakLogger(

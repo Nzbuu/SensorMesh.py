@@ -1,7 +1,11 @@
-class DataSource(object):
+from .exceptions import ConfigurationError
+
+
+class Base(object):
     def __init__(self, name=''):
         super().__init__()
         self._name = name
+        self._fields = []
 
     @property
     def name(self):
@@ -10,76 +14,60 @@ class DataSource(object):
     @name.setter
     def name(self, u):
         self._name = u
+
+    @property
+    def fields(self):
+        return self._fields
+
+    def _add_field(self, name_local):
+        self._fields.append(name_local)
+
+
+class DataSource(Base):
+    def __init__(self, name=''):
+        super().__init__(name=name)
 
     def read(self):
         raise NotImplementedError()
 
 
-class DataTarget(object):
+class DataTarget(Base):
     def __init__(self, name=''):
-        super().__init__()
-        self._name = name
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, u):
-        self._name = u
+        super().__init__(name=name)
 
     def update(self, data):
         raise NotImplementedError()
 
 
 class DataSourceWrapper(DataSource):
-    def __init__(self, name='', *args, **kwargs):
+    def __init__(self, name='', fields=('value',), source=()):
         super().__init__(name=name)
-        if args:
-            raise ValueError()
 
-        self._dict = kwargs
+        if not source:
+            raise ConfigurationError
+
+        self._source = None
+        self._dict = {}
+
+        if callable(source):
+            self._source = source
+            for name in fields:
+                self._add_field(name)
+                self._dict[name] = None
+        else:
+            for name, src in zip(fields, source):
+                self._add_field(name)
+                self._dict[name] = src
 
     def read(self):
-        data = {k: v() for k, v in self._dict.items()}
-        return data
-
-
-class DataAdapter(object):
-    def __init__(self, feeds=None):
-        super().__init__()
-
-        self._local_names = {}
-        self._remote_names = {}
-        if feeds:
-            self.add_field(**feeds)
-
-    def add_field(self, **kwargs):
-        for remote_name, local_name in kwargs.items():
-            if not remote_name or not local_name:
-                raise ValueError('Inputs must be non-empty strings')
-
-            if remote_name in self._local_names:
-                if self._local_names[remote_name] == local_name:
-                    # already have remote_name <-> local_name
-                    pass
-                else:
-                    # already have remote_name but doesn't correspond to
-                    # local_name
-                    raise KeyError('Local and Remote names must be unique.')
-            elif local_name in self._remote_names:
-                    # already have local_name but doesn't correspond to
-                    # remote_name
-                raise KeyError('Local and Remote names must be unique.')
+        if self._source:
+            values = self._source()
+            if len(self._fields) == 1:
+                data = {self._fields[0]: values}
             else:
-                self._local_names[remote_name] = local_name
-                self._remote_names[local_name] = remote_name
+                data = {name: value
+                        for name, value in zip(self._fields, values)}
+        else:
+            data = {name: source() for name, source in self._dict.items()}
 
-    def parse_local(self, local_data):
-        return self._rename_fields(local_data, self._remote_names)
-
-    def parse_remote(self, remote_data):
-        return self._rename_fields(remote_data, self._local_names)
-
-    def _rename_fields(self, data, names):
-        return {names[k]: data[k] for k in names if k in data}
+        return data

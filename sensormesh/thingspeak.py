@@ -4,8 +4,9 @@ from string import Template
 import requests
 import dateutil.parser
 
-from .base import DataSource, DataAdapter
+from .base import DataSource
 from .rest import RestTarget
+from .utils import DataAdapter
 from .exceptions import ConfigurationError
 
 
@@ -88,7 +89,12 @@ class ThingSpeakLogger(RestTarget):
 
         super().__init__(name=name, api=api)
 
-        self._adapter = DataAdapter(feeds)
+        self._adapter = DataAdapter()
+        if feeds:
+            for name_remote, name_local in feeds.items():
+                self._add_field(name_local)
+                self._adapter.add_field(local_name=name_local,
+                                        remote_name=name_remote)
 
     def _prepare_update(self, data):
         content = self._adapter.parse_local(data)
@@ -113,7 +119,12 @@ class ThingSpeakSource(DataSource):
                     "API input")
         self._api = api
 
-        self._adapter = DataAdapter(feeds)
+        self._adapter = DataAdapter()
+        if feeds:
+            for name_remote, name_local in feeds.items():
+                self._add_field(name_local)
+                self._adapter.add_field(local_name=name_local,
+                                        remote_name=name_remote)
 
     def read(self):
         content = self._api.get_data()
