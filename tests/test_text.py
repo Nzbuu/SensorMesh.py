@@ -10,7 +10,7 @@ class TestTextLogger:
         with pytest.raises(TypeError):
             _ = TextLogger(fields=['timestamp', 'values'])
 
-    def test_cannot_create_without_feeds(self):
+    def test_cannot_create_without_fields(self):
         with pytest.raises(TypeError):
             _ = TextLogger(filename='temp_logfile.txt')
 

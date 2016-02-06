@@ -32,7 +32,7 @@ class TestThingSpeakSource:
 
         obj = ThingSpeakSource(
                 api=mock_api,
-                feeds={'field1': 'Server Temp'}
+                fields=[('Server Temp', 'field1')]
         )
 
         data = obj.read()
@@ -71,7 +71,7 @@ class TestThingSpeakLogger:
 
         obj = ThingSpeakLogger(
                 api=mock_api,
-                feeds={'field1': 'Server Temp'}
+                fields=[('Server Temp', 'field1')]
         )
 
         data = {
