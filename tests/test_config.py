@@ -1,6 +1,5 @@
 import unittest.mock as mock
 import json
-import builtins
 
 from sensormesh.application import ConfigManager
 
@@ -11,7 +10,7 @@ class TestConfigManager:
         cfg_man = ConfigManager()
 
         mock_file = mock.mock_open(read_data=json.dumps(test_data))
-        with mock.patch.object(builtins, 'open', mock_file):
+        with mock.patch('builtins.open', mock_file):
             cfg_data = cfg_man.load_config_file('config.json')
 
         assert cfg_data == test_data
@@ -21,7 +20,7 @@ class TestConfigManager:
         cfg_man = ConfigManager()
 
         mock_file = mock.mock_open(read_data=json.dumps(test_data))
-        with mock.patch.object(builtins, 'open', mock_file):
+        with mock.patch('builtins.open', mock_file):
             cfg_data = cfg_man.load_config_file('config.json')
 
         assert cfg_data == test_data
