@@ -9,6 +9,10 @@ class TextLogger(DataTarget):
         super().__init__(name=name)
         self._filename = filename
 
+    @property
+    def filename(self):
+        return self._filename
+
     def update(self, data):
         did_exist = os.path.isfile(self._filename)
         with open(self._filename, 'a') as fp:
