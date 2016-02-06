@@ -3,8 +3,8 @@ from .exceptions import ConfigurationError
 
 
 class RestTarget(DataTarget):
-    def __init__(self, name='', api=None):
-        super().__init__(name=name)
+    def __init__(self, name='', feeds=None, fields=None, api=None):
+        super().__init__(name=name, feeds=feeds, fields=fields)
         self._api = api
 
     def update(self, data):

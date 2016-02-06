@@ -3,10 +3,23 @@ from .exceptions import ConfigurationError
 
 
 class Base(object):
-    def __init__(self, name=''):
+    def __init__(self, name='', feeds=None, fields=None):
+        if feeds and fields:
+            raise TypeError('Only use one of feeds or fields')
+
         super().__init__()
         self._name = name
         self._adapter = DataAdapter()
+
+        if fields:
+            for name in fields:
+                self._adapter.add_field(name, name)
+        elif feeds:
+            for remote_name, local_name in feeds.items():
+                self._adapter.add_field(
+                        local_name=local_name,
+                        remote_name=remote_name
+                )
 
     @property
     def name(self):
@@ -31,24 +44,27 @@ class Base(object):
 
 
 class DataSource(Base):
-    def __init__(self, name=''):
-        super().__init__(name=name)
+    def __init__(self, name='', feeds=None, fields=None):
+        super().__init__(name=name, feeds=feeds, fields=fields)
 
     def read(self):
         raise NotImplementedError()
 
 
 class DataTarget(Base):
-    def __init__(self, name=''):
-        super().__init__(name=name)
+    def __init__(self, name='', feeds=None, fields=None):
+        super().__init__(name=name, feeds=feeds, fields=fields)
 
     def update(self, data):
         raise NotImplementedError()
 
 
 class DataSourceWrapper(DataSource):
-    def __init__(self, name='', fields=('value',), source=()):
-        super().__init__(name=name)
+    def __init__(self, name='', feeds=None, fields=None, source=()):
+        if not feeds and not fields:
+            fields = ['value']
+
+        super().__init__(name=name, feeds=feeds, fields=fields)
 
         if not source:
             raise ConfigurationError

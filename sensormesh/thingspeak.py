@@ -79,7 +79,7 @@ class ThingSpeakApi(object):
 
 
 class ThingSpeakLogger(RestTarget):
-    def __init__(self, name='', feeds=None, api=None, **kwargs):
+    def __init__(self, name='', feeds=None, fields=None, api=None, **kwargs):
         if api is None:
             api = ThingSpeakApi(**kwargs)
         elif kwargs:
@@ -87,13 +87,7 @@ class ThingSpeakLogger(RestTarget):
                     "Additional keyword inputs are forbidden when using "
                     "API input")
 
-        super().__init__(name=name, api=api)
-
-        if feeds:
-            for remote_name, local_name in feeds.items():
-                self._add_field(
-                        local_name=local_name,
-                        remote_name=remote_name)
+        super().__init__(name=name, feeds=feeds, fields=fields, api=api)
 
     def _prepare_update(self, data):
         content = self._adapter.create_remote_struct(data)
@@ -107,8 +101,8 @@ class ThingSpeakLogger(RestTarget):
 
 
 class ThingSpeakSource(DataSource):
-    def __init__(self, name='', feeds=None, api=None, **kwargs):
-        super().__init__(name=name)
+    def __init__(self, name='', feeds=None, fields=None, api=None, **kwargs):
+        super().__init__(name=name, feeds=feeds, fields=fields)
 
         if api is None:
             api = ThingSpeakApi(**kwargs)
@@ -117,12 +111,6 @@ class ThingSpeakSource(DataSource):
                     "Additional keyword inputs are forbidden when using "
                     "API input")
         self._api = api
-
-        if feeds:
-            for remote_name, local_name in feeds.items():
-                self._add_field(
-                        local_name=local_name,
-                        remote_name=remote_name)
 
     def read(self):
         content = self._api.get_data()
