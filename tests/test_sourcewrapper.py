@@ -10,10 +10,15 @@ class TestDataSourceWrapper:
         with pytest.raises(ConfigurationError):
             s = DataSourceWrapper(name='test_source')
 
+    def test_default_field_is_value(self):
+        m = mock.Mock(return_value=10)
+        s = DataSourceWrapper(source=m, name='test_source')
+        assert s.name == 'test_source'
+        assert s.fields == ['value']
+
     def test_can_wrap_one_callable(self):
         m = mock.Mock(return_value=10)
-        s = DataSourceWrapper(fields=['count'], source=[m], name='test_source')
-        assert s.name == 'test_source'
+        s = DataSourceWrapper(fields=['count'], source=[m])
 
         assert s.fields == ['count']
 

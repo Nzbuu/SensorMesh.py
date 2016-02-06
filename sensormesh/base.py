@@ -40,7 +40,7 @@ class DataTarget(Base):
 
 
 class DataSourceWrapper(DataSource):
-    def __init__(self, name='', fields=(), source=()):
+    def __init__(self, name='', fields=('value',), source=()):
         super().__init__(name=name)
 
         if not source:

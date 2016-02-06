@@ -13,7 +13,7 @@ app = Controller()
 app.set_steps(step=20, num_steps=5)
 
 # Source
-s = DataSourceWrapper(fields=['value'], source=random.random)
+s = DataSourceWrapper(source=random.random)
 app.add_source(s)
 
 # Target 1
