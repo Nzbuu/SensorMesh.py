@@ -13,7 +13,12 @@ class Base(object):
 
         if fields:
             for name in fields:
-                self._adapter.add_field(name, name)
+                if isinstance(name, str):
+                    self._adapter.add_field(name, name)
+                else:
+                    self._adapter.add_field(
+                            local_name=name[0],
+                            remote_name=name[1])
         elif feeds:
             for remote_name, local_name in feeds.items():
                 self._adapter.add_field(
