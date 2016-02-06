@@ -44,7 +44,7 @@ class TestTextLogger:
         with mock.patch('os.path.isfile', mock_isfile):
             with mock.patch('builtins.open', mock_file):
                 o = TextLogger(filename='temp_file.txt')
-                data = {'timestamp': 100, 'value': 200}
+                data = {'timestamp': 150, 'value': 250}
                 o.update(data)
 
         assert mock_isfile.call_count == 1
@@ -54,4 +54,4 @@ class TestTextLogger:
 
         file_handle = mock_file()
         assert file_handle.write.call_count == 1
-        file_handle.write.assert_called_with('100,200' + os.linesep)
+        file_handle.write.assert_called_with('150,250' + os.linesep)
