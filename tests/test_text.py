@@ -45,8 +45,8 @@ class TestTextLogger:
         file_handle = mock_file()
         assert file_handle.write.call_count == 2
         file_handle.write.assert_has_calls([
-            mock.call('timestamp,value' + os.linesep),
-            mock.call('100,200' + os.linesep),
+            mock.call('timestamp,value\r\n'),
+            mock.call('100,200\r\n'),
         ])
 
     def test_can_continue_existing_file(self):
@@ -69,4 +69,4 @@ class TestTextLogger:
 
         file_handle = mock_file()
         assert file_handle.write.call_count == 1
-        file_handle.write.assert_called_with('150,250' + os.linesep)
+        file_handle.write.assert_called_with('150,250\r\n')
