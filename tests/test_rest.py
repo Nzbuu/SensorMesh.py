@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+import unittest.mock as mock
 
 import pytest
 
@@ -12,7 +12,7 @@ class TestRestTarget:
         assert o._api is None
 
     def test_can_create_with_api(self):
-        mock_api = Mock()
+        mock_api = mock.Mock()
         o = RestTarget(api=mock_api)
         assert o._api is mock_api
 
@@ -22,7 +22,7 @@ class TestRestTarget:
             o.update({'value': 1})
 
     def test_can_update_with_api(self):
-        mock_api = Mock()
+        mock_api = mock.Mock()
         o = RestTarget(api=mock_api)
         o.update({'value': 1})
         mock_api.post_update.assert_called_with({'value': 1})

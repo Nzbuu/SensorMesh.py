@@ -1,4 +1,4 @@
-from unittest.mock import patch, mock_open, Mock
+import unittest.mock as mock
 import json
 import builtins
 
@@ -9,7 +9,9 @@ class TestConfigManager:
     def test_can_read_empty_json_file(self):
         test_data = {}
         cfg_man = ConfigManager()
-        with patch.object(builtins, 'open', mock_open(read_data=json.dumps(test_data))):
+
+        mock_file = mock.mock_open(read_data=json.dumps(test_data))
+        with mock.patch.object(builtins, 'open', mock_file):
             cfg_data = cfg_man.load_config_file('config.json')
 
         assert cfg_data == test_data
@@ -17,14 +19,16 @@ class TestConfigManager:
     def test_can_read_json_config_file(self):
         test_data = {'name': 'test_thing', 'key': 'ABCDEFGHIJ', 'feed': {'field1': 'A'}}
         cfg_man = ConfigManager()
-        with patch.object(builtins, 'open', mock_open(read_data=json.dumps(test_data))):
+
+        mock_file = mock.mock_open(read_data=json.dumps(test_data))
+        with mock.patch.object(builtins, 'open', mock_file):
             cfg_data = cfg_man.load_config_file('config.json')
 
         assert cfg_data == test_data
 
     def test_selects_correct_loader(self):
-        mock_test = Mock(return_value={})
-        mock_cnfg = Mock(return_value={})
+        mock_test = mock.Mock(return_value={})
+        mock_cnfg = mock.Mock(return_value={})
 
         cfg_man = ConfigManager()
         cfg_man._map = {'.test': mock_test, '.cnfg': mock_cnfg}

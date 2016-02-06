@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+import unittest.mock as mock
 
 import pytest
 
@@ -57,13 +57,13 @@ class TestController:
             a.start()
 
     def test_runs_with_zero_step(self):
-        tf = Mock()
+        tf = mock.Mock()
         tf.side_effect = [1453928000, 1453928000.1, 1453928000.2]
-        df = Mock()
+        df = mock.Mock()
 
         a = Controller(timefcn=tf, delayfcn=df)
         a.set_steps(step=0, num_steps=2)
-        a.step = Mock()
+        a.step = mock.Mock()
 
         s = DataSource()
         a.add_source(s)
@@ -77,13 +77,13 @@ class TestController:
         assert df.call_count == 0  # No delays when zero step
 
     def test_runs_with_nonzero_step(self):
-        tf = Mock()
+        tf = mock.Mock()
         tf.side_effect = [1453928000, 1453928000.1, 1453928001.1]
-        df = Mock()
+        df = mock.Mock()
 
         a = Controller(timefcn=tf, delayfcn=df)
         a.set_steps(step=1, num_steps=2)
-        a.step = Mock()
+        a.step = mock.Mock()
 
         s = DataSource()
         a.add_source(s)
@@ -97,13 +97,13 @@ class TestController:
         assert df.call_count == 1  # Don't delay after final step
 
     def test_skips_missing_steps(self):
-        tf = Mock()
+        tf = mock.Mock()
         tf.side_effect = [1453928000, 1453928001.1, 1453928003.1]
-        df = Mock()
+        df = mock.Mock()
 
         a = Controller(timefcn=tf, delayfcn=df)
         a.set_steps(step=1, num_steps=2)
-        a.step = Mock()
+        a.step = mock.Mock()
 
         s = DataSource()
         a.add_source(s)
@@ -117,19 +117,19 @@ class TestController:
         assert df.call_count == 1  # Don't delay after final step
 
     def test_step_calls_read_and_update(self):
-        tf = Mock()
+        tf = mock.Mock()
         tf.side_effect = [1453928000, 1453928000.1, 1453928001.1]
-        df = Mock()
+        df = mock.Mock()
 
         a = Controller(timefcn=tf, delayfcn=df)
 
         s = DataSource()
-        s.read = Mock()
+        s.read = mock.Mock()
         s.read.return_value = {'value': 0.5}
         a.add_source(s)
 
         t = DataTarget()
-        t.update = Mock()
+        t.update = mock.Mock()
         a.add_target(t)
 
         a.step()
