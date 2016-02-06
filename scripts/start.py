@@ -21,7 +21,7 @@ t = ConsoleDisplay()
 app.add_target(t)
 
 # Target 2
-tsl_config = cfg_man.load_config_file('thingspeak.json')
+tsl_config = cfg_man.load_config_file('scripts/thingspeak.json')
 t = ThingSpeakLogger(**tsl_config)
 app.add_target(t)
 
