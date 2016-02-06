@@ -72,6 +72,15 @@ class TestDataAdapter:
         remote = o.create_remote_struct({'l1': 5})
         assert remote == {'r1': 5}
 
+    def test_create_missing_local_data_as_option(self):
+        o = DataAdapter()
+        o.create_missing = True
+        o.add_field('l1', 'r1')
+        o.add_field('l2', 'r2')
+
+        remote = o.create_remote_struct({'l1': 5})
+        assert remote == {'r1': 5, 'r2': None}
+
     def test_ignore_extra_local_field(self):
         o = DataAdapter()
         o.add_field('l2', 'r2')
@@ -94,6 +103,15 @@ class TestDataAdapter:
 
         local = o.create_local_struct({'r1': -3})
         assert local == {'l1': -3}
+
+    def test_create_missing_remote_data_as_option(self):
+        o = DataAdapter()
+        o.create_missing = True
+        o.add_field('l1', 'r1')
+        o.add_field('l2', 'r2')
+
+        local = o.create_local_struct({'r1': -3})
+        assert local == {'l1': -3, 'l2': None}
 
     def test_ignore_extra_remote_field(self):
         o = DataAdapter()

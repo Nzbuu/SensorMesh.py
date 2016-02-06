@@ -7,6 +7,7 @@ class DataAdapter(object):
 
         self._remote_to_local = OrderedDict()
         self._local_to_remote = OrderedDict()
+        self.create_missing = False
 
     @property
     def local_names(self):
@@ -29,8 +30,8 @@ class DataAdapter(object):
                 # local_name
                 raise KeyError('Local and Remote names must be unique.')
         elif local_name in self._local_to_remote:
-                # already have local_name but doesn't correspond to
-                # remote_name
+            # already have local_name but doesn't correspond to
+            # remote_name
             raise KeyError('Local and Remote names must be unique.')
         else:
             self._remote_to_local[remote_name] = local_name
@@ -43,5 +44,8 @@ class DataAdapter(object):
         return self._rename_fields(remote_data, self._remote_to_local)
 
     def _rename_fields(self, data, names):
-        return {names[k]: data[k] for k in names if k in data}
-
+        if self.create_missing:
+            out = {names[k]: data[k] if k in data else None for k in names}
+        else:
+            out = {names[k]: data[k] for k in names if k in data}
+        return out
