@@ -78,7 +78,7 @@ class ThingSpeakApi(object):
 
 
 class ThingSpeakLogger(RestTarget):
-    def __init__(self, name='', feeds=None, fields=None, api=None, **kwargs):
+    def __init__(self, name='', fields=None, api=None, **kwargs):
         if api is None:
             api = ThingSpeakApi(**kwargs)
         elif kwargs:
@@ -86,7 +86,7 @@ class ThingSpeakLogger(RestTarget):
                     "Additional keyword inputs are forbidden when using "
                     "API input")
 
-        super().__init__(name=name, feeds=feeds, fields=fields, api=api)
+        super().__init__(name=name, fields=fields, api=api)
 
     def _prepare_update(self, data):
         content = self._adapter.create_remote_struct(data)
@@ -100,8 +100,8 @@ class ThingSpeakLogger(RestTarget):
 
 
 class ThingSpeakSource(DataSource):
-    def __init__(self, name='', feeds=None, fields=None, api=None, **kwargs):
-        super().__init__(name=name, feeds=feeds, fields=fields)
+    def __init__(self, name='', fields=None, api=None, **kwargs):
+        super().__init__(name=name, fields=fields)
 
         if api is None:
             api = ThingSpeakApi(**kwargs)

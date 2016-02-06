@@ -10,7 +10,7 @@ class TestTextLogger:
         with pytest.raises(TypeError):
             _ = TextLogger(fields=['timestamp', 'values'])
 
-    def test_cannot_create_without_feeds(self):
+    def test_cannot_create_without_fields(self):
         with pytest.raises(TypeError):
             _ = TextLogger(filename='temp_logfile.txt')
 
@@ -70,3 +70,78 @@ class TestTextLogger:
         file_handle = mock_file()
         assert file_handle.write.call_count == 1
         file_handle.write.assert_called_with('150,250\r\n')
+
+    def test_can_write_remote_names(self):
+        mock_isfile = mock.Mock(return_value=False)
+        mock_file = mock.mock_open()
+
+        with mock.patch('os.path.isfile', mock_isfile):
+            with mock.patch('builtins.open', mock_file):
+                o = TextLogger(
+                        filename='temp_file.txt',
+                        fields=['timestamp', ('value', 'field1')]
+                )
+                data = {'timestamp': 110, 'value': 210}
+                o.update(data)
+
+        assert mock_isfile.call_count == 1
+
+        assert mock_file.call_count == 1
+        mock_file.assert_called_with('temp_file.txt', 'a')
+
+        file_handle = mock_file()
+        assert file_handle.write.call_count == 2
+        file_handle.write.assert_has_calls([
+            mock.call('timestamp,field1\r\n'),
+            mock.call('110,210\r\n'),
+        ])
+
+    def test_ignores_extra_inputs(self):
+        mock_isfile = mock.Mock(return_value=False)
+        mock_file = mock.mock_open()
+
+        with mock.patch('os.path.isfile', mock_isfile):
+            with mock.patch('builtins.open', mock_file):
+                o = TextLogger(
+                        filename='temp_file.txt',
+                        fields=['timestamp', 'value']
+                )
+                data = {'timestamp': 1100, 'value': 2100}
+                o.update(data)
+
+        assert mock_isfile.call_count == 1
+
+        assert mock_file.call_count == 1
+        mock_file.assert_called_with('temp_file.txt', 'a')
+
+        file_handle = mock_file()
+        assert file_handle.write.call_count == 2
+        file_handle.write.assert_has_calls([
+            mock.call('timestamp,value\r\n'),
+            mock.call('1100,2100\r\n'),
+        ])
+
+    def test_create_missing_inputs(self):
+        mock_isfile = mock.Mock(return_value=False)
+        mock_file = mock.mock_open()
+
+        with mock.patch('os.path.isfile', mock_isfile):
+            with mock.patch('builtins.open', mock_file):
+                o = TextLogger(
+                        filename='temp_file.txt',
+                        fields=['timestamp', 'r1', 'r2']
+                )
+                data = {'timestamp': 1200, 'r2': 5}
+                o.update(data)
+
+        assert mock_isfile.call_count == 1
+
+        assert mock_file.call_count == 1
+        mock_file.assert_called_with('temp_file.txt', 'a')
+
+        file_handle = mock_file()
+        assert file_handle.write.call_count == 2
+        file_handle.write.assert_has_calls([
+            mock.call('timestamp,r1,r2\r\n'),
+            mock.call('1200,,5\r\n'),
+        ])

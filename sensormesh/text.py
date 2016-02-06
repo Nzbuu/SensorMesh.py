@@ -5,11 +5,8 @@ from .base import DataTarget
 
 
 class TextLogger(DataTarget):
-    def __init__(self, filename, feeds=None, fields=None, name=''):
-        if not feeds and not fields:
-            raise TypeError('Missing fields or feeds information')
-
-        super().__init__(name=name, feeds=feeds, fields=fields)
+    def __init__(self, filename, fields, name=''):
+        super().__init__(name=name, fields=fields)
         self._filename = filename
         self._adapter.create_missing = True
 
