@@ -8,12 +8,21 @@ from sensormesh.text import *
 class TestTextLogger:
     def test_cannot_create_without_filename(self):
         with pytest.raises(TypeError):
-            _ = TextLogger(name='CsvLogger')
+            _ = TextLogger(feeds=['timestamp', 'values'])
+
+    def test_cannot_create_without_feeds(self):
+        with pytest.raises(TypeError):
+            _ = TextLogger(filename='temp_logfile.txt')
 
     def test_can_create_with_filename(self):
-        l = TextLogger(filename='temp_logfile.txt', name='CsvLogger')
+        l = TextLogger(
+                filename='temp_logfile.txt',
+                name='CsvLogger',
+                feeds=['timestamp', 'values']
+        )
         assert l.name == 'CsvLogger'
         assert l.filename == 'temp_logfile.txt'
+        assert l.fields == ['timestamp', 'values']
 
     def test_can_start_new_file(self):
         mock_isfile = mock.Mock(return_value=False)
@@ -21,7 +30,10 @@ class TestTextLogger:
 
         with mock.patch('os.path.isfile', mock_isfile):
             with mock.patch('builtins.open', mock_file):
-                o = TextLogger(filename='temp_file.txt')
+                o = TextLogger(
+                        filename='temp_file.txt',
+                        feeds=['timestamp', 'value']
+                )
                 data = {'timestamp': 100, 'value': 200}
                 o.update(data)
 
@@ -43,7 +55,10 @@ class TestTextLogger:
 
         with mock.patch('os.path.isfile', mock_isfile):
             with mock.patch('builtins.open', mock_file):
-                o = TextLogger(filename='temp_file.txt')
+                o = TextLogger(
+                        filename='temp_file.txt',
+                        feeds=['timestamp', 'value']
+                )
                 data = {'timestamp': 150, 'value': 250}
                 o.update(data)
 
