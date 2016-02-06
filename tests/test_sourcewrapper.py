@@ -2,29 +2,48 @@ import unittest.mock as mock
 
 import pytest
 
-from sensormesh.base import DataSourceWrapper
+from sensormesh.base import DataSourceWrapper, ConfigurationError
 
 
 class TestDataSourceWrapper:
-    def test_can_create_without_callable(self):
-        s = DataSourceWrapper(name='test_source')
-        assert s.name == 'test_source'
-
-    def test_throws_on_extra_positional_args(self):
-        with pytest.raises(ValueError):
-            s = DataSourceWrapper('test_source', 'x')  # 'test_source' is name
+    def test_cannot_create_without_callable(self):
+        with pytest.raises(ConfigurationError):
+            s = DataSourceWrapper(name='test_source')
 
     def test_can_wrap_one_callable(self):
         m = mock.Mock(return_value=10)
-        s = DataSourceWrapper(value=m)
+        s = DataSourceWrapper(fields=['count'], source=[m], name='test_source')
+        assert s.name == 'test_source'
+
+        assert s.fields == ['count']
 
         d = s.read()
-        assert d == {'value': 10}
+        assert d == {'count': 10}
 
     def test_can_wrap_two_callables(self):
         m1 = mock.Mock(return_value=10)
         m2 = mock.Mock(return_value=20)
-        s = DataSourceWrapper(field1=m1, field2=m2)
+        s = DataSourceWrapper(fields=['field1', 'field2'], source=[m1, m2])
+
+        assert s.fields == ['field1', 'field2']
 
         d = s.read()
         assert d == {'field1': 10, 'field2': 20}
+
+    def test_can_wrap_single_output(self):
+        m = mock.Mock(return_value=(110, 120))
+        s = DataSourceWrapper(fields=['field3'], source=m)
+
+        assert s.fields == ['field3']
+
+        d = s.read()
+        assert d == {'field3': (110,  120)}
+
+    def test_can_wrap_multiple_outputs(self):
+        m = mock.Mock(return_value=(210, 220))
+        s = DataSourceWrapper(fields=['field3', 'field1'], source=m)
+
+        assert s.fields == ['field3', 'field1']
+
+        d = s.read()
+        assert d == {'field3': 210, 'field1': 220}

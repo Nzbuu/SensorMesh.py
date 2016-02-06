@@ -1,3 +1,6 @@
+from .exceptions import ConfigurationError
+
+
 class DataSource(object):
     def __init__(self, name=''):
         super().__init__()
@@ -41,13 +44,33 @@ class DataTarget(object):
 
 
 class DataSourceWrapper(DataSource):
-    def __init__(self, name='', *args, **kwargs):
+    def __init__(self, name='', fields=(), source=()):
         super().__init__(name=name)
-        if args:
-            raise ValueError()
 
-        self._dict = kwargs
+        if not source:
+            raise ConfigurationError
+
+        self._source = None
+        self._dict = {}
+
+        if callable(source):
+            self._source = source
+            for n in fields:
+                self._add_field(n)
+                self._dict[n] = None
+        else:
+            for n, s in zip(fields, source):
+                self._add_field(n)
+                self._dict[n] = s
 
     def read(self):
-        data = {k: v() for k, v in self._dict.items()}
+        if self._source:
+            values = self._source()
+            if len(self._fields) == 1:
+                data = {self._fields[0]: values}
+            else:
+                data = {name: value for name, value in zip(self._fields, values)}
+        else:
+            data = {name: source() for name, source in self._dict.items()}
+
         return data
