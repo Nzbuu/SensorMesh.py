@@ -15,4 +15,7 @@ class RestTarget(DataTarget):
         self._api.post_update(content)
 
     def _prepare_update(self, data):
-        return data
+        if self._adapter.count:
+            return self._adapter.create_remote_struct(data)
+        else:
+            return data

@@ -10,6 +10,10 @@ class DataAdapter(object):
         self.create_missing = False
 
     @property
+    def count(self):
+        return len(self._remote_to_local)
+
+    @property
     def local_names(self):
         return self._local_to_remote.keys()
 
