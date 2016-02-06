@@ -93,7 +93,8 @@ class ThingSpeakLogger(RestTarget):
         if feeds:
             for name_remote, name_local in feeds.items():
                 self._add_field(name_local)
-                self._adapter.add_field(local_name=name_local, remote_name=name_remote)
+                self._adapter.add_field(local_name=name_local,
+                                        remote_name=name_remote)
 
     def _prepare_update(self, data):
         content = self._adapter.parse_local(data)
@@ -122,7 +123,8 @@ class ThingSpeakSource(DataSource):
         if feeds:
             for name_remote, name_local in feeds.items():
                 self._add_field(name_local)
-                self._adapter.add_field(local_name=name_local, remote_name=name_remote)
+                self._adapter.add_field(local_name=name_local,
+                                        remote_name=name_remote)
 
     def read(self):
         content = self._api.get_data()

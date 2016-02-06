@@ -51,13 +51,13 @@ class DataSourceWrapper(DataSource):
 
         if callable(source):
             self._source = source
-            for n in fields:
-                self._add_field(n)
-                self._dict[n] = None
+            for name in fields:
+                self._add_field(name)
+                self._dict[name] = None
         else:
-            for n, s in zip(fields, source):
-                self._add_field(n)
-                self._dict[n] = s
+            for name, src in zip(fields, source):
+                self._add_field(name)
+                self._dict[name] = src
 
     def read(self):
         if self._source:
@@ -65,7 +65,8 @@ class DataSourceWrapper(DataSource):
             if len(self._fields) == 1:
                 data = {self._fields[0]: values}
             else:
-                data = {name: value for name, value in zip(self._fields, values)}
+                data = {name: value
+                        for name, value in zip(self._fields, values)}
         else:
             data = {name: source() for name, source in self._dict.items()}
 
