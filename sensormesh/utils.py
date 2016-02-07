@@ -46,6 +46,4 @@ class DataAdapter(object):
                 data_out[name_out] = data_in[name_in]
             elif self.create_missing:
                 data_out[name_out] = None
-            else:
-                pass
         return data_out
