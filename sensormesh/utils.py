@@ -47,9 +47,13 @@ class DataAdapter(object):
     def create_local_struct(self, remote_data):
         return self._rename_fields(remote_data, self._remote_to_local)
 
-    def _rename_fields(self, data, names):
-        if self.create_missing:
-            out = {names[k]: data[k] if k in data else None for k in names}
-        else:
-            out = {names[k]: data[k] for k in names if k in data}
-        return out
+    def _rename_fields(self, data_in, names):
+        data_out = {}
+        for name_in, name_out in names.items():
+            if name_in in data_in:
+                data_out[name_out] = data_in[name_in]
+            elif self.create_missing:
+                data_out[name_out] = None
+            else:
+                pass
+        return data_out
