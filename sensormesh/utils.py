@@ -25,17 +25,9 @@ class DataAdapter(object):
         if not remote_name or not local_name:
             raise ValueError('Inputs must be non-empty strings')
 
-        if remote_name in self._remote_to_local:
-            if self._remote_to_local[remote_name] == local_name:
-                # already have remote_name <-> local_name
-                pass
-            else:
-                # already have remote_name but doesn't correspond to
-                # local_name
-                raise KeyError('Local and Remote names must be unique.')
-        elif local_name in self._local_to_remote:
-            # already have local_name but doesn't correspond to
-            # remote_name
+        if (remote_name in self._remote_to_local or
+                    local_name in self._local_to_remote):
+            # already have local_name or remote_name
             raise KeyError('Local and Remote names must be unique.')
         else:
             self._remote_to_local[remote_name] = local_name

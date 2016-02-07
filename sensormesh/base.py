@@ -67,12 +67,10 @@ class DataSourceWrapper(DataSource):
 
         if callable(source):
             self._source = source
-            for name in fields:
-                self._add_field(name)
+            for name in self.fields:
                 self._dict[name] = None
         else:
-            for name, src in zip(fields, source):
-                self._add_field(name)
+            for name, src in zip(self.fields, source):
                 self._dict[name] = src
 
     def read(self):

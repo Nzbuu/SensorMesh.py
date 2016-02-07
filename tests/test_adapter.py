@@ -48,12 +48,11 @@ class TestDataAdapter:
         with pytest.raises(KeyError):
             o.add_field('l', 'r2')
 
-    def test_can_duplicate_whole_entry(self):
+    def test_cannot_duplicate_whole_entry(self):
         o = DataAdapter()
         o.add_field('l', 'r')
-        o.add_field('l', 'r')
-        assert o._remote_to_local == {'r': 'l'}
-        assert o._local_to_remote == {'l': 'r'}
+        with pytest.raises(KeyError):
+            o.add_field('l', 'r')
 
     # Parsing tests
     def test_can_convert_local_data(self):
