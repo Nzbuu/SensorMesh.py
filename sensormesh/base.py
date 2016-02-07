@@ -11,9 +11,9 @@ class Base(object):
         if fields:
             for name in fields:
                 if isinstance(name, str):
-                    self._adapter.add_field(name, name)
+                    self._add_field(name)
                 else:
-                    self._adapter.add_field(
+                    self._add_field(
                             local_name=name[0],
                             remote_name=name[1])
 
