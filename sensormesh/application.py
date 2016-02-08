@@ -65,7 +65,7 @@ class Controller(object):
         timestamp = self._timefcn()
 
         data = self._source.read()
-        if not data.get('timestamp', None):
+        if not data.get('timestamp'):
             data['timestamp'] = timestamp
 
         for l in self._targets:
