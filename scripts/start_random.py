@@ -1,10 +1,13 @@
 import random
 
-from sensormesh.application import Controller, ConfigManager
-from sensormesh.base import DataSourceWrapper
-from sensormesh.console import ConsoleDisplay
-from sensormesh.thingspeak import ThingSpeakLogger
-from sensormesh.text import TextLogger
+from sensormesh import (
+    Controller,
+    ConfigManager,
+    DataSourceWrapper,
+    ConsoleDisplay,
+    ThingSpeakLogger,
+    TextLogger,
+)
 
 # Configuration loader class
 cfg_man = ConfigManager()
@@ -22,12 +25,16 @@ t = ConsoleDisplay()
 app.add_target(t)
 
 # Target 2
-tsl_config = cfg_man.load_config_file('scripts/thingspeak.json')
+tsl_config = cfg_man.load_config_file('thingspeak_random.json')
 t = ThingSpeakLogger(**tsl_config)
 app.add_target(t)
 
 # Target 3
-t = TextLogger(filename='scripts/testdata.csv', fields=['timestamp', 'value'])
+csv_config = {
+    'filename': 'testdata.csv',
+    'fields': ['timestamp', 'value']
+}
+t = TextLogger(**csv_config)
 app.add_target(t)
 
 # Start application
