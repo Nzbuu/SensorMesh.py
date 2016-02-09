@@ -11,12 +11,15 @@ cfg_man = ConfigManager()
 
 # Configure App
 app = Controller()
-app.set_steps(step=60, num_steps=24*60)
+app.set_steps(step=60, num_steps=24 * 60)
 
 # Source
 o = W1ThermSensor()
 print(o)
-s = DataSourceWrapper(fields=['temperature'], source=o.get_temperature)
+s = DataSourceWrapper(
+        fields=['temperature'],
+        source=o.get_temperature
+)
 app.add_source(s)
 
 # Target 1
@@ -29,7 +32,11 @@ t = ThingSpeakLogger(**tsl_config)
 app.add_target(t)
 
 # Target 3
-t = TextLogger(filename='logdata_therm.csv', fields=['timestamp', 'temperature'])
+csv_config = {
+    'filename': 'logdata_therm.csv',
+    'fields': ['timestamp', 'temperature']
+}
+t = TextLogger(**csv_config)
 app.add_target(t)
 
 # Start application
