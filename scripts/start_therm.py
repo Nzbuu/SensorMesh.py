@@ -1,5 +1,3 @@
-import random
-
 from w1thermsensor import W1ThermSensor
 
 from sensormesh.application import Controller, ConfigManager
