@@ -1,13 +1,10 @@
 import random
 
-from sensormesh import (
-    Controller,
-    ConfigManager,
-    DataSourceWrapper,
-    ConsoleDisplay,
-    ThingSpeakLogger,
-    TextLogger,
-)
+from sensormesh.application import Controller, ConfigManager
+from sensormesh.base import DataSourceWrapper
+from sensormesh.console import ConsoleDisplay
+from sensormesh.thingspeak import ThingSpeakLogger
+from sensormesh.text import TextLogger
 
 # Configuration loader class
 cfg_man = ConfigManager()
