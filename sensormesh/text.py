@@ -39,7 +39,8 @@ class TextLogger(DataTarget):
             f.close()
 
     def __del__(self):
-        self.stop()
+        if hasattr(self, '_file'):  # TODO: This might be a dirty hack. See http://stackoverflow.com/questions/35327164/python-destructor-for-failed-constructor
+            self.stop()
 
     def update(self, data):
         content = self._adapter.create_remote_struct(data)
