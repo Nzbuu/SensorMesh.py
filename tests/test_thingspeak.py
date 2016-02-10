@@ -149,9 +149,9 @@ class TestThingSpeakApi:
                 base_url='https://api.example.com:6666'
         )
 
-        with responses.RequestsMock() as r_mock:
-            with pytest.raises(ConfigurationError):
-                data = api.get_data()
+        with responses.RequestsMock() as r_mock, \
+                pytest.raises(ConfigurationError):
+            data = api.get_data()
 
         assert len(r_mock.calls) == 0
 
@@ -227,11 +227,11 @@ class TestThingSpeakApi:
         )
         data = {"created_at": "2016-01-27T20:52:20", "field1": "60.0 F"}
 
-        with responses.RequestsMock() as r_mock:
-            with pytest.raises(ConfigurationError):
-                api.post_update(data)
+        with responses.RequestsMock() as r_mock, \
+                pytest.raises(ConfigurationError):
+            api.post_update(data)
 
-            assert len(r_mock.calls) == 0
+        assert len(r_mock.calls) == 0
 
 
 canned_responses = {
