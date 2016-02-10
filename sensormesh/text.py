@@ -17,7 +17,7 @@ class TextLogger(DataTarget):
     def filename(self):
         return self._filename
 
-    def start(self):
+    def open(self):
         if not self._file:
             create_file = not(self._reopen and os.path.isfile(self._filename))
             file_mode = 'w' if create_file else 'a'
@@ -30,7 +30,7 @@ class TextLogger(DataTarget):
             if create_file:
                 self._writer.writeheader()
 
-    def stop(self):
+    def close(self):
         if self._file:
             self._writer = None
 
@@ -40,7 +40,7 @@ class TextLogger(DataTarget):
 
     def __del__(self):
         if hasattr(self, '_file'):  # TODO: This might be a dirty hack. See http://stackoverflow.com/questions/35327164/python-destructor-for-failed-constructor
-            self.stop()
+            self.close()
 
     def update(self, data):
         content = self._adapter.create_remote_struct(data)

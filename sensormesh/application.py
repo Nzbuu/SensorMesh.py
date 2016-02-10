@@ -1,6 +1,7 @@
 import os.path
 import time
 import json
+import contextlib
 
 from .exceptions import ConfigurationError
 
@@ -47,9 +48,9 @@ class Controller(object):
         self._check_for_source()
         self._check_for_targets()
 
-        self._start()
+        with contextlib.ExitStack() as stack:
+            self._start(stack)
 
-        try:
             time_start_next = self._timefcn()
             for count_steps in range(self._num_steps):
                 self._step()
@@ -63,18 +64,17 @@ class Controller(object):
                         time_start_next += self._time_step
 
                     self._delayfcn(max(time_start_next - time_finish_now, 0))
-        finally:
-            self._stop()
 
-    def _start(self):
-        self._source.start()
-        for t in self._targets:
-            t.start()
+    def _start(self, stack=None):
+        s = self._source
+        s.open()
+        if stack:
+            stack.callback(s.close)
 
-    def _stop(self):
-        self._source.stop()
         for t in self._targets:
-            t.stop()
+            t.open()
+            if stack:
+                stack.callback(t.close)
 
     def _step(self):
         timestamp = self._timefcn()

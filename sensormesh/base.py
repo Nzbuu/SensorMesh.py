@@ -38,10 +38,10 @@ class Base(object):
                 remote_name=remote_name
         )
 
-    def start(self):
+    def open(self):
         pass
 
-    def stop(self):
+    def close(self):
         pass
 
 

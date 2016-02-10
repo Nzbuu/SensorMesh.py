@@ -35,9 +35,9 @@ class TestTextLogger:
                     fields=['timestamp', 'value']
             )
             data = {'timestamp': 100, 'value': 200}
-            o.start()
+            o.open()
             o.update(data)
-            o.stop()
+            o.close()
 
         assert mock_isfile.call_count == 1
 
@@ -62,9 +62,9 @@ class TestTextLogger:
                     fields=['timestamp', 'value']
             )
             data = {'timestamp': 150, 'value': 250}
-            o.start()
+            o.open()
             o.update(data)
-            o.stop()
+            o.close()
 
         assert mock_isfile.call_count == 1
 
@@ -86,9 +86,9 @@ class TestTextLogger:
                     fields=['timestamp', ('value', 'field1')]
             )
             data = {'timestamp': 110, 'value': 210}
-            o.start()
+            o.open()
             o.update(data)
-            o.stop()
+            o.close()
 
         assert mock_isfile.call_count == 1
 
@@ -113,9 +113,9 @@ class TestTextLogger:
                     fields=['timestamp', 'value']
             )
             data = {'timestamp': 1100, 'value': 2100}
-            o.start()
+            o.open()
             o.update(data)
-            o.stop()
+            o.close()
 
         assert mock_isfile.call_count == 1
 
@@ -140,9 +140,9 @@ class TestTextLogger:
                     fields=['timestamp', 'r1', 'r2']
             )
             data = {'timestamp': 1200, 'r2': 5}
-            o.start()
+            o.open()
             o.update(data)
-            o.stop()
+            o.close()
 
         assert mock_isfile.call_count == 1
 
