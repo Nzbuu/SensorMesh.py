@@ -34,6 +34,7 @@ app.add_target(t)
 # Target 3
 csv_config = {
     'filename': 'logdata_therm.csv',
+    'reopen_file': True,
     'fields': ['timestamp', 'temperature']
 }
 t = TextLogger(**csv_config)
