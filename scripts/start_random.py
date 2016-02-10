@@ -36,7 +36,7 @@ app.add_target(t)
 
 # Start application
 try:
-    app.start()
+    app.run()
 except KeyboardInterrupt:
     print("Goodbye!")
 finally:

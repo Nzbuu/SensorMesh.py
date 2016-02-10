@@ -47,14 +47,14 @@ class TestController:
         s = DataSource()
         a.add_source(s)
         with pytest.raises(ConfigurationError):
-            a.start()
+            a.run()
 
     def test_cannot_start_without_source(self):
         a = Controller()
         t = DataTarget()
         a.add_target(t)
         with pytest.raises(ConfigurationError):
-            a.start()
+            a.run()
 
     def test_runs_with_zero_step(self):
         tf = mock.Mock()
@@ -63,7 +63,9 @@ class TestController:
 
         a = Controller(timefcn=tf, delayfcn=df)
         a.set_steps(step=0, num_steps=2)
-        a.step = mock.Mock()
+        a._start = mock.Mock()
+        a._step = mock.Mock()
+        a._stop = mock.Mock()
 
         s = DataSource()
         a.add_source(s)
@@ -71,9 +73,11 @@ class TestController:
         t = DataTarget()
         a.add_target(t)
 
-        a.start()
+        a.run()
 
-        assert a.step.call_count == 2
+        assert a._start.call_count == 1
+        assert a._step.call_count == 2
+        assert a._stop.call_count == 1
         assert df.call_count == 0  # No delays when zero step
 
     def test_runs_with_nonzero_step(self):
@@ -83,7 +87,9 @@ class TestController:
 
         a = Controller(timefcn=tf, delayfcn=df)
         a.set_steps(step=1, num_steps=2)
-        a.step = mock.Mock()
+        a._start = mock.Mock()
+        a._step = mock.Mock()
+        a._stop = mock.Mock()
 
         s = DataSource()
         a.add_source(s)
@@ -91,9 +97,11 @@ class TestController:
         t = DataTarget()
         a.add_target(t)
 
-        a.start()
+        a.run()
 
-        assert a.step.call_count == 2
+        assert a._start.call_count == 1
+        assert a._step.call_count == 2
+        assert a._stop.call_count == 1
         assert df.call_count == 1  # Don't delay after final step
 
     def test_skips_missing_steps(self):
@@ -103,7 +111,9 @@ class TestController:
 
         a = Controller(timefcn=tf, delayfcn=df)
         a.set_steps(step=1, num_steps=2)
-        a.step = mock.Mock()
+        a._start = mock.Mock()
+        a._step = mock.Mock()
+        a._stop = mock.Mock()
 
         s = DataSource()
         a.add_source(s)
@@ -111,9 +121,11 @@ class TestController:
         t = DataTarget()
         a.add_target(t)
 
-        a.start()
+        a.run()
 
-        assert a.step.call_count == 2
+        assert a._start.call_count == 1
+        assert a._step.call_count == 2
+        assert a._stop.call_count == 1
         assert df.call_count == 1  # Don't delay after final step
 
     def test_step_calls_read_and_update(self):
@@ -132,8 +144,7 @@ class TestController:
         t.update = mock.Mock()
         a.add_target(t)
 
-        a.step()
+        a._step()
 
         assert s.read.call_count == 1
         assert t.update.call_count == 1
-

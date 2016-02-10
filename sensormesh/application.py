@@ -10,14 +10,14 @@ class Controller(object):
         self.name = name
         self._source = None
         self._targets = []
-        self._step = 0
+        self._time_step = 0
         self._num_steps = 1
 
         self._timefcn = timefcn if timefcn else time.time
         self._delayfcn = delayfcn if delayfcn else time.sleep
 
     def set_steps(self, step, num_steps):
-        self._step = step
+        self._time_step = step
         self._num_steps = num_steps
 
     def add_source(self, source):
@@ -43,33 +43,47 @@ class Controller(object):
         if not self._targets:
             raise ConfigurationError()
 
-    def start(self):
+    def run(self):
         self._check_for_source()
         self._check_for_targets()
 
+        self._start()
+
         time_start_next = self._timefcn()
         for count_steps in range(self._num_steps):
-            self.step()
+            self._step()
 
-            if self._step <= 0:
+            if self._time_step <= 0:
                 pass
             elif count_steps < self._num_steps - 1:
                 time_finish_now = self._timefcn()
-                time_start_next += self._step
+                time_start_next += self._time_step
                 while time_finish_now > time_start_next:
-                    time_start_next += self._step
+                    time_start_next += self._time_step
 
                 self._delayfcn(max(time_start_next - time_finish_now, 0))
 
-    def step(self):
+        self._stop()
+
+    def _start(self):
+        self._source.start()
+        for t in self._targets:
+            t.start()
+
+    def _stop(self):
+        self._source.stop()
+        for t in self._targets:
+            t.stop()
+
+    def _step(self):
         timestamp = self._timefcn()
 
         data = self._source.read()
         if not data.get('timestamp'):
             data['timestamp'] = timestamp
 
-        for l in self._targets:
-            l.update(data)
+        for t in self._targets:
+            t.update(data)
 
 
 class ConfigManager(object):

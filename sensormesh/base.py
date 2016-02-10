@@ -38,6 +38,12 @@ class Base(object):
                 remote_name=remote_name
         )
 
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
 
 class DataSource(Base):
     def __init__(self, name='', fields=None):
