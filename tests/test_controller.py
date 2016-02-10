@@ -135,16 +135,62 @@ class TestController:
 
         a = Controller(timefcn=tf, delayfcn=df)
 
-        s = DataSource()
-        s.read = mock.Mock()
+        s = mock.Mock(spec=DataSource)
         s.read.return_value = {'value': 0.5}
         a.add_source(s)
 
-        t = DataTarget()
-        t.update = mock.Mock()
-        a.add_target(t)
+        t1 = mock.Mock(spec=DataTarget)
+        a.add_target(t1)
+
+        t2 = mock.Mock(spec=DataTarget)
+        a.add_target(t2)
 
         a._step()
 
         assert s.read.call_count == 1
-        assert t.update.call_count == 1
+        assert t1.update.call_count == 1
+        assert t2.update.call_count == 1
+
+    def test_start_calls_source_and_targets(self):
+        tf = mock.Mock()
+        df = mock.Mock()
+
+        a = Controller(timefcn=tf, delayfcn=df)
+
+        s = mock.Mock(spec=DataSource)
+        s.read.return_value = {'value': 0.5}
+        a.add_source(s)
+
+        t1 = mock.Mock(spec=DataTarget)
+        a.add_target(t1)
+
+        t2 = mock.Mock(spec=DataTarget)
+        a.add_target(t2)
+
+        a._start()
+
+        assert s.start.call_count == 1
+        assert t1.start.call_count == 1
+        assert t2.start.call_count == 1
+
+    def test_stop_calls_source_and_targets(self):
+        tf = mock.Mock()
+        df = mock.Mock()
+
+        a = Controller(timefcn=tf, delayfcn=df)
+
+        s = mock.Mock(spec=DataSource)
+        s.read.return_value = {'value': 0.5}
+        a.add_source(s)
+
+        t1 = mock.Mock(spec=DataTarget)
+        a.add_target(t1)
+
+        t2 = mock.Mock(spec=DataTarget)
+        a.add_target(t2)
+
+        a._stop()
+
+        assert s.stop.call_count == 1
+        assert t1.stop.call_count == 1
+        assert t2.stop.call_count == 1
