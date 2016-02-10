@@ -49,21 +49,22 @@ class Controller(object):
 
         self._start()
 
-        time_start_next = self._timefcn()
-        for count_steps in range(self._num_steps):
-            self._step()
+        try:
+            time_start_next = self._timefcn()
+            for count_steps in range(self._num_steps):
+                self._step()
 
-            if self._time_step <= 0:
-                pass
-            elif count_steps < self._num_steps - 1:
-                time_finish_now = self._timefcn()
-                time_start_next += self._time_step
-                while time_finish_now > time_start_next:
+                if self._time_step <= 0:
+                    pass
+                elif count_steps < self._num_steps - 1:
+                    time_finish_now = self._timefcn()
                     time_start_next += self._time_step
+                    while time_finish_now > time_start_next:
+                        time_start_next += self._time_step
 
-                self._delayfcn(max(time_start_next - time_finish_now, 0))
-
-        self._stop()
+                    self._delayfcn(max(time_start_next - time_finish_now, 0))
+        finally:
+            self._stop()
 
     def _start(self):
         self._source.start()
