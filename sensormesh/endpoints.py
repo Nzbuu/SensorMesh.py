@@ -21,10 +21,6 @@ class DataEndpoint(object):
     def name(self):
         return self._name
 
-    @name.setter
-    def name(self, u):
-        self._name = u
-
     @property
     def fields(self):
         return list(self._adapter.local_names)
