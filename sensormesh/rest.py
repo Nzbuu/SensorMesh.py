@@ -11,12 +11,5 @@ class RestTarget(DataTarget):
         else:
             raise ConfigurationError()
 
-    def update(self, data):
-        content = self._prepare_update(data)
-        self._api.post_update(content)
-
-    def _prepare_update(self, data):
-        if self._adapter.count:
-            return self._adapter.create_remote_struct(data)
-        else:
-            return data
+    def _update(self, data):
+        self._api.post_update(data)

@@ -89,14 +89,15 @@ class ThingSpeakLogger(RestTarget):
         super().__init__(name=name, fields=fields, api=api)
 
     def _prepare_update(self, data):
-        content = self._adapter.create_remote_struct(data)
+        data_out = super()._prepare_update(data)
 
-        if 'timestamp' in data and data['timestamp']:
+        if ('timestamp' in data and data['timestamp'] and
+                'created_at' not in data_out):
             timestamp = data['timestamp']
             ts = datetime.fromtimestamp(timestamp)
-            content['created_at'] = ts.isoformat()
+            data_out['created_at'] = ts.isoformat()
 
-        return content
+        return data_out
 
 
 class ThingSpeakSource(DataSource):

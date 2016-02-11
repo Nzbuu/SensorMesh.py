@@ -38,6 +38,5 @@ class TextLogger(DataTarget):
             self._file = None
             f.close()
 
-    def update(self, data):
-        content = self._adapter.create_remote_struct(data)
-        self._writer.writerow(content)
+    def _update(self, data):
+        self._writer.writerow(data)

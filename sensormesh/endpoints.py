@@ -61,6 +61,16 @@ class DataTarget(DataEndpoint):
         super().__init__(*args, **kwargs)
 
     def update(self, data):
+        data_out = self._prepare_update(data)
+        self._update(data_out)
+
+    def _prepare_update(self, data):
+        if self._adapter.count:
+            return self._adapter.create_remote_struct(data)
+        else:
+            return data
+
+    def _update(self, data):
         raise NotImplementedError()
 
 
