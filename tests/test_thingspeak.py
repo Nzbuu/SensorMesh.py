@@ -35,7 +35,8 @@ class TestThingSpeakSource:
                 fields=[('Server Temp', 'field1')]
         )
 
-        data = obj.read()
+        with obj:
+            data = obj.read()
 
         assert mock_api.get_data.call_count == 1
         mock_api.get_data.assert_called_with()
@@ -78,7 +79,8 @@ class TestThingSpeakLogger:
             'timestamp': 1453927940,
             'Server Temp': '60.0 F',
         }
-        obj.update(data)
+        with obj:
+            obj.update(data)
 
         assert mock_api.post_update.call_count == 1
         mock_api.post_update.assert_called_with({
