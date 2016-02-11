@@ -112,12 +112,11 @@ class ThingSpeakSource(DataSource):
                     "API input")
         self._api = api
 
-    def read(self):
-        content = self._api.get_data()
-        return self._parse_feed(content)
+    def _read(self):
+        return self._api.get_data()
 
-    def _parse_feed(self, content):
-        data = self._adapter.create_local_struct(content)
+    def _process_data(self, content):
+        data = super()._process_data(content)
 
         if 'timestamp' not in data:
             ts = dateutil.parser.parse(content['created_at'])
