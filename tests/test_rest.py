@@ -7,8 +7,12 @@ from sensormesh.rest import *
 
 class TestRestTarget:
     def test_cannot_create_target_without_api(self):
-        with pytest.raises(ConfigurationError):
+        with pytest.raises(TypeError):
             o = RestTarget()
+
+    def test_cannot_create_target_with_empty_api(self):
+        with pytest.raises(ValueError):
+            o = RestTarget(api=None)
 
     def test_can_create_with_api(self):
         mock_api = mock.Mock()

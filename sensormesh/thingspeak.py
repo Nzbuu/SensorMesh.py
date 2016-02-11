@@ -78,15 +78,11 @@ class ThingSpeakApi(object):
 
 
 class ThingSpeakLogger(RestTarget):
-    def __init__(self, name='', fields=None, api=None, **kwargs):
-        if api is None:
-            api = ThingSpeakApi(**kwargs)
-        elif kwargs:
-            raise ValueError(
-                    "Additional keyword inputs are forbidden when using "
-                    "API input")
+    def __init__(self, api, *args, **kwargs):
+        if isinstance(api, dict):
+            api = ThingSpeakApi(**api)
 
-        super().__init__(name=name, fields=fields, api=api)
+        super().__init__(*args, **kwargs, api=api)
 
     def _prepare_update(self, data):
         data_out = super()._prepare_update(data)
@@ -101,15 +97,13 @@ class ThingSpeakLogger(RestTarget):
 
 
 class ThingSpeakSource(DataSource):
-    def __init__(self, name='', fields=None, api=None, **kwargs):
-        super().__init__(name=name, fields=fields)
+    def __init__(self, api, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        if api is None:
-            api = ThingSpeakApi(**kwargs)
-        elif kwargs:
-            raise ValueError(
-                    "Additional keyword inputs are forbidden when using "
-                    "API input")
+        if isinstance(api, dict):
+            api = ThingSpeakApi(**api)
+        elif not api:
+            raise ValueError('Missing API input.')
         self._api = api
 
     def _read(self):
