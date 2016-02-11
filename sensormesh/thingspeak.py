@@ -82,7 +82,7 @@ class ThingSpeakLogger(RestTarget):
         if isinstance(api, dict):
             api = ThingSpeakApi(**api)
 
-        super().__init__(*args, **kwargs, api=api)
+        super().__init__(*args, api=api, **kwargs)
 
     def _prepare_update(self, data):
         data_out = super()._prepare_update(data)
