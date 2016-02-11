@@ -78,45 +78,39 @@ class ThingSpeakApi(object):
 
 
 class ThingSpeakLogger(RestTarget):
-    def __init__(self, name='', fields=None, api=None, **kwargs):
-        if api is None:
-            api = ThingSpeakApi(**kwargs)
-        elif kwargs:
-            raise ValueError(
-                    "Additional keyword inputs are forbidden when using "
-                    "API input")
+    def __init__(self, api, *args, **kwargs):
+        if isinstance(api, dict):
+            api = ThingSpeakApi(**api)
 
-        super().__init__(name=name, fields=fields, api=api)
+        super().__init__(*args, api=api, **kwargs)
 
     def _prepare_update(self, data):
-        content = self._adapter.create_remote_struct(data)
+        data_out = super()._prepare_update(data)
 
-        if 'timestamp' in data and data['timestamp']:
+        if ('timestamp' in data and data['timestamp'] and
+                'created_at' not in data_out):
             timestamp = data['timestamp']
             ts = datetime.fromtimestamp(timestamp)
-            content['created_at'] = ts.isoformat()
+            data_out['created_at'] = ts.isoformat()
 
-        return content
+        return data_out
 
 
 class ThingSpeakSource(DataSource):
-    def __init__(self, name='', fields=None, api=None, **kwargs):
-        super().__init__(name=name, fields=fields)
+    def __init__(self, api, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        if api is None:
-            api = ThingSpeakApi(**kwargs)
-        elif kwargs:
-            raise ValueError(
-                    "Additional keyword inputs are forbidden when using "
-                    "API input")
+        if isinstance(api, dict):
+            api = ThingSpeakApi(**api)
+        elif not api:
+            raise ValueError('Missing API input.')
         self._api = api
 
-    def read(self):
-        content = self._api.get_data()
-        return self._parse_feed(content)
+    def _read(self):
+        return self._api.get_data()
 
-    def _parse_feed(self, content):
-        data = self._adapter.create_local_struct(content)
+    def _process_data(self, content):
+        data = super()._process_data(content)
 
         if 'timestamp' not in data:
             ts = dateutil.parser.parse(content['created_at'])

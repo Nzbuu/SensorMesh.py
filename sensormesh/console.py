@@ -1,12 +1,13 @@
 from datetime import datetime
+
 from .endpoints import DataTarget
 
 
 class ConsoleDisplay(DataTarget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def update(self, data):
+    def _update(self, data):
         # Copy input so that original is not modified
         data = dict(data)
 

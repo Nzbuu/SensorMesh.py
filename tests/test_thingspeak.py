@@ -8,23 +8,22 @@ from sensormesh.thingspeak import *
 
 
 class TestThingSpeakSource:
-    def test_can_create_source(self):
-        obj = ThingSpeakSource(name='Test Source')
-        assert obj.name == 'Test Source'
+    def test_cannot_create_source_without_api(self):
+        with pytest.raises(TypeError):
+            _ = ThingSpeakSource(name='Test Source')
+
+    def test_cannot_create_source_with_empty_api(self):
+        with pytest.raises(ValueError):
+            _ = ThingSpeakSource(api=None, name='Test Source')
 
     def test_can_configure_key(self):
-        obj = ThingSpeakSource(key='ABCDEFGHIJKLMNOPQRST')
+        obj = ThingSpeakSource(api={'key': 'ABCDEFGHIJKLMNOPQRST'})
         assert obj._api.key == 'ABCDEFGHIJKLMNOPQRST'
 
     def test_can_inject_api(self):
         api = mock.Mock(spec=ThingSpeakApi)
         obj = ThingSpeakLogger(api=api)
         assert obj._api is api
-
-    def test_throws_with_api_and_keywords(self):
-        api = mock.Mock(spec=ThingSpeakApi)
-        with pytest.raises(ValueError):
-            obj = ThingSpeakSource(api=api, key='ABCDEFGHIJ')
 
     def test_can_read_with_api(self):
         mock_api = mock.Mock()
@@ -48,23 +47,23 @@ class TestThingSpeakSource:
 
 
 class TestThingSpeakLogger:
-    def test_can_create_logger(self):
-        obj = ThingSpeakLogger(name='Test Logger')
-        assert obj.name == 'Test Logger'
+    def test_cannot_create_logger_without_api(self):
+        with pytest.raises(TypeError):
+            _ = ThingSpeakLogger(name='Test Logger')
+
+    def test_cannot_create_logger_with_empty_api(self):
+        with pytest.raises(ValueError):
+            _ = ThingSpeakLogger(api=None, name='Test Logger')
 
     def test_can_configure_key(self):
-        obj = ThingSpeakLogger(key='ZYXWVUTSRQP0987654321')
+        obj = ThingSpeakLogger(api={'key': 'ZYXWVUTSRQP0987654321'}, name='Test Logger')
         assert obj._api.key == 'ZYXWVUTSRQP0987654321'
+        assert obj.name == 'Test Logger'
 
     def test_can_inject_api(self):
         api = mock.Mock(spec=ThingSpeakApi)
         obj = ThingSpeakLogger(api=api)
         assert obj._api is api
-
-    def test_throws_with_api_and_keywords(self):
-        api = mock.Mock(spec=ThingSpeakApi)
-        with pytest.raises(ValueError):
-            obj = ThingSpeakLogger(api=api, key='ZYXWVUTSRQP0987654321')
 
     def test_can_update_with_api(self):
         mock_api = mock.Mock()
