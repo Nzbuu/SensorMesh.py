@@ -53,24 +53,26 @@ class DataEndpoint(object):
 
 
 class DataSource(DataEndpoint):
-    def __init__(self, name='', fields=None):
-        super().__init__(name=name, fields=fields)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def read(self):
         raise NotImplementedError()
 
 
 class DataTarget(DataEndpoint):
-    def __init__(self, name='', fields=None):
-        super().__init__(name=name, fields=fields)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def update(self, data):
         raise NotImplementedError()
 
 
 class DataSourceWrapper(DataSource):
-    def __init__(self, name='', fields=('value',), source=()):
-        super().__init__(name=name, fields=fields)
+    def __init__(self, source=(), *args, **kwargs):
+        if 'fields' not in kwargs:
+            kwargs['fields'] = ('value',)
+        super().__init__(*args, **kwargs)
 
         if not source:
             raise ConfigurationError
