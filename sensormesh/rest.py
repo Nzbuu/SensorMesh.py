@@ -1,5 +1,4 @@
 from .endpoints import DataTarget
-from .exceptions import ConfigurationError
 
 
 class RestTarget(DataTarget):
