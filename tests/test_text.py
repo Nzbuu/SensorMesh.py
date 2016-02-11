@@ -28,19 +28,20 @@ class TestTextLogger:
         mock_isfile = mock.Mock(return_value=False)
         mock_file = mock.mock_open()
 
-        with mock.patch('os.path.isfile', mock_isfile):
-            with mock.patch('builtins.open', mock_file):
-                o = TextLogger(
-                        filename='temp_file.txt',
-                        fields=['timestamp', 'value']
-                )
-                data = {'timestamp': 100, 'value': 200}
+        with mock.patch('os.path.isfile', mock_isfile), \
+             mock.patch('builtins.open', mock_file):
+            o = TextLogger(
+                    filename='temp_file.txt',
+                    fields=['timestamp', 'value']
+            )
+            data = {'timestamp': 100, 'value': 200}
+            with o:
                 o.update(data)
 
         assert mock_isfile.call_count == 1
 
         assert mock_file.call_count == 1
-        mock_file.assert_called_with('temp_file.txt', 'a', newline='')
+        mock_file.assert_called_with('temp_file.txt', 'w', newline='')
 
         file_handle = mock_file()
         assert file_handle.write.call_count == 2
@@ -53,13 +54,14 @@ class TestTextLogger:
         mock_isfile = mock.Mock(return_value=True)
         mock_file = mock.mock_open()
 
-        with mock.patch('os.path.isfile', mock_isfile):
-            with mock.patch('builtins.open', mock_file):
-                o = TextLogger(
-                        filename='temp_file.txt',
-                        fields=['timestamp', 'value']
-                )
-                data = {'timestamp': 150, 'value': 250}
+        with mock.patch('os.path.isfile', mock_isfile), \
+             mock.patch('builtins.open', mock_file):
+            o = TextLogger(
+                    filename='temp_file.txt',
+                    fields=['timestamp', 'value']
+            )
+            data = {'timestamp': 150, 'value': 250}
+            with o:
                 o.update(data)
 
         assert mock_isfile.call_count == 1
@@ -75,19 +77,20 @@ class TestTextLogger:
         mock_isfile = mock.Mock(return_value=False)
         mock_file = mock.mock_open()
 
-        with mock.patch('os.path.isfile', mock_isfile):
-            with mock.patch('builtins.open', mock_file):
-                o = TextLogger(
-                        filename='temp_file.txt',
-                        fields=['timestamp', ('value', 'field1')]
-                )
-                data = {'timestamp': 110, 'value': 210}
+        with mock.patch('os.path.isfile', mock_isfile), \
+             mock.patch('builtins.open', mock_file):
+            o = TextLogger(
+                    filename='temp_file.txt',
+                    fields=['timestamp', ('value', 'field1')]
+            )
+            data = {'timestamp': 110, 'value': 210}
+            with o:
                 o.update(data)
 
         assert mock_isfile.call_count == 1
 
         assert mock_file.call_count == 1
-        mock_file.assert_called_with('temp_file.txt', 'a', newline='')
+        mock_file.assert_called_with('temp_file.txt', 'w', newline='')
 
         file_handle = mock_file()
         assert file_handle.write.call_count == 2
@@ -100,19 +103,20 @@ class TestTextLogger:
         mock_isfile = mock.Mock(return_value=False)
         mock_file = mock.mock_open()
 
-        with mock.patch('os.path.isfile', mock_isfile):
-            with mock.patch('builtins.open', mock_file):
-                o = TextLogger(
-                        filename='temp_file.txt',
-                        fields=['timestamp', 'value']
-                )
-                data = {'timestamp': 1100, 'value': 2100}
+        with mock.patch('os.path.isfile', mock_isfile), \
+             mock.patch('builtins.open', mock_file):
+            o = TextLogger(
+                    filename='temp_file.txt',
+                    fields=['timestamp', 'value']
+            )
+            data = {'timestamp': 1100, 'value': 2100}
+            with o:
                 o.update(data)
 
         assert mock_isfile.call_count == 1
 
         assert mock_file.call_count == 1
-        mock_file.assert_called_with('temp_file.txt', 'a', newline='')
+        mock_file.assert_called_with('temp_file.txt', 'w', newline='')
 
         file_handle = mock_file()
         assert file_handle.write.call_count == 2
@@ -125,19 +129,20 @@ class TestTextLogger:
         mock_isfile = mock.Mock(return_value=False)
         mock_file = mock.mock_open()
 
-        with mock.patch('os.path.isfile', mock_isfile):
-            with mock.patch('builtins.open', mock_file):
-                o = TextLogger(
-                        filename='temp_file.txt',
-                        fields=['timestamp', 'r1', 'r2']
-                )
-                data = {'timestamp': 1200, 'r2': 5}
+        with mock.patch('os.path.isfile', mock_isfile), \
+             mock.patch('builtins.open', mock_file):
+            o = TextLogger(
+                    filename='temp_file.txt',
+                    fields=['timestamp', 'r1', 'r2']
+            )
+            data = {'timestamp': 1200, 'r2': 5}
+            with o:
                 o.update(data)
 
         assert mock_isfile.call_count == 1
 
         assert mock_file.call_count == 1
-        mock_file.assert_called_with('temp_file.txt', 'a', newline='')
+        mock_file.assert_called_with('temp_file.txt', 'w', newline='')
 
         file_handle = mock_file()
         assert file_handle.write.call_count == 2

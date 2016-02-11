@@ -19,23 +19,27 @@ class TestRestTarget:
     def test_can_update_with_fields(self):
         mock_api = mock.Mock()
         o = RestTarget(api=mock_api, fields=[('value', 'field1')])
-        o.update({'value': 1})
+        with o:
+            o.update({'value': 1})
         mock_api.post_update.assert_called_with({'field1': 1})
 
     def test_can_update_without_fields(self):
         mock_api = mock.Mock()
         o = RestTarget(api=mock_api)
-        o.update({'value': 1})
+        with o:
+            o.update({'value': 1})
         mock_api.post_update.assert_called_with({'value': 1})
 
     def test_can_update_with_missing_inputs(self):
         mock_api = mock.Mock()
         o = RestTarget(api=mock_api, fields=[('value', 'field1'), ('count', 'field2')])
-        o.update({'value': 1})
+        with o:
+            o.update({'value': 1})
         mock_api.post_update.assert_called_with({'field1': 1})
 
     def test_can_update_with_extra_inputs(self):
         mock_api = mock.Mock()
         o = RestTarget(api=mock_api, fields=[('value', 'field1')])
-        o.update({'value': 1, 'other': 0})
+        with o:
+            o.update({'value': 1, 'other': 0})
         mock_api.post_update.assert_called_with({'field1': 1})

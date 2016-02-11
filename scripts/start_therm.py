@@ -1,13 +1,10 @@
 from w1thermsensor import W1ThermSensor
 
-from sensormesh import (
-    Controller,
-    ConfigManager,
-    DataSourceWrapper,
-    ConsoleDisplay,
-    ThingSpeakLogger,
-    TextLogger,
-)
+from sensormesh.application import Controller, ConfigManager
+from sensormesh.endpoints import DataSourceWrapper
+from sensormesh.console import ConsoleDisplay
+from sensormesh.thingspeak import ThingSpeakLogger
+from sensormesh.text import TextLogger
 
 # Configuration loader class
 cfg_man = ConfigManager()
@@ -37,6 +34,7 @@ app.add_target(t)
 # Target 3
 csv_config = {
     'filename': 'logdata_therm.csv',
+    'reopen_file': True,
     'fields': ['timestamp', 'temperature']
 }
 t = TextLogger(**csv_config)
@@ -44,7 +42,7 @@ app.add_target(t)
 
 # Start application
 try:
-    app.start()
+    app.run()
 except KeyboardInterrupt:
     print("Goodbye!")
 finally:

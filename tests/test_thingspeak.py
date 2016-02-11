@@ -35,7 +35,8 @@ class TestThingSpeakSource:
                 fields=[('Server Temp', 'field1')]
         )
 
-        data = obj.read()
+        with obj:
+            data = obj.read()
 
         assert mock_api.get_data.call_count == 1
         mock_api.get_data.assert_called_with()
@@ -78,7 +79,8 @@ class TestThingSpeakLogger:
             'timestamp': 1453927940,
             'Server Temp': '60.0 F',
         }
-        obj.update(data)
+        with obj:
+            obj.update(data)
 
         assert mock_api.post_update.call_count == 1
         mock_api.post_update.assert_called_with({
@@ -149,9 +151,9 @@ class TestThingSpeakApi:
                 base_url='https://api.example.com:6666'
         )
 
-        with responses.RequestsMock() as r_mock:
-            with pytest.raises(ConfigurationError):
-                data = api.get_data()
+        with responses.RequestsMock() as r_mock, \
+                pytest.raises(ConfigurationError):
+            data = api.get_data()
 
         assert len(r_mock.calls) == 0
 
@@ -227,11 +229,11 @@ class TestThingSpeakApi:
         )
         data = {"created_at": "2016-01-27T20:52:20", "field1": "60.0 F"}
 
-        with responses.RequestsMock() as r_mock:
-            with pytest.raises(ConfigurationError):
-                api.post_update(data)
+        with responses.RequestsMock() as r_mock, \
+                pytest.raises(ConfigurationError):
+            api.post_update(data)
 
-            assert len(r_mock.calls) == 0
+        assert len(r_mock.calls) == 0
 
 
 canned_responses = {

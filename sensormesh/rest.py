@@ -1,10 +1,10 @@
-from .base import DataTarget
+from .endpoints import DataTarget
 from .exceptions import ConfigurationError
 
 
 class RestTarget(DataTarget):
-    def __init__(self, name='', fields=None, api=None):
-        super().__init__(name=name, fields=fields)
+    def __init__(self, api=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         if api:
             self._api = api

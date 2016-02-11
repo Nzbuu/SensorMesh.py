@@ -1,6 +1,7 @@
 import os.path
 import time
 import json
+import contextlib
 
 from .exceptions import ConfigurationError
 
@@ -10,14 +11,14 @@ class Controller(object):
         self.name = name
         self._source = None
         self._targets = []
-        self._step = 0
+        self._time_step = 0
         self._num_steps = 1
 
         self._timefcn = timefcn if timefcn else time.time
         self._delayfcn = delayfcn if delayfcn else time.sleep
 
     def set_steps(self, step, num_steps):
-        self._step = step
+        self._time_step = step
         self._num_steps = num_steps
 
     def add_source(self, source):
@@ -43,33 +44,40 @@ class Controller(object):
         if not self._targets:
             raise ConfigurationError()
 
-    def start(self):
+    def run(self):
         self._check_for_source()
         self._check_for_targets()
 
-        time_start_next = self._timefcn()
-        for count_steps in range(self._num_steps):
-            self.step()
+        with contextlib.ExitStack() as stack:
+            self._start(stack)
 
-            if self._step <= 0:
-                pass
-            elif count_steps < self._num_steps - 1:
-                time_finish_now = self._timefcn()
-                time_start_next += self._step
-                while time_finish_now > time_start_next:
-                    time_start_next += self._step
+            time_start_next = self._timefcn()
+            for count_steps in range(self._num_steps):
+                self._step()
 
-                self._delayfcn(max(time_start_next - time_finish_now, 0))
+                if self._time_step <= 0:
+                    pass
+                elif count_steps < self._num_steps - 1:
+                    time_finish_now = self._timefcn()
+                    time_start_next += self._time_step
+                    while time_finish_now > time_start_next:
+                        time_start_next += self._time_step
 
-    def step(self):
+                    self._delayfcn(max(time_start_next - time_finish_now, 0))
+
+    def _start(self, stack):
+        for o in [self._source] + self._targets:
+            stack.enter_context(o)
+
+    def _step(self):
         timestamp = self._timefcn()
 
         data = self._source.read()
         if not data.get('timestamp'):
             data['timestamp'] = timestamp
 
-        for l in self._targets:
-            l.update(data)
+        for t in self._targets:
+            t.update(data)
 
 
 class ConfigManager(object):

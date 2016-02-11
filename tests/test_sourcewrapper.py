@@ -2,7 +2,7 @@ import unittest.mock as mock
 
 import pytest
 
-from sensormesh.base import DataSourceWrapper, ConfigurationError
+from sensormesh.endpoints import DataSourceWrapper, ConfigurationError
 
 
 class TestDataSourceWrapper:
@@ -22,7 +22,8 @@ class TestDataSourceWrapper:
 
         assert s.fields == ['count']
 
-        d = s.read()
+        with s:
+            d = s.read()
         assert d == {'count': 10}
 
     def test_can_wrap_two_callables(self):
@@ -32,7 +33,8 @@ class TestDataSourceWrapper:
 
         assert s.fields == ['field1', 'field2']
 
-        d = s.read()
+        with s:
+            d = s.read()
         assert d == {'field1': 10, 'field2': 20}
 
     def test_can_wrap_single_output(self):
@@ -41,8 +43,9 @@ class TestDataSourceWrapper:
 
         assert s.fields == ['field3']
 
-        d = s.read()
-        assert d == {'field3': (110,  120)}
+        with s:
+            d = s.read()
+        assert d == {'field3': (110, 120)}
 
     def test_can_wrap_multiple_outputs(self):
         m = mock.Mock(return_value=(210, 220))
@@ -50,5 +53,6 @@ class TestDataSourceWrapper:
 
         assert s.fields == ['field3', 'field1']
 
-        d = s.read()
+        with s:
+            d = s.read()
         assert d == {'field3': 210, 'field1': 220}

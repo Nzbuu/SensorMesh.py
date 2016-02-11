@@ -2,7 +2,7 @@ from .utils import DataAdapter
 from .exceptions import ConfigurationError
 
 
-class Base(object):
+class DataEndpoint(object):
     def __init__(self, name='', fields=None):
         super().__init__()
         self._name = name
@@ -21,10 +21,6 @@ class Base(object):
     def name(self):
         return self._name
 
-    @name.setter
-    def name(self, u):
-        self._name = u
-
     @property
     def fields(self):
         return list(self._adapter.local_names)
@@ -38,26 +34,41 @@ class Base(object):
                 remote_name=remote_name
         )
 
+    def __enter__(self):
+        self.open()
+        return self
 
-class DataSource(Base):
-    def __init__(self, name='', fields=None):
-        super().__init__(name=name, fields=fields)
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+    def open(self):
+        pass
+
+    def close(self):
+        pass
+
+
+class DataSource(DataEndpoint):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def read(self):
         raise NotImplementedError()
 
 
-class DataTarget(Base):
-    def __init__(self, name='', fields=None):
-        super().__init__(name=name, fields=fields)
+class DataTarget(DataEndpoint):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def update(self, data):
         raise NotImplementedError()
 
 
 class DataSourceWrapper(DataSource):
-    def __init__(self, name='', fields=('value',), source=()):
-        super().__init__(name=name, fields=fields)
+    def __init__(self, source=(), *args, **kwargs):
+        if 'fields' not in kwargs:
+            kwargs['fields'] = ('value',)
+        super().__init__(*args, **kwargs)
 
         if not source:
             raise ConfigurationError
