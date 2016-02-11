@@ -6,8 +6,9 @@ from sensormesh.console import *
 class TestConsoleDisplay:
     def test_can_create_target(self):
         with mock.patch("builtins.print", autospec=True) as mock_print:
-            t = ConsoleDisplay()
+            t = ConsoleDisplay(name='Console Logger')
             assert not mock_print.called
+            assert t.name == 'Console Logger'
 
     def test_update_one_value_no_timestamp(self):
         t = ConsoleDisplay()
