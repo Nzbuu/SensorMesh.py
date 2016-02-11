@@ -57,123 +57,107 @@ class TestController:
             a.run()
 
     def test_runs_with_zero_step(self):
-        tf = mock.Mock()
-        tf.side_effect = [1453928000, 1453928000.1, 1453928000.2]
-        df = mock.Mock()
-
-        a = Controller(timefcn=tf, delayfcn=df)
+        a = mock_application()
+        a._timefcn.side_effect = [1453928000, 1453928000.1, 1453928000.2]
         a.set_steps(step=0, num_steps=2)
         a._step = mock.Mock()
 
-        s = mock.Mock(spec=DataSource)
-        a.add_source(s)
-
-        t1 = mock.Mock(spec=DataTarget)
-        a.add_target(t1)
-
-        t2 = mock.Mock(spec=DataTarget)
-        a.add_target(t2)
-
         a.run()
 
         assert a._step.call_count == 2
-        assert df.call_count == 0  # No delays when zero step
+        assert a._delayfcn.call_count == 0  # Never sleeps
 
         # All resources started
-        assert s.open.call_count == 1
-        assert t1.open.call_count == 1
-        assert t2.open.call_count == 1
+        assert a._source.open.call_count == 1
+        assert a._targets[0].open.call_count == 1
+        assert a._targets[1].open.call_count == 1
 
         # All resources stopped
-        assert s.close.call_count == 1
-        assert t1.close.call_count == 1
-        assert t2.close.call_count == 1
+        assert a._source.close.call_count == 1
+        assert a._targets[0].close.call_count == 1
+        assert a._targets[1].close.call_count == 1
 
     def test_runs_with_nonzero_step(self):
-        tf = mock.Mock()
-        tf.side_effect = [1453928000, 1453928000.1, 1453928001.1]
-        df = mock.Mock()
-
-        a = Controller(timefcn=tf, delayfcn=df)
+        a = mock_application()
+        a._timefcn.side_effect = [1453928000, 1453928000.1, 1453928001.1]
         a.set_steps(step=1, num_steps=2)
         a._step = mock.Mock()
-
-        s = mock.Mock(spec=DataSource)
-        a.add_source(s)
-
-        t1 = mock.Mock(spec=DataTarget)
-        a.add_target(t1)
-
-        t2 = mock.Mock(spec=DataTarget)
-        a.add_target(t2)
 
         a.run()
 
         assert a._step.call_count == 2
-        assert df.call_count == 1  # Don't delay after final step
+        assert a._delayfcn.call_count == 1  # Don't delay after final step
 
         # All resources started
-        assert s.open.call_count == 1
-        assert t1.open.call_count == 1
-        assert t2.open.call_count == 1
+        assert a._source.open.call_count == 1
+        assert a._targets[0].open.call_count == 1
+        assert a._targets[1].open.call_count == 1
 
         # All resources stopped
-        assert s.close.call_count == 1
-        assert t1.close.call_count == 1
-        assert t2.close.call_count == 1
+        assert a._source.close.call_count == 1
+        assert a._targets[0].close.call_count == 1
+        assert a._targets[1].close.call_count == 1
 
     def test_skips_missing_steps(self):
-        tf = mock.Mock()
-        tf.side_effect = [1453928000, 1453928001.1, 1453928003.1]
-        df = mock.Mock()
-
-        a = Controller(timefcn=tf, delayfcn=df)
+        a = mock_application()
+        a._timefcn.side_effect = [1453928000, 1453928001.1, 1453928003.1]
         a.set_steps(step=1, num_steps=2)
         a._step = mock.Mock()
-
-        s = mock.Mock(spec=DataSource)
-        a.add_source(s)
-
-        t1 = mock.Mock(spec=DataTarget)
-        a.add_target(t1)
-
-        t2 = mock.Mock(spec=DataTarget)
-        a.add_target(t2)
 
         a.run()
 
         assert a._step.call_count == 2
-        assert df.call_count == 1  # Don't delay after final step
+        assert a._delayfcn.call_count == 1  # Don't delay after final step
 
         # All resources started
-        assert s.open.call_count == 1
-        assert t1.open.call_count == 1
-        assert t2.open.call_count == 1
+        assert a._source.open.call_count == 1
+        assert a._targets[0].open.call_count == 1
+        assert a._targets[1].open.call_count == 1
 
         # All resources stopped
-        assert s.close.call_count == 1
-        assert t1.close.call_count == 1
-        assert t2.close.call_count == 1
+        assert a._source.close.call_count == 1
+        assert a._targets[0].close.call_count == 1
+        assert a._targets[1].close.call_count == 1
 
     def test_step_calls_read_and_update(self):
-        tf = mock.Mock()
-        tf.side_effect = [1453928000, 1453928000.1, 1453928001.1]
-        df = mock.Mock()
-
-        a = Controller(timefcn=tf, delayfcn=df)
-
-        s = mock.Mock(spec=DataSource)
-        s.read.return_value = {'value': 0.5}
-        a.add_source(s)
-
-        t1 = mock.Mock(spec=DataTarget)
-        a.add_target(t1)
-
-        t2 = mock.Mock(spec=DataTarget)
-        a.add_target(t2)
+        a = mock_application()
+        a._timefcn.side_effect = [1453928000, 1453928000.1, 1453928001.1]
 
         a._step()
 
-        assert s.read.call_count == 1
-        assert t1.update.call_count == 1
-        assert t2.update.call_count == 1
+        assert a._source.read.call_count == 1
+        assert a._targets[0].update.call_count == 1
+        assert a._targets[1].update.call_count == 1
+
+
+def mock_application():
+    tf = mock.Mock()
+    df = mock.Mock()
+
+    a = Controller(timefcn=tf, delayfcn=df)
+
+    s = mock_source()
+    a.add_source(s)
+
+    for _ in range(2):
+        t = mock_target()
+        a.add_target(t)
+
+    return a
+
+
+def mock_source(name=''):
+    s = DataSource(name=name)
+    s.open = mock.Mock()
+    s.close = mock.Mock()
+    s.read = mock.Mock()
+    s.read.return_value = {'value': 0.5}
+    return s
+
+
+def mock_target(name=''):
+    t = DataTarget(name=name)
+    t.open = mock.Mock()
+    t.close = mock.Mock()
+    t.update = mock.Mock()
+    return t

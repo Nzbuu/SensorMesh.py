@@ -65,16 +65,9 @@ class Controller(object):
 
                     self._delayfcn(max(time_start_next - time_finish_now, 0))
 
-    def _start(self, stack=None):
-        s = self._source
-        s.open()
-        if stack:
-            stack.callback(s.close)
-
-        for t in self._targets:
-            t.open()
-            if stack:
-                stack.callback(t.close)
+    def _start(self, stack):
+        for o in [self._source] + self._targets:
+            stack.enter_context(o)
 
     def _step(self):
         timestamp = self._timefcn()

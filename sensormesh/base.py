@@ -38,6 +38,13 @@ class Base(object):
                 remote_name=remote_name
         )
 
+    def __enter__(self):
+        self.open()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
     def open(self):
         pass
 
