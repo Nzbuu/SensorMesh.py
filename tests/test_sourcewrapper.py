@@ -2,7 +2,7 @@ import unittest.mock as mock
 
 import pytest
 
-from sensormesh.base import DataSourceWrapper, ConfigurationError
+from sensormesh.endpoints import DataSourceWrapper, ConfigurationError
 
 
 class TestDataSourceWrapper:

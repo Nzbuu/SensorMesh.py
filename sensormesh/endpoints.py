@@ -2,7 +2,7 @@ from .utils import DataAdapter
 from .exceptions import ConfigurationError
 
 
-class Base(object):
+class DataEndpoint(object):
     def __init__(self, name='', fields=None):
         super().__init__()
         self._name = name
@@ -52,7 +52,7 @@ class Base(object):
         pass
 
 
-class DataSource(Base):
+class DataSource(DataEndpoint):
     def __init__(self, name='', fields=None):
         super().__init__(name=name, fields=fields)
 
@@ -60,7 +60,7 @@ class DataSource(Base):
         raise NotImplementedError()
 
 
-class DataTarget(Base):
+class DataTarget(DataEndpoint):
     def __init__(self, name='', fields=None):
         super().__init__(name=name, fields=fields)
 

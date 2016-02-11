@@ -4,7 +4,7 @@ from string import Template
 import requests
 import dateutil.parser
 
-from .base import DataSource
+from .endpoints import DataSource
 from .rest import RestTarget
 from .exceptions import ConfigurationError
 

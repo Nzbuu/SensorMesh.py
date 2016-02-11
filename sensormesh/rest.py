@@ -1,4 +1,4 @@
-from .base import DataTarget
+from .endpoints import DataTarget
 from .exceptions import ConfigurationError
 
 

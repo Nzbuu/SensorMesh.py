@@ -1,7 +1,7 @@
 import csv
 import os.path
 
-from .base import DataTarget
+from .endpoints import DataTarget
 
 
 class TextLogger(DataTarget):

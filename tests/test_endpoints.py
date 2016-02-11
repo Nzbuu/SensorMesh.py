@@ -1,6 +1,6 @@
 import pytest
 
-from sensormesh.base import Base as BaseClass
+from sensormesh.endpoints import DataEndpoint as BaseClass
 
 
 class TestBase:

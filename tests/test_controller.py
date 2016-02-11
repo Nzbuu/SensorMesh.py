@@ -3,7 +3,7 @@ import unittest.mock as mock
 import pytest
 
 from sensormesh.application import *
-from sensormesh.base import DataSource, DataTarget
+from sensormesh.endpoints import DataSource, DataTarget
 
 
 class TestController:

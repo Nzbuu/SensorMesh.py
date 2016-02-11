@@ -1,5 +1,5 @@
 from datetime import datetime
-from .base import DataTarget
+from .endpoints import DataTarget
 
 
 class ConsoleDisplay(DataTarget):

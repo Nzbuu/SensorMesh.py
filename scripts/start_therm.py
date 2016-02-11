@@ -1,7 +1,7 @@
 from w1thermsensor import W1ThermSensor
 
 from sensormesh.application import Controller, ConfigManager
-from sensormesh.base import DataSourceWrapper
+from sensormesh.endpoints import DataSourceWrapper
 from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 from sensormesh.text import TextLogger
