@@ -147,17 +147,17 @@ def mock_application():
 
 
 def mock_source(name=''):
-    s = DataSource(name=name)
-    s.open = mock.Mock()
-    s.close = mock.Mock()
-    s.read = mock.Mock()
-    s.read.return_value = {'value': 0.5}
-    return s
+    obj = DataSource(name=name)
+    obj.open = mock.Mock(wraps=obj.open)
+    obj.close = mock.Mock(wraps=obj.close)
+    obj.read = mock.Mock()
+    obj.read.return_value = {'value': 0.5}
+    return obj
 
 
 def mock_target(name=''):
-    t = DataTarget(name=name)
-    t.open = mock.Mock()
-    t.close = mock.Mock()
-    t.update = mock.Mock()
-    return t
+    obj = DataTarget(name=name)
+    obj.open = mock.Mock(wraps=obj.open)
+    obj.close = mock.Mock(wraps=obj.close)
+    obj.update = mock.Mock()
+    return obj
