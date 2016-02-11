@@ -30,6 +30,15 @@ class TestConsoleDisplay:
                 t.update({'value1': 1, 'value2': 'kevin'})
             mock_print.assert_called_once_with('None', ':', {'value1': 1, 'value2': 'kevin'})
 
+    def test_can_write_remote_names(self):
+        t = ConsoleDisplay(
+                fields=['timestamp', ('value1', 'field1')]
+        )
+        with mock.patch("builtins.print", autospec=True) as mock_print:
+            with t:
+                t.update({'value1': 1, 'value2': 'kevin'})
+            mock_print.assert_called_once_with('None', ':', {'field1': 1})
+
     def test_can_call_multiple_times_with_timestamp(self):
         t = ConsoleDisplay()
         data = {'timestamp': 1453927940, 'value': 1}
