@@ -6,7 +6,7 @@ from .endpoints import DataTarget
 
 class TextLogger(DataTarget):
     def __init__(self, filename, fields, reopen_file=True, *args, **kwargs):
-        super().__init__(*args, **kwargs, fields=fields)
+        super().__init__(*args, fields=fields, **kwargs)
         self._filename = filename
         self._reopen = reopen_file
         self._adapter.create_missing = True
