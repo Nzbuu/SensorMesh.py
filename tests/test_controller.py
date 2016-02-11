@@ -12,46 +12,42 @@ class TestController:
 
     def test_can_add_source(self):
         a = Controller()
-        s = DataSource()
-        s.name = 'Mock Source'
+        s = mock_source('Mock Source')
         a.add_source(s)
         assert a.get_source_name() == 'Mock Source'
 
     def test_cannot_add_2_sources(self):
         a = Controller()
-        s1 = DataSource()
-        s2 = DataSource()
+        s1 = mock_source()
+        s2 = mock_source()
         a.add_source(s1)
         with pytest.raises(ConfigurationError):
             a.add_source(s2)
 
     def test_can_add_target(self):
         a = Controller()
-        t = DataTarget()
-        t.name = 'Mock Target'
+        t = mock_target('Mock Target')
         a.add_target(t)
         assert a.get_target_names() == ['Mock Target']
 
     def test_can_add_2_targets(self):
         a = Controller()
-        t1 = DataTarget()
-        t1.name = 'Mock Target 1'
-        t2 = DataTarget()
-        t2.name = 'Mock Target 2'
+        t1 = mock_target('Mock Target 1')
+        t2 = mock_target('Mock Target 2')
         a.add_target(t1)
         a.add_target(t2)
         assert a.get_target_names() == ['Mock Target 1', 'Mock Target 2']
 
     def test_cannot_start_without_target(self):
         a = Controller()
-        s = DataSource()
+        s = mock_source()
         a.add_source(s)
         with pytest.raises(ConfigurationError):
             a.run()
 
     def test_cannot_start_without_source(self):
         a = Controller()
-        t = DataTarget()
+        t = mock_target()
         a.add_target(t)
         with pytest.raises(ConfigurationError):
             a.run()
