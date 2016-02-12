@@ -11,15 +11,11 @@ class Controller(object):
         self.name = name
         self._source = None
         self._targets = []
-        self._time_step = 0
-        self._num_steps = 1
 
-        self._timefcn = timefcn if timefcn else time.time
-        self._delayfcn = delayfcn if delayfcn else time.sleep
+        self._trigger = TimeTrigger(timefcn, delayfcn)
 
-    def set_steps(self, step, num_steps):
-        self._time_step = step
-        self._num_steps = num_steps
+    def set_steps(self, time_step, num_steps):
+        self._trigger.set_steps(time_step, num_steps)
 
     def add_source(self, source):
         if self._source is None:
@@ -51,33 +47,50 @@ class Controller(object):
         with contextlib.ExitStack() as stack:
             self._start(stack)
 
-            time_start_next = self._timefcn()
-            for count_steps in range(self._num_steps):
-                self._step()
-
-                if self._time_step <= 0:
-                    pass
-                elif count_steps < self._num_steps - 1:
-                    time_finish_now = self._timefcn()
-                    time_start_next += self._time_step
-                    while time_finish_now > time_start_next:
-                        time_start_next += self._time_step
-
-                    self._delayfcn(max(time_start_next - time_finish_now, 0))
+            for timestamp in self._trigger.iter():
+                self._step(timestamp)
 
     def _start(self, stack):
         for o in [self._source] + self._targets:
             stack.enter_context(o)
 
-    def _step(self):
-        timestamp = self._timefcn()
-
+    def _step(self, timestamp):
         data = self._source.read()
         if not data.get('timestamp'):
             data['timestamp'] = timestamp
 
         for t in self._targets:
             t.update(data)
+
+
+class TimeTrigger(object):
+    def __init__(self, timefcn, delayfcn):
+        self._timefcn = timefcn if timefcn else time.time
+        self._delayfcn = delayfcn if delayfcn else time.sleep
+        self._num_steps = 1
+        self._time_step = 0
+
+    def set_steps(self, time_step, num_steps):
+        self._time_step = time_step
+        self._num_steps = num_steps
+
+    def iter(self):
+        time_finish_now = self._timefcn()
+        time_start_next = time_finish_now
+
+        for count_steps in range(self._num_steps):
+            if time_start_next > time_finish_now:
+                self._delayfcn(time_start_next - time_finish_now)
+
+            yield time_start_next
+
+            time_finish_now = self._timefcn()
+            if self._time_step > 0:
+                time_start_next += self._time_step
+                while time_finish_now > time_start_next:
+                    time_start_next += self._time_step
+            else:
+                time_start_next = time_finish_now
 
 
 class ConfigManager(object):
