@@ -54,14 +54,14 @@ class TestController:
 
     def test_runs_with_zero_step(self):
         a = mock_application()
-        a._timefcn.side_effect = [1453928000, 1453928000.1, 1453928000.2]
-        a.set_steps(step=0, num_steps=2)
+        a._trigger._timefcn.side_effect = [1453928000, 1453928000.1, 1453928000.2]
+        a.set_steps(time_step=0, num_steps=2)
         a._step = mock.Mock()
 
         a.run()
 
         assert a._step.call_count == 2
-        assert a._delayfcn.call_count == 0  # Never sleeps
+        assert a._trigger._delayfcn.call_count == 0  # Never sleeps
 
         # All resources started
         assert a._source.open.call_count == 1
@@ -75,14 +75,14 @@ class TestController:
 
     def test_runs_with_nonzero_step(self):
         a = mock_application()
-        a._timefcn.side_effect = [1453928000, 1453928000.1, 1453928001.1]
-        a.set_steps(step=1, num_steps=2)
+        a._trigger._timefcn.side_effect = [1453928000, 1453928000.1, 1453928001.1]
+        a.set_steps(time_step=1, num_steps=2)
         a._step = mock.Mock()
 
         a.run()
 
         assert a._step.call_count == 2
-        assert a._delayfcn.call_count == 1  # Don't delay after final step
+        assert a._trigger._delayfcn.call_count == 1  # Don't delay after final step
 
         # All resources started
         assert a._source.open.call_count == 1
@@ -96,14 +96,14 @@ class TestController:
 
     def test_skips_missing_steps(self):
         a = mock_application()
-        a._timefcn.side_effect = [1453928000, 1453928001.1, 1453928003.1]
-        a.set_steps(step=1, num_steps=2)
+        a._trigger._timefcn.side_effect = [1453928000, 1453928001.1, 1453928003.1]
+        a.set_steps(time_step=1, num_steps=2)
         a._step = mock.Mock()
 
         a.run()
 
         assert a._step.call_count == 2
-        assert a._delayfcn.call_count == 1  # Don't delay after final step
+        assert a._trigger._delayfcn.call_count == 1  # Don't delay after final step
 
         # All resources started
         assert a._source.open.call_count == 1
@@ -117,9 +117,8 @@ class TestController:
 
     def test_step_calls_read_and_update(self):
         a = mock_application()
-        a._timefcn.side_effect = [1453928000, 1453928000.1, 1453928001.1]
 
-        a._step()
+        a._step(1453928000)
 
         assert a._source.read.call_count == 1
         assert a._targets[0].update.call_count == 1

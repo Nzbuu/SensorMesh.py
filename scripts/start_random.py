@@ -11,7 +11,7 @@ cfg_man = ConfigManager()
 
 # Configure App
 app = Controller()
-app.set_steps(step=20, num_steps=5)
+app.set_steps(time_step=20, num_steps=5)
 
 # Source
 s = DataSourceWrapper(source=random.random)

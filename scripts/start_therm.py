@@ -11,7 +11,7 @@ cfg_man = ConfigManager()
 
 # Configure App
 app = Controller()
-app.set_steps(step=60, num_steps=24 * 60)
+app.set_steps(time_step=60, num_steps=24 * 60)
 
 # Source
 o = W1ThermSensor()
