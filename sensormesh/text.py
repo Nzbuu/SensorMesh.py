@@ -18,8 +18,9 @@ class TextLogger(DataTarget):
         return self._filename
 
     def open(self):
+        super().open()
         if not self._file:
-            create_file = not(self._reopen and os.path.isfile(self._filename))
+            create_file = not (self._reopen and os.path.isfile(self._filename))
             file_mode = 'w' if create_file else 'a'
 
             self._file = open(self._filename, file_mode, newline='')
@@ -31,6 +32,7 @@ class TextLogger(DataTarget):
                 self._writer.writeheader()
 
     def close(self):
+        super().close()
         if self._file:
             self._writer = None
 
@@ -40,3 +42,10 @@ class TextLogger(DataTarget):
 
     def _update(self, data):
         self._writer.writerow(data)
+
+    def __str__(self):
+        return "{0}(name='{1}', filename='{2}')".format(
+                self.__class__.__name__,
+                self._name,
+                self._filename
+        )

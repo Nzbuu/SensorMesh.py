@@ -18,12 +18,13 @@ o = W1ThermSensor()
 print(o)
 s = DataSourceWrapper(
         fields=['temperature'],
-        source=o.get_temperature
+        source=o.get_temperature,
+        name=str(o)
 )
 app.add_source(s)
 
 # Target 1
-t = ConsoleDisplay()
+t = ConsoleDisplay(name='stdout')
 app.add_target(t)
 
 # Target 2

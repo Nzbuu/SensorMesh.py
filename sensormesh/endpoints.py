@@ -1,5 +1,9 @@
+import logging
+
 from .utils import DataAdapter
 from .exceptions import ConfigurationError
+
+logger = logging.getLogger(__name__)
 
 
 class DataEndpoint(object):
@@ -46,10 +50,13 @@ class DataEndpoint(object):
         self.close()
 
     def open(self):
-        pass
+        logger.info('Opening %s', str(self))
 
     def close(self):
-        pass
+        logger.info('Closing %s', str(self))
+
+    def __str__(self):
+        return "{0}(name='{1}')".format(self.__class__.__name__, self._name)
 
 
 class DataSource(DataEndpoint):
@@ -57,6 +64,7 @@ class DataSource(DataEndpoint):
         super().__init__(*args, **kwargs)
 
     def read(self):
+        logger.info('Read %s', str(self))
         data_in = self._read()
         data = self._process_data(data_in)
         return data
@@ -74,6 +82,7 @@ class DataTarget(DataEndpoint):
         super().__init__(*args, **kwargs)
 
     def update(self, data):
+        logger.info('Update %s', str(self))
         data_out = self._prepare_update(data)
         self._update(data_out)
 
