@@ -23,11 +23,11 @@ app = Controller()
 app.set_steps(time_step=20, num_steps=5)
 
 # Source
-s = DataSourceWrapper(source=random.random)
+s = DataSourceWrapper(source=random.random, name='Random numbers')
 app.add_source(s)
 
 # Target 1
-t = ConsoleDisplay()
+t = ConsoleDisplay(name='stdout')
 app.add_target(t)
 
 # Target 2
