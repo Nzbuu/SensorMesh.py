@@ -3,6 +3,7 @@ import unittest.mock as mock
 
 import pytest
 import responses
+import requests.exceptions
 
 from sensormesh.thingspeak import *
 
@@ -178,6 +179,26 @@ class TestThingSpeakApi:
         assert data['created_at'] == '2016-01-27T20:52:10Z'
         assert data['field1'] == '58.5 F'
 
+    def test_get_data_connection_error(self):
+        api = ThingSpeakApi(
+                channel=666,
+                base_url='https://api.example.com:6666'
+        )
+
+        with responses.RequestsMock() as r_mock:
+            r_mock.add(
+                    r_mock.GET,
+                    'https://api.example.com:6666/channels/666/feed/last.json',
+                    body=requests.exceptions.ConnectionError()
+            )
+
+            with pytest.raises(requests.exceptions.ConnectionError):
+                _ = api.get_data()
+
+            assert len(r_mock.calls) == 1
+            assert r_mock.calls[0].request.url == 'https://api.example.com:6666/channels/666/feed/last.json'
+            assert type(r_mock.calls[0].response) is requests.exceptions.ConnectionError
+
     def test_can_post_update_with_url(self):
         api = ThingSpeakApi(
                 key='ZYXWVUTSRQP0987654321',
@@ -233,6 +254,27 @@ class TestThingSpeakApi:
             api.post_update(data)
 
         assert len(r_mock.calls) == 0
+
+    def test_post_update_connection_error(self):
+        api = ThingSpeakApi(
+                key='ZYXWVUTSRQP0987654321',
+                base_url='https://api.example.com:6666'
+        )
+        data = {"created_at": "2016-01-27T20:52:20", "field1": "60.0 F"}
+
+        with responses.RequestsMock() as r_mock:
+            r_mock.add(
+                    r_mock.POST,
+                    'https://api.example.com:6666/update.json',
+                    body=requests.exceptions.ConnectionError()
+            )
+
+            with pytest.raises(requests.exceptions.ConnectionError):
+                api.post_update(data)
+
+            assert len(r_mock.calls) == 1
+            assert r_mock.calls[0].request.url == 'https://api.example.com:6666/update.json'
+            assert type(r_mock.calls[0].response) is requests.exceptions.ConnectionError
 
 
 canned_responses = {
