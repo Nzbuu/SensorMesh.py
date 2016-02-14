@@ -56,7 +56,7 @@ class DataEndpoint(object):
         logger.info('Closing %s', str(self))
 
     def __str__(self):
-        return "{}(name='{}')".format(self.__class__.__name__, self._name)
+        return "{0}(name='{1}')".format(self.__class__.__name__, self._name)
 
 
 class DataSource(DataEndpoint):
