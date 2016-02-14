@@ -1,10 +1,19 @@
 import random
+import logging
+import logging.config
+import json
 
 from sensormesh.application import Controller, ConfigManager
 from sensormesh.endpoints import DataSourceWrapper
 from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 from sensormesh.text import TextLogger
+
+# Configure logging
+with open('log_config.json', 'r') as f:
+    log_config = json.load(f)
+log_config['disable_existing_loggers'] = False
+logging.config.dictConfig(log_config)
 
 # Configuration loader class
 cfg_man = ConfigManager()

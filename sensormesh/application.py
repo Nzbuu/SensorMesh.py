@@ -2,8 +2,11 @@ import os.path
 import time
 import json
 import contextlib
+import logging
 
 from .exceptions import ConfigurationError
+
+logger = logging.getLogger(__name__)
 
 
 class Controller(object):
@@ -41,6 +44,8 @@ class Controller(object):
             raise ConfigurationError()
 
     def run(self):
+        logger.info('Starting Controller')
+
         self._check_for_source()
         self._check_for_targets()
 
@@ -75,6 +80,8 @@ class TimeTrigger(object):
         self._num_steps = num_steps
 
     def iter(self):
+        logger.info('Starting iterator')
+
         time_finish_now = self._timefcn()
         time_start_next = time_finish_now
 
@@ -82,6 +89,7 @@ class TimeTrigger(object):
             if time_start_next > time_finish_now:
                 self._delayfcn(time_start_next - time_finish_now)
 
+            logger.info('Start iteration')
             yield time_start_next
 
             time_finish_now = self._timefcn()
@@ -91,6 +99,8 @@ class TimeTrigger(object):
                     time_start_next += self._time_step
             else:
                 time_start_next = time_finish_now
+
+        logger.info('Finished iterator')
 
 
 class ConfigManager(object):
