@@ -85,11 +85,11 @@ class TimeTrigger(object):
         time_finish_now = self._timefcn()
         time_start_next = time_finish_now
 
-        for _ in range(self._num_steps):
+        for count_steps in range(self._num_steps):
             if time_start_next > time_finish_now:
                 self._delayfcn(time_start_next - time_finish_now)
 
-            logger.info('Start iteration')
+            logger.info('Start iteration #{}'.format(count_steps))
             yield time_start_next
 
             time_finish_now = self._timefcn()
