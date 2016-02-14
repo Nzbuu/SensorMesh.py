@@ -55,12 +55,16 @@ class DataEndpoint(object):
     def close(self):
         logger.info('Closing {}'.format(str(self)))
 
+    def __str__(self):
+        return "{}(name='{}')".format(self.__class__.__name__, self._name)
+
 
 class DataSource(DataEndpoint):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def read(self):
+        logger.info('Read {}'.format(str(self)))
         data_in = self._read()
         data = self._process_data(data_in)
         return data
@@ -78,6 +82,7 @@ class DataTarget(DataEndpoint):
         super().__init__(*args, **kwargs)
 
     def update(self, data):
+        logger.info('Update {}'.format(str(self)))
         data_out = self._prepare_update(data)
         self._update(data_out)
 
