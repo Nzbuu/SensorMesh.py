@@ -61,11 +61,17 @@ class Controller(object):
 
     def _step(self, timestamp):
         data = self._source.read()
+
         if not data.get('timestamp'):
             data['timestamp'] = timestamp
 
         for t in self._targets:
-            t.update(data)
+            try:
+                t.update(data)
+            except Exception as e:
+                # Log exception as error, rather than exception for simpler log message
+                # Continue after exception
+                logger.error('Failed to update %s: %s', str(t), repr(e))
 
 
 class TimeTrigger(object):

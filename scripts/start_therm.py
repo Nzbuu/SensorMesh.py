@@ -1,3 +1,7 @@
+import logging
+import logging.config
+import json
+
 from w1thermsensor import W1ThermSensor
 
 from sensormesh.application import Controller, ConfigManager
@@ -6,12 +10,19 @@ from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 from sensormesh.text import TextLogger
 
+
+# Configure logging
+with open('log_config.json', 'r') as f:
+    log_config = json.load(f)
+log_config['disable_existing_loggers'] = False
+logging.config.dictConfig(log_config)
+
 # Configuration loader class
 cfg_man = ConfigManager()
 
 # Configure App
 app = Controller()
-app.set_steps(time_step=60, num_steps=24 * 60)
+app.set_steps(time_step=300, num_steps=1000)
 
 # Source
 o = W1ThermSensor()

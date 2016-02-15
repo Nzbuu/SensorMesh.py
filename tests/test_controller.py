@@ -1,6 +1,8 @@
 import unittest.mock as mock
+import logging
 
 import pytest
+import testfixtures
 
 from sensormesh.application import *
 from sensormesh.endpoints import DataSource, DataTarget
@@ -58,7 +60,8 @@ class TestController:
         a.set_steps(time_step=0, num_steps=2)
         a._step = mock.Mock()
 
-        a.run()
+        with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
+            a.run()
 
         assert a._step.call_count == 2
         assert a._trigger._delayfcn.call_count == 0  # Never sleeps
@@ -73,13 +76,17 @@ class TestController:
         assert a._targets[0].close.call_count == 1
         assert a._targets[1].close.call_count == 1
 
+        # No events logged
+        assert not l_warn.records
+
     def test_runs_with_nonzero_step(self):
         a = mock_application()
         a._trigger._timefcn.side_effect = [1453928000, 1453928000.1, 1453928001.1]
         a.set_steps(time_step=1, num_steps=2)
         a._step = mock.Mock()
 
-        a.run()
+        with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
+            a.run()
 
         assert a._step.call_count == 2
         assert a._trigger._delayfcn.call_count == 1  # Don't delay after final step
@@ -93,6 +100,9 @@ class TestController:
         assert a._source.close.call_count == 1
         assert a._targets[0].close.call_count == 1
         assert a._targets[1].close.call_count == 1
+
+        # No events logged
+        assert not l_warn.records
 
     def test_skips_missing_steps(self):
         a = mock_application()
@@ -100,7 +110,8 @@ class TestController:
         a.set_steps(time_step=1, num_steps=2)
         a._step = mock.Mock()
 
-        a.run()
+        with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
+            a.run()
 
         assert a._step.call_count == 2
         assert a._trigger._delayfcn.call_count == 1  # Don't delay after final step
@@ -115,14 +126,40 @@ class TestController:
         assert a._targets[0].close.call_count == 1
         assert a._targets[1].close.call_count == 1
 
+        # No events logged
+        assert not l_warn.records
+
     def test_step_calls_read_and_update(self):
         a = mock_application()
 
-        a._step(1453928000)
+        with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
+            a._step(1453928000)
 
         assert a._source.read.call_count == 1
         assert a._targets[0].update.call_count == 1
         assert a._targets[1].update.call_count == 1
+
+        # Check that no events are logged
+        assert not l_warn.records
+
+    def test_target_exceptions_are_logged_and_continue(self):
+        a = mock_application()
+
+        t_fail = a._targets[0]
+        t_fail._name = 'Mock Target'
+        t_fail.update.side_effect = ValueError('Invalid value')
+
+        with testfixtures.LogCapture(level=logging.WARNING) as l:
+            a._step(1453928000)
+
+        assert a._source.read.call_count == 1
+        assert a._targets[0].update.call_count == 1
+        assert a._targets[1].update.call_count == 1
+
+        # Check that exception is logged
+        assert len(l.records) == 1
+        assert l.records[0].levelname == 'ERROR'
+        assert l.records[0].getMessage() == "Failed to update DataTarget(name='Mock Target'): ValueError('Invalid value',)"
 
 
 def mock_application():
