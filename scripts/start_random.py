@@ -38,7 +38,7 @@ app.add_target(t)
 # Target 3
 csv_config = {
     'filename': 'testdata.csv',
-    'reopen_file': True,
+    'mode': 'a',
     'fields': ['timestamp', 'value']
 }
 t = TextLogger(**csv_config)
