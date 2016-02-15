@@ -97,13 +97,13 @@ class DataTarget(DataEndpoint):
 
 
 class DataSourceWrapper(DataSource):
-    def __init__(self, source=(), *args, **kwargs):
+    def __init__(self, source=None, *args, **kwargs):
         if 'fields' not in kwargs:
             kwargs['fields'] = ('value',)
         super().__init__(*args, **kwargs)
 
         if not source:
-            raise ConfigurationError
+            raise ConfigurationError('Missing source input')
 
         self._source = None
         self._dict = {}

@@ -37,7 +37,7 @@ class ThingSpeakApi(object):
 
     def get_data(self):
         if not self.channel:
-            raise ConfigurationError()
+            raise ConfigurationError('Missing channel parameter')
 
         headers = self._prepare_headers(write=False)
 
@@ -72,7 +72,7 @@ class ThingSpeakApi(object):
         if self.key:
             return self.key
         elif write:
-            raise ConfigurationError()
+            raise ConfigurationError('Missing key parameter')
         else:
             return None
 

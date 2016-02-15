@@ -24,7 +24,7 @@ class Controller(object):
         if self._source is None:
             self._source = source
         else:
-            raise ConfigurationError()
+            raise ConfigurationError('Cannot add more than one source object')
 
     def add_target(self, logger):
         self._targets.append(logger)
@@ -37,11 +37,11 @@ class Controller(object):
 
     def _check_for_source(self):
         if not self._source:
-            raise ConfigurationError()
+            raise ConfigurationError('Source object is missing')
 
     def _check_for_targets(self):
         if not self._targets:
-            raise ConfigurationError()
+            raise ConfigurationError('Target object is missing')
 
     def run(self):
         logger.info('Starting Controller')
