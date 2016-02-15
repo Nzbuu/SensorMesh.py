@@ -94,37 +94,3 @@ class DataTarget(DataEndpoint):
 
     def _update(self, data):
         raise NotImplementedError()
-
-
-class DataSourceWrapper(DataSource):
-    def __init__(self, source=None, *args, **kwargs):
-        if 'fields' not in kwargs:
-            kwargs['fields'] = ('value',)
-        super().__init__(*args, **kwargs)
-
-        if not source:
-            raise ConfigurationError('Missing source input')
-
-        self._source = None
-        self._dict = {}
-
-        if callable(source):
-            self._source = source
-            for name in self.fields:
-                self._dict[name] = None
-        else:
-            for name, src in zip(self.fields_remote, source):
-                self._dict[name] = src
-
-    def _read(self):
-        if self._source:
-            values = self._source()
-            if len(self.fields_remote) == 1:
-                data = {self.fields_remote[0]: values}
-            else:
-                data = {name: value
-                        for name, value in zip(self.fields_remote, values)}
-        else:
-            data = {name: source() for name, source in self._dict.items()}
-
-        return data
