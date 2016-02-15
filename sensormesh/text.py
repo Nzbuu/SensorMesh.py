@@ -29,7 +29,8 @@ class TextLogger(DataTarget):
     def open(self):
         super().open()
         if not self._file:
-            create_file = self._filemode == 'w' or not os.path.isfile(self._filename)
+            create_file = (self._filemode == 'w' or
+                           not os.path.isfile(self._filename))
 
             self._file = open(self._filename, self._filemode, newline='')
             self._writer = csv.DictWriter(

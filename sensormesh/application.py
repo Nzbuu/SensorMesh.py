@@ -69,8 +69,8 @@ class Controller(object):
             try:
                 t.update(data)
             except Exception as e:
-                # Log exception as error, rather than exception for simpler log message
-                # Continue after exception
+                # Log exception as error, rather than exception for simpler
+                # log message. Continue afterwards.
                 logger.error('Failed to update %s: %s', str(t), repr(e))
 
 
