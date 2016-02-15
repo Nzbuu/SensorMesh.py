@@ -53,17 +53,18 @@ class Controller(object):
             self._start(stack)
 
             for timestamp in self._trigger.iter():
-                self._step(timestamp)
+                self._step(timestamp=timestamp)
 
     def _start(self, stack):
         for o in [self._source] + self._targets:
             stack.enter_context(o)
 
-    def _step(self, timestamp):
+    def _step(self, **kwargs):
         data = self._source.read()
 
-        if not data.get('timestamp'):
-            data['timestamp'] = timestamp
+        for k in kwargs:
+            if not data.get(k):
+                data[k] = kwargs[k]
 
         for t in self._targets:
             try:

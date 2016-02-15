@@ -133,7 +133,7 @@ class TestController:
         a = mock_application()
 
         with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
-            a._step(1453928000)
+            a._step(timestamp=1453928000)
 
         assert a._source.read.call_count == 1
         assert a._targets[0].update.call_count == 1
@@ -150,7 +150,7 @@ class TestController:
         t_fail.update.side_effect = ValueError('Invalid value')
 
         with testfixtures.LogCapture(level=logging.WARNING) as l:
-            a._step(1453928000)
+            a._step(timestamp=1453928000)
 
         assert a._source.read.call_count == 1
         assert a._targets[0].update.call_count == 1
