@@ -55,3 +55,23 @@ class TestDataSourceWrapper:
         with s:
             d = s.read()
         assert d == {'field3': 210, 'field1': 220}
+
+    def test_can_wrap_object_properties(self):
+        class O:
+            def __init__(self):
+                self._count = 0
+
+            @property
+            def value(self):
+                self._count += 1
+                return self._count
+
+        obj = O()
+        s = DataSourceWrapper(source=obj, fields=[('result', 'value')])
+
+        with s:
+            d = s.read()
+            assert d == {'result': 1}
+
+            d = s.read()
+            assert d == {'result': 2}

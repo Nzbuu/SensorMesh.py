@@ -12,11 +12,15 @@ class DataSourceWrapper(DataSource):
         self._source = source
 
     def _read(self):
-        values = self._source()
-        if len(self.fields_remote) == 1:
-            data = {self.fields_remote[0]: values}
+        if callable(self._source):
+            values = self._source()
+            if len(self.fields_remote) == 1:
+                data = {self.fields_remote[0]: values}
+            else:
+                data = {name: value
+                        for name, value in zip(self.fields_remote, values)}
         else:
-            data = {name: value
-                    for name, value in zip(self.fields_remote, values)}
+            data = {name: getattr(self._source, name)
+                    for name in self.fields_remote}
 
         return data
