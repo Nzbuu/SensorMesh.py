@@ -124,6 +124,21 @@ class TestController:
         assert a._targets[0].update.call_count == 1
         assert a._targets[1].update.call_count == 1
 
+    def test_target_exceptions_are_logged_and_continue(self):
+        a = mock_application()
+
+        t_fail = a._targets[0]
+        t_fail._name = 'Mock Target'
+        t_fail.update.side_effect = ValueError('Invalid value')
+
+        a._step(1453928000)
+
+        assert a._source.read.call_count == 1
+        assert a._targets[0].update.call_count == 1
+        assert a._targets[1].update.call_count == 1
+
+        # TODO: Check that exception is logged
+
 
 def mock_application():
     tf = mock.Mock()
