@@ -1,7 +1,6 @@
 import logging
 
 from .utils import DataAdapter
-from .exceptions import ConfigurationError
 
 logger = logging.getLogger(__name__)
 
