@@ -5,11 +5,17 @@
       "class": "logging.Formatter",
       "format": "%(asctime)s %(name)-15s %(levelname)-8s %(processName)-10s %(message)s",
       "datefmt": "%Y-%m-%d %H:%M:%S"
+    },
+    "display": {
+      "class": "logging.Formatter",
+      "format": "%(asctime)s - %(levelname)s - %(message)s",
+      "datefmt": "%Y-%m-%d %H:%M:%S"
     }
   },
   "handlers": {
     "console": {
       "class": "logging.StreamHandler",
+      "formatter": "display",
       "level": "WARNING"
     },
     "file": {
