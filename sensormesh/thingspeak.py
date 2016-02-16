@@ -5,11 +5,11 @@ import requests
 import dateutil.parser
 
 from .endpoints import DataSource
-from .rest import RestTarget
+from .rest import RestTarget, RestApi
 from .exceptions import ConfigurationError
 
 
-class ThingSpeakApi(object):
+class ThingSpeakApi(RestApi):
     def __init__(self, key=None, channel=None,
                  base_url='https://api.thingspeak.com'):
         super().__init__()
@@ -37,7 +37,7 @@ class ThingSpeakApi(object):
 
     def get_data(self):
         if not self.channel:
-            raise ConfigurationError()
+            raise ConfigurationError('Missing channel parameter')
 
         headers = self._prepare_headers(write=False)
 
@@ -72,23 +72,25 @@ class ThingSpeakApi(object):
         if self.key:
             return self.key
         elif write:
-            raise ConfigurationError()
+            raise ConfigurationError('Missing key parameter')
         else:
             return None
 
 
 class ThingSpeakLogger(RestTarget):
-    def __init__(self, api, *args, **kwargs):
-        if isinstance(api, dict):
-            api = ThingSpeakApi(**api)
+    def __init__(self, api=None, *args, **kwargs):
+        # Create API instance
+        #   Note that this modifies kwargs
+        api = ThingSpeakApi.configure_api(api, kwargs)
 
+        # Create instance
         super().__init__(*args, api=api, **kwargs)
 
     def _prepare_update(self, data):
         data_out = super()._prepare_update(data)
 
         if ('timestamp' in data and data['timestamp'] and
-                'created_at' not in data_out):
+                    'created_at' not in data_out):
             timestamp = data['timestamp']
             ts = datetime.fromtimestamp(timestamp)
             data_out['created_at'] = ts.isoformat()
@@ -97,13 +99,13 @@ class ThingSpeakLogger(RestTarget):
 
 
 class ThingSpeakSource(DataSource):
-    def __init__(self, api, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, api=None, *args, **kwargs):
+        # Create API instance
+        #   Note that this modifies kwargs
+        api = ThingSpeakApi.configure_api(api, kwargs)
 
-        if isinstance(api, dict):
-            api = ThingSpeakApi(**api)
-        elif not api:
-            raise ValueError('Missing API input.')
+        # Construct instance
+        super().__init__(*args, **kwargs)
         self._api = api
 
     def _read(self):
@@ -112,8 +114,8 @@ class ThingSpeakSource(DataSource):
     def _process_data(self, content):
         data = super()._process_data(content)
 
-        if 'timestamp' not in data:
-            ts = dateutil.parser.parse(content['created_at'])
+        if 'timestamp' in data and isinstance(data['timestamp'], str):
+            ts = dateutil.parser.parse(data['timestamp'])
             data['timestamp'] = ts.timestamp()
 
         return data

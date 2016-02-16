@@ -1,9 +1,7 @@
 {
   "name": "",
-  "api": {
-    "key": null,
-    "channel": null
-  },
+  "key": null,
+  "channel": null,
   "fields": [
   ]
 }

@@ -24,7 +24,7 @@ class Controller(object):
         if self._source is None:
             self._source = source
         else:
-            raise ConfigurationError()
+            raise ConfigurationError('Cannot add more than one source object')
 
     def add_target(self, logger):
         self._targets.append(logger)
@@ -37,11 +37,11 @@ class Controller(object):
 
     def _check_for_source(self):
         if not self._source:
-            raise ConfigurationError()
+            raise ConfigurationError('Source object is missing')
 
     def _check_for_targets(self):
         if not self._targets:
-            raise ConfigurationError()
+            raise ConfigurationError('Target object is missing')
 
     def run(self):
         logger.info('Starting Controller')
@@ -53,24 +53,29 @@ class Controller(object):
             self._start(stack)
 
             for timestamp in self._trigger.iter():
-                self._step(timestamp)
+                self._step(timestamp=timestamp)
 
     def _start(self, stack):
         for o in [self._source] + self._targets:
             stack.enter_context(o)
 
-    def _step(self, timestamp):
+    def _step(self, **kwargs):
         data = self._source.read()
 
-        if not data.get('timestamp'):
-            data['timestamp'] = timestamp
+        if not data:
+            logger.info('Read data is empty')
+            return
+
+        for k in kwargs:
+            if not data.get(k):
+                data[k] = kwargs[k]
 
         for t in self._targets:
             try:
                 t.update(data)
             except Exception as e:
-                # Log exception as error, rather than exception for simpler log message
-                # Continue after exception
+                # Log exception as error, rather than exception for simpler
+                # log message. Continue afterwards.
                 logger.error('Failed to update %s: %s', str(t), repr(e))
 
 

@@ -133,11 +133,25 @@ class TestController:
         a = mock_application()
 
         with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
-            a._step(1453928000)
+            a._step(timestamp=1453928000)
 
         assert a._source.read.call_count == 1
         assert a._targets[0].update.call_count == 1
         assert a._targets[1].update.call_count == 1
+
+        # Check that no events are logged
+        assert not l_warn.records
+
+    def test_step_skips_update_when_no_data(self):
+        a = mock_application()
+        a._source.read.return_value = None
+
+        with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
+            a._step(timestamp=1453928000)
+
+        assert a._source.read.call_count == 1
+        assert a._targets[0].update.call_count == 0
+        assert a._targets[1].update.call_count == 0
 
         # Check that no events are logged
         assert not l_warn.records
@@ -150,7 +164,7 @@ class TestController:
         t_fail.update.side_effect = ValueError('Invalid value')
 
         with testfixtures.LogCapture(level=logging.WARNING) as l:
-            a._step(1453928000)
+            a._step(timestamp=1453928000)
 
         assert a._source.read.call_count == 1
         assert a._targets[0].update.call_count == 1

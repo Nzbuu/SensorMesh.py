@@ -5,10 +5,15 @@ from .endpoints import DataTarget
 
 
 class TextLogger(DataTarget):
-    def __init__(self, filename, fields, reopen_file=True, *args, **kwargs):
+    def __init__(self, filename, fields, mode='a', *args, **kwargs):
         super().__init__(*args, fields=fields, **kwargs)
         self._filename = filename
-        self._reopen = reopen_file
+
+        if mode in {'a', 'w'}:
+            self._filemode = mode
+        else:
+            raise ValueError('Invalid file mode')
+
         self._adapter.create_missing = True
         self._file = None
         self._writer = None
@@ -17,13 +22,17 @@ class TextLogger(DataTarget):
     def filename(self):
         return self._filename
 
+    @property
+    def mode(self):
+        return self._filemode
+
     def open(self):
         super().open()
         if not self._file:
-            create_file = not (self._reopen and os.path.isfile(self._filename))
-            file_mode = 'w' if create_file else 'a'
+            create_file = (self._filemode == 'w' or
+                           not os.path.isfile(self._filename))
 
-            self._file = open(self._filename, file_mode, newline='')
+            self._file = open(self._filename, self._filemode, newline='')
             self._writer = csv.DictWriter(
                     self._file,
                     fieldnames=list(self._adapter.remote_names),

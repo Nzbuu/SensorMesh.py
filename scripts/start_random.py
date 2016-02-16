@@ -4,7 +4,7 @@ import logging.config
 import json
 
 from sensormesh.application import Controller, ConfigManager
-from sensormesh.endpoints import DataSourceWrapper
+from sensormesh.sources import DataSourceWrapper
 from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 from sensormesh.text import TextLogger
@@ -38,7 +38,7 @@ app.add_target(t)
 # Target 3
 csv_config = {
     'filename': 'testdata.csv',
-    'reopen_file': True,
+    'mode': 'a',
     'fields': ['timestamp', 'value']
 }
 t = TextLogger(**csv_config)

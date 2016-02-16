@@ -14,6 +14,18 @@ class TestTextLogger:
         with pytest.raises(TypeError):
             _ = TextLogger(filename='temp_logfile.txt')
 
+    def test_default_mode_is_append(self):
+        t = TextLogger(filename='temp_logfile.txt', fields=['value'])
+        assert t.mode == 'a'
+
+    def test_requires_valid_mode(self):
+        with pytest.raises(ValueError):
+            _ = TextLogger(
+                    filename='temp_logfile.txt',
+                    mode='x',
+                    fields=['value']
+            )
+
     def test_can_create_with_filename(self):
         l = TextLogger(
                 filename='temp_logfile.txt',
@@ -32,6 +44,7 @@ class TestTextLogger:
              mock.patch('builtins.open', mock_file):
             o = TextLogger(
                     filename='temp_file.txt',
+                    mode='a',
                     fields=['timestamp', 'value']
             )
             data = {'timestamp': 100, 'value': 200}
@@ -41,7 +54,7 @@ class TestTextLogger:
         assert mock_isfile.call_count == 1
 
         assert mock_file.call_count == 1
-        mock_file.assert_called_with('temp_file.txt', 'w', newline='')
+        mock_file.assert_called_with('temp_file.txt', 'a', newline='')
 
         file_handle = mock_file()
         assert file_handle.write.call_count == 2
@@ -58,6 +71,7 @@ class TestTextLogger:
              mock.patch('builtins.open', mock_file):
             o = TextLogger(
                     filename='temp_file.txt',
+                    mode='a',
                     fields=['timestamp', 'value']
             )
             data = {'timestamp': 150, 'value': 250}
@@ -81,13 +95,15 @@ class TestTextLogger:
              mock.patch('builtins.open', mock_file):
             o = TextLogger(
                     filename='temp_file.txt',
+                    mode='w',
                     fields=['timestamp', ('value', 'field1')]
             )
             data = {'timestamp': 110, 'value': 210}
             with o:
                 o.update(data)
 
-        assert mock_isfile.call_count == 1
+        # Doesn't matter if this is called since want to overwrite anyway
+        assert mock_isfile.call_count in {0, 1}
 
         assert mock_file.call_count == 1
         mock_file.assert_called_with('temp_file.txt', 'w', newline='')
@@ -107,13 +123,15 @@ class TestTextLogger:
              mock.patch('builtins.open', mock_file):
             o = TextLogger(
                     filename='temp_file.txt',
+                    mode='w',
                     fields=['timestamp', 'value']
             )
             data = {'timestamp': 1100, 'value': 2100}
             with o:
                 o.update(data)
 
-        assert mock_isfile.call_count == 1
+        # Doesn't matter if this is called since want to overwrite anyway
+        assert mock_isfile.call_count in {0, 1}
 
         assert mock_file.call_count == 1
         mock_file.assert_called_with('temp_file.txt', 'w', newline='')
@@ -133,13 +151,15 @@ class TestTextLogger:
              mock.patch('builtins.open', mock_file):
             o = TextLogger(
                     filename='temp_file.txt',
+                    mode='w',
                     fields=['timestamp', 'r1', 'r2']
             )
             data = {'timestamp': 1200, 'r2': 5}
             with o:
                 o.update(data)
 
-        assert mock_isfile.call_count == 1
+        # Doesn't matter if this is called since want to overwrite anyway
+        assert mock_isfile.call_count in {0, 1}
 
         assert mock_file.call_count == 1
         mock_file.assert_called_with('temp_file.txt', 'w', newline='')
