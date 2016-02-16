@@ -114,8 +114,8 @@ class ThingSpeakSource(DataSource):
     def _process_data(self, content):
         data = super()._process_data(content)
 
-        if 'timestamp' not in data:
-            ts = dateutil.parser.parse(content['created_at'])
+        if 'timestamp' in data and isinstance(data['timestamp'], str):
+            ts = dateutil.parser.parse(data['timestamp'])
             data['timestamp'] = ts.timestamp()
 
         return data
