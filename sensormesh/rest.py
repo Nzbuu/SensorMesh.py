@@ -22,7 +22,7 @@ class RestApi(object):
         # Create API instance
         if api and config_api:
             raise TypeError('Cannot specify API object and API parameters')
-        elif config_api:
+        elif not api:
             api = api_cls(**config_api)
 
         return api
