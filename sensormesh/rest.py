@@ -1,6 +1,6 @@
 import inspect
 
-from .endpoints import DataTarget
+from .endpoints import DataSource, DataTarget
 
 
 class RestApi(object):
@@ -39,3 +39,16 @@ class RestTarget(DataTarget):
 
     def _update(self, data):
         self._api.post_update(data)
+
+
+class RestSource(DataSource):
+    def __init__(self, api, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if api:
+            self._api = api
+        else:
+            raise ValueError('Missing API input.')
+
+    def _read(self):
+        return self._api.get_data()

@@ -4,8 +4,7 @@ from string import Template
 import requests
 import dateutil.parser
 
-from .endpoints import DataSource
-from .rest import RestTarget, RestApi
+from .rest import RestSource, RestTarget, RestApi
 from .exceptions import ConfigurationError
 
 
@@ -99,18 +98,14 @@ class ThingSpeakLogger(RestTarget):
         return data_out
 
 
-class ThingSpeakSource(DataSource):
+class ThingSpeakSource(RestSource):
     def __init__(self, api=None, *args, **kwargs):
         # Create API instance
         #   Note that this modifies kwargs
         api = ThingSpeakApi.configure_api(api, kwargs)
 
         # Construct instance
-        super().__init__(*args, **kwargs)
-        self._api = api
-
-    def _read(self):
-        return self._api.get_data()
+        super().__init__(*args, api=api, **kwargs)
 
     def _process_data(self, content):
         data = super()._process_data(content)
