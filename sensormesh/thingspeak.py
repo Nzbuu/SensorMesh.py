@@ -89,11 +89,12 @@ class ThingSpeakLogger(RestTarget):
     def _prepare_update(self, data):
         data_out = super()._prepare_update(data)
 
-        if ('timestamp' in data and data['timestamp'] and
-                    'created_at' not in data_out):
-            timestamp = data['timestamp']
-            ts = datetime.fromtimestamp(timestamp)
-            data_out['created_at'] = ts.isoformat()
+        # created_at has special meaning and should be an ISO date string
+        if data_out.get('created_at'):
+            timestamp = data_out['created_at']
+            if not isinstance(timestamp, str):
+                ts = datetime.fromtimestamp(timestamp)
+                data_out['created_at'] = ts.isoformat()
 
         return data_out
 
@@ -114,7 +115,8 @@ class ThingSpeakSource(DataSource):
     def _process_data(self, content):
         data = super()._process_data(content)
 
-        if 'timestamp' in data and isinstance(data['timestamp'], str):
+        # timestamp has special meaning and should be UNIX timestamp in UTC
+        if isinstance(data.get('timestamp'), str):
             ts = dateutil.parser.parse(data['timestamp'])
             data['timestamp'] = ts.timestamp()
 
