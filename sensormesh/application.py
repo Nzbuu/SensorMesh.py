@@ -62,6 +62,10 @@ class Controller(object):
     def _step(self, **kwargs):
         data = self._source.read()
 
+        if not data:
+            logger.info('Read data is empty')
+            return
+
         for k in kwargs:
             if not data.get(k):
                 data[k] = kwargs[k]
