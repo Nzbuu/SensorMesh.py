@@ -9,6 +9,7 @@ from sensormesh.sources import DataSourceWrapper
 from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 from sensormesh.text import TextLogger
+from sensormesh.conditions import TimeCheck
 
 
 # Configure logging
@@ -41,6 +42,7 @@ app.add_target(t)
 # Target 2
 tsl_config = cfg_man.load_config_file('thingspeak_therm.json')
 t = ThingSpeakLogger(**tsl_config)
+t.add_condition(TimeCheck(15))
 app.add_target(t)
 
 # Target 3

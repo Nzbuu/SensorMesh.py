@@ -8,6 +8,7 @@ from sensormesh.sources import DataSourceWrapper
 from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 from sensormesh.text import TextLogger
+from sensormesh.conditions import TimeCheck
 
 # Configure logging
 with open('log_config.json', 'r') as f:
@@ -20,7 +21,7 @@ cfg_man = ConfigManager()
 
 # Configure App
 app = Controller()
-app.set_steps(time_step=20, num_steps=5)
+app.set_steps(time_step=10, num_steps=5)
 
 # Source
 s = DataSourceWrapper(source=random.random, name='Random numbers')
@@ -33,6 +34,7 @@ app.add_target(t)
 # Target 2
 tsl_config = cfg_man.load_config_file('thingspeak_random.json')
 t = ThingSpeakLogger(**tsl_config)
+t.add_condition(TimeCheck(15))
 app.add_target(t)
 
 # Target 3

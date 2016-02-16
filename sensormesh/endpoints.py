@@ -9,11 +9,11 @@ class DataEndpoint(object):
     def __init__(self, name='', fields=(), when=()):
         super().__init__()
         self._name = name
+        self._conditions = []
         self._adapter = DataAdapter()
 
-        self._condition = []
-        for w in when:
-            self._add_condition(w)
+        for condition in when:
+            self.add_condition(condition)
 
         for name in fields:
             if isinstance(name, str):
@@ -44,11 +44,11 @@ class DataEndpoint(object):
             remote_name=remote_name
         )
 
-    def _add_condition(self, condition):
-        pass
+    def add_condition(self, condition):
+        self._conditions.append(condition)
 
     def _check_conditions(self, **kwargs):
-        return True
+        return all(cond.check(**kwargs) for cond in self._conditions)
 
     def __enter__(self):
         self.open()
