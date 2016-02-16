@@ -41,7 +41,10 @@ class TestThingSpeakSource:
 
         obj = ThingSpeakSource(
                 api=mock_api,
-                fields=[('Server Temp', 'field1'), ('timestamp', 'created_at')]
+                fields=[
+                    ('Server Temp', 'field1'),
+                    ('timestamp', 'created_at')
+                ]
         )
 
         with obj:
@@ -61,7 +64,7 @@ class TestThingSpeakLogger:
         obj = ThingSpeakLogger(name='Test Logger')
         assert obj.name == 'Test Logger'
 
-    def test_cannot_create_logger_with_empty_api(self):
+    def test_can_create_logger_with_empty_api(self):
         obj = ThingSpeakLogger(api=None, name='Alt Logger')
         assert obj.name == 'Alt Logger'
 
@@ -85,7 +88,10 @@ class TestThingSpeakLogger:
 
         obj = ThingSpeakLogger(
                 api=mock_api,
-                fields=[('Server Temp', 'field1')]
+                fields=[
+                    ('Server Temp', 'field1'),
+                    ('timestamp', 'created_at')
+                ]
         )
 
         data = {
