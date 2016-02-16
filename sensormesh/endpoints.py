@@ -6,19 +6,22 @@ logger = logging.getLogger(__name__)
 
 
 class DataEndpoint(object):
-    def __init__(self, name='', fields=None):
+    def __init__(self, name='', fields=(), when=()):
         super().__init__()
         self._name = name
         self._adapter = DataAdapter()
 
-        if fields:
-            for name in fields:
-                if isinstance(name, str):
-                    self._add_field(name)
-                else:
-                    self._add_field(
-                            local_name=name[0],
-                            remote_name=name[1])
+        self._condition = []
+        for w in when:
+            self._add_condition(w)
+
+        for name in fields:
+            if isinstance(name, str):
+                self._add_field(name)
+            else:
+                self._add_field(
+                    local_name=name[0],
+                    remote_name=name[1])
 
     @property
     def name(self):
@@ -37,9 +40,15 @@ class DataEndpoint(object):
             remote_name = local_name
 
         self._adapter.add_field(
-                local_name=local_name,
-                remote_name=remote_name
+            local_name=local_name,
+            remote_name=remote_name
         )
+
+    def _add_condition(self, condition):
+        pass
+
+    def _check_conditions(self, **kwargs):
+        return True
 
     def __enter__(self):
         self.open()
@@ -62,11 +71,15 @@ class DataSource(DataEndpoint):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def read(self):
-        logger.info('Read %s', str(self))
-        data_in = self._read()
-        data = self._process_data(data_in)
-        return data
+    def read(self, **kwargs):
+        if self._check_conditions(**kwargs):
+            logger.info('Read %s', str(self))
+            data_in = self._read()
+            data = self._process_data(data_in)
+            return data
+        else:
+            logger.info('Skip read %s', str(self))
+            return {}
 
     def _read(self):
         raise NotImplementedError()
@@ -83,9 +96,12 @@ class DataTarget(DataEndpoint):
         super().__init__(*args, **kwargs)
 
     def update(self, data):
-        logger.info('Update %s', str(self))
-        data_out = self._prepare_update(data)
-        self._update(data_out)
+        if self._check_conditions(**data):
+            logger.info('Update %s', str(self))
+            data_out = self._prepare_update(data)
+            self._update(data_out)
+        else:
+            logger.info('Skip update %s', str(self))
 
     def _prepare_update(self, data):
         if self._adapter.count:

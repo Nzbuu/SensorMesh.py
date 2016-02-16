@@ -60,7 +60,7 @@ class Controller(object):
             stack.enter_context(o)
 
     def _step(self, **kwargs):
-        data = self._source.read()
+        data = self._source.read(**kwargs)
 
         if not data:
             logger.info('Read data is empty')
