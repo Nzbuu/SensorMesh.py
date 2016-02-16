@@ -72,8 +72,10 @@ class DataSource(DataEndpoint):
         raise NotImplementedError()
 
     def _process_data(self, data):
-        data_out = self._adapter.create_local_struct(data)
-        return data_out
+        if self._adapter.count:
+            return self._adapter.create_local_struct(data)
+        else:
+            return data
 
 
 class DataTarget(DataEndpoint):
