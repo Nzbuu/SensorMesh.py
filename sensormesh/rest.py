@@ -20,10 +20,9 @@ class RestApi(object):
         config_api = {k: kwargs.pop(k) for k in sig.parameters if k in kwargs}
 
         # Create API instance
-        if api:
-            if config_api:
-                raise TypeError('Cannot specify API object and API parameters')
-        else:
+        if api and config_api:
+            raise TypeError('Cannot specify API object and API parameters')
+        elif config_api:
             api = api_cls(**config_api)
 
         return api
