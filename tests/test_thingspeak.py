@@ -41,7 +41,7 @@ class TestThingSpeakSource:
 
         obj = ThingSpeakSource(
                 api=mock_api,
-                fields=[('Server Temp', 'field1')]
+                fields=[('Server Temp', 'field1'), ('timestamp', 'created_at')]
         )
 
         with obj:
