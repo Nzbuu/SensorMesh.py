@@ -204,7 +204,8 @@ class TestController:
         # Check that exception is logged
         assert len(l.records) == 1
         assert l.records[0].levelname == 'ERROR'
-        assert l.records[0].getMessage() == "Failed to update DataTarget(name='Mock Target'): ValueError('Invalid value',)"
+        assert (l.records[0].getMessage() ==
+                "Failed to update DataTarget(name='Target 1') because of ValueError('Invalid value',)")
 
 
 def mock_application():

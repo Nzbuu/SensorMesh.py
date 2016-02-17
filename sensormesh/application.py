@@ -81,7 +81,8 @@ class Controller(object):
 
         if duplicate_fields:
             duplicate_fields = sorted(duplicate_fields)
-            str = 'Duplicate data fields found: {0!s}'.format(duplicate_fields)
+            str = 'Duplicate data fields found: {0!s}'.format(
+                duplicate_fields)
             logger.critical(str)
             raise DuplicateFieldError(str)
 
@@ -94,7 +95,7 @@ class Controller(object):
             except Exception as e:
                 # Log exception as error, rather than exception for simpler
                 # log message. Continue afterwards.
-                logger.error('Failed to update %s: %r', t, e)
+                logger.error('Failed to update %s because of %r', t, e)
 
 
 class TimeTrigger(object):
