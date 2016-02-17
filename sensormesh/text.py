@@ -53,7 +53,7 @@ class TextLogger(DataTarget):
         self._writer.writerow(data)
 
     def __str__(self):
-        return "{0}(name='{1}', filename='{2}')".format(
+        return "{0}(name={1!r}, filename={2!r})".format(
                 self.__class__.__name__,
                 self._name,
                 self._filename
