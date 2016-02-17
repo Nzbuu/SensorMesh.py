@@ -8,6 +8,7 @@ class Condition:
     def __str__(self):
         return '{0}()'.format(self.__class__.__name__)
 
+
 class TimeCheck(Condition):
     def __init__(self, time_step):
         super().__init__()
