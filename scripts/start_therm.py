@@ -9,6 +9,7 @@ from sensormesh.sources import DataSourceWrapper
 from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 from sensormesh.text import TextLogger
+from sensormesh.conditions import TimeCheck
 
 
 # Configure logging
@@ -41,6 +42,7 @@ app.add_target(t)
 # Target 2
 tsl_config = cfg_man.load_config_file('thingspeak_therm.json')
 t = ThingSpeakLogger(**tsl_config)
+t.add_condition(TimeCheck(15))
 app.add_target(t)
 
 # Target 3
@@ -52,10 +54,17 @@ csv_config = {
 t = TextLogger(**csv_config)
 app.add_target(t)
 
-# Start application
+# Run application
+logging.info('Starting Application')
 try:
     app.run()
 except KeyboardInterrupt:
+    logging.info('Stopped Application due to KeyboardInterrupt')
     print("Goodbye!")
+except Exception as e:
+    logging.error('Aborted Application due to %r', e)
+    raise
+else:
+    logging.info('Finished Application')
 finally:
     print("Stop!")

@@ -60,7 +60,7 @@ class Controller(object):
             stack.enter_context(o)
 
     def _step(self, **kwargs):
-        data = self._source.read()
+        data = self._source.read(**kwargs)
 
         if not data:
             logger.info('Read data is empty')
@@ -76,7 +76,7 @@ class Controller(object):
             except Exception as e:
                 # Log exception as error, rather than exception for simpler
                 # log message. Continue afterwards.
-                logger.error('Failed to update %s: %s', str(t), repr(e))
+                logger.error('Failed to update %s: %r', t, e)
 
 
 class TimeTrigger(object):

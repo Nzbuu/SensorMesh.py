@@ -14,6 +14,10 @@ class TestTextLogger:
         with pytest.raises(TypeError):
             _ = TextLogger(filename='temp_logfile.txt')
 
+    def test_string_includes_name_and_filename(self):
+        t = TextLogger(name="csv_file", filename='temp_logfile.txt', mode='w', fields=['value'])
+        assert str(t) == "TextLogger(name='csv_file', filename='temp_logfile.txt')"
+
     def test_default_mode_is_append(self):
         t = TextLogger(filename='temp_logfile.txt', fields=['value'])
         assert t.mode == 'a'
