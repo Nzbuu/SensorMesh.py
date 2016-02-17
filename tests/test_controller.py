@@ -137,11 +137,11 @@ class TestController:
 
         assert a._read_sources.call_count == 1
         assert a._sources[0].read.call_count == 1
+        a._read_sources.assert_called_with(timestamp=1453928000)
+
         assert a._update_targets.call_count == 1
         assert a._targets[0].update.call_count == 1
         assert a._targets[1].update.call_count == 1
-
-        a._read_sources.assert_called_with(timestamp=1453928000)
         a._update_targets.assert_called_with({'timestamp': 1453928000, 'value': 0.5})
 
         # Check that no events are logged
@@ -156,6 +156,8 @@ class TestController:
 
         assert a._read_sources.call_count == 1
         assert a._sources[0].read.call_count == 1
+        a._read_sources.assert_called_with(timestamp=1453928000)
+
         assert a._update_targets.call_count == 0
         assert a._targets[0].update.call_count == 0
         assert a._targets[1].update.call_count == 0
@@ -172,6 +174,8 @@ class TestController:
 
         assert a._read_sources.call_count == 1
         assert a._sources[0].read.call_count == 1
+        a._read_sources.assert_called_with(timestamp=1453928000)
+
         assert a._update_targets.call_count == 0
         assert a._targets[0].update.call_count == 0
         assert a._targets[1].update.call_count == 0
@@ -183,7 +187,6 @@ class TestController:
         a = mock_application()
 
         t_fail = a._targets[0]
-        t_fail._name = 'Mock Target'
         t_fail.update.side_effect = ValueError('Invalid value')
 
         with testfixtures.LogCapture(level=logging.WARNING) as l:
@@ -191,9 +194,12 @@ class TestController:
 
         assert a._read_sources.call_count == 1
         assert a._sources[0].read.call_count == 1
+        a._read_sources.assert_called_with(timestamp=1453928000)
+
         assert a._update_targets.call_count == 1
         assert a._targets[0].update.call_count == 1
         assert a._targets[1].update.call_count == 1
+        a._update_targets.assert_called_with({'timestamp': 1453928000, 'value': 0.5})
 
         # Check that exception is logged
         assert len(l.records) == 1
@@ -207,11 +213,11 @@ def mock_application():
 
     a = Controller(timefcn=tf, delayfcn=df)
 
-    s = mock_source()
+    s = mock_source('Source 1')
     a.add_source(s)
 
-    for _ in range(2):
-        t = mock_target()
+    for count in range(2):
+        t = mock_target('Target {}'.format(count + 1))
         a.add_target(t)
 
     a._read_sources = mock.Mock(wraps=a._read_sources)
@@ -220,12 +226,15 @@ def mock_application():
     return a
 
 
-def mock_source(name=''):
+def mock_source(name='', **kwargs):
+    if not kwargs:
+        kwargs = {'value': 0.5}
+
     obj = DataSource(name=name)
     obj.open = mock.Mock(wraps=obj.open)
     obj.close = mock.Mock(wraps=obj.close)
     obj.read = mock.Mock()
-    obj.read.return_value = {'value': 0.5}
+    obj.read.return_value = kwargs
     return obj
 
 
