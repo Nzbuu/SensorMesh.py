@@ -117,7 +117,7 @@ class TestBase:
 
 class TestSource:
     def test_read_continues_when_checks_pass(self):
-        s = mock_source()
+        s = mock_source(name='mock_source')
 
         with testfixtures.LogCapture(level=logging.INFO) as l:
             with s:
@@ -128,9 +128,14 @@ class TestSource:
         s._read.assert_called_once_with()
         s._update_conditions.assert_called_once_with(timestamp=1)
 
+        assert len(l.records) == 3
+        assert_record_is(l.records[0], 'INFO', "Opening DataSource(name='mock_source')")
+        assert_record_is(l.records[1], 'INFO', "Reading DataSource(name='mock_source')")
+        assert_record_is(l.records[2], 'INFO', "Closing DataSource(name='mock_source')")
+
     def test_read_stops_when_checks_fail(self):
-        s = mock_source()
-        s._check_conditions = mock.Mock(return_value=(False, 'MyCondition(threshold=10)'))
+        s = mock_source(name='mock_source')
+        s._check_conditions = mock.Mock(return_value=(False, 'MyCondition(threshold=9)'))
 
         with testfixtures.LogCapture(level=logging.INFO) as l:
             with s:
@@ -141,10 +146,17 @@ class TestSource:
         assert s._read.call_count == 0
         assert s._update_conditions.call_count == 0
 
+        assert len(l.records) == 3
+        assert_record_is(l.records[0], 'INFO', "Opening DataSource(name='mock_source')")
+        assert_record_is(l.records[1], 'INFO',
+                         ("Skipping read of DataSource(name='mock_source') because "
+                          "of MyCondition(threshold=9)"))
+        assert_record_is(l.records[2], 'INFO', "Closing DataSource(name='mock_source')")
+
 
 class TestTarget:
     def test_update_continues_when_checks_pass(self):
-        t = mock_target()
+        t = mock_target(name='mock_target')
 
         data = {'timestamp': 2, 'field1': 5, 'field2': -7}
 
@@ -156,8 +168,13 @@ class TestTarget:
         t._update.assert_called_once_with(data)
         t._update_conditions.assert_called_once_with(**data)
 
+        assert len(l.records) == 3
+        assert_record_is(l.records[0], 'INFO', "Opening DataTarget(name='mock_target')")
+        assert_record_is(l.records[1], 'INFO', "Updating DataTarget(name='mock_target')")
+        assert_record_is(l.records[2], 'INFO', "Closing DataTarget(name='mock_target')")
+
     def test_update_stops_when_checks_fail(self):
-        t = mock_target()
+        t = mock_target(name='mock_target')
         t._check_conditions = mock.Mock(return_value=(False, 'MyCondition(threshold=10)'))
 
         data = {'timestamp': 2, 'field1': 5, 'field2': -7}
@@ -170,22 +187,27 @@ class TestTarget:
         assert t._update.call_count == 0
         assert t._update_conditions.call_count == 0
 
+        assert len(l.records) == 3
+        assert_record_is(l.records[0], 'INFO', "Opening DataTarget(name='mock_target')")
+        assert_record_is(l.records[1], 'INFO',
+                         ("Skipping update of DataTarget(name='mock_target') because "
+                          "of MyCondition(threshold=10)"))
+        assert_record_is(l.records[2], 'INFO', "Closing DataTarget(name='mock_target')")
 
-def mock_source():
-    obj = DataSource()
+
+def mock_source(**kwargs):
+    obj = DataSource(**kwargs)
     obj._read = mock.Mock(return_value={'field1': 5, 'field2': -7})
     obj._check_conditions = mock.Mock(return_value=(True, None))
     obj._update_conditions = mock.Mock()
-    obj.__str__ = mock.Mock(return_value='MockSource(param=0)')
     return obj
 
 
-def mock_target():
-    obj = DataTarget()
+def mock_target(**kwargs):
+    obj = DataTarget(**kwargs)
     obj._update = mock.Mock()
     obj._check_conditions = mock.Mock(return_value=(True, None))
     obj._update_conditions = mock.Mock()
-    obj.__str__ = mock.Mock(return_value='MockSource(param=0)')
     return obj
 
 
@@ -199,3 +221,8 @@ def mock_condition(**kwargs):
     obj.__str__.return_value = str
 
     return obj
+
+
+def assert_record_is(record, level, message):
+    assert record.levelname == level
+    assert record.getMessage() == message

@@ -81,13 +81,13 @@ class DataSource(DataEndpoint):
     def read(self, **kwargs):
         result, reason = self._check_conditions(**kwargs)
         if result:
-            logger.info('Read %s', str(self))
+            logger.info('Reading %s', str(self))
             self._update_conditions(**kwargs)
             data_in = self._read()
             data = self._process_data(data_in)
             return data
         else:
-            logger.info('Skip read %s because of %s', str(self), reason)
+            logger.info('Skipping read of %s because of %s', str(self), reason)
             return {}
 
     def _read(self):
@@ -108,11 +108,11 @@ class DataTarget(DataEndpoint):
         result, reason = self._check_conditions(**data)
         if result:
             self._update_conditions(**data)
-            logger.info('Update %s', str(self))
+            logger.info('Updating %s', str(self))
             data_out = self._prepare_update(data)
             self._update(data_out)
         else:
-            logger.info('Skip update %s because of %s', str(self), reason)
+            logger.info('Skipping update of %s because of %s', str(self), reason)
 
     def _prepare_update(self, data):
         if self._adapter.count:
