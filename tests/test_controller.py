@@ -207,6 +207,28 @@ class TestController:
         assert (l.records[0].getMessage() ==
                 "Failed to update DataTarget(name='Target 1') because of ValueError('Invalid value',)")
 
+    def test_step_overrides_null_data(self):
+        a = mock_application()
+        a._sources[0].read.return_value = {'value': 0.5, 'timestamp': None}
+
+        with testfixtures.LogCapture(level=logging.WARNING) as l:
+            a._step(timestamp=1453928000)
+
+        a._read_sources.assert_called_with(timestamp=1453928000)
+        a._update_targets.assert_called_with({'timestamp': 1453928000, 'value': 0.5})
+        assert not l.records
+
+    def test_step_does_not_override_data(self):
+        a = mock_application()
+        a._sources[0].read.return_value = {'value': 0.5, 'timestamp': 14539230000}
+
+        with testfixtures.LogCapture(level=logging.WARNING) as l:
+            a._step(timestamp=1453928000)
+
+        a._read_sources.assert_called_with(timestamp=1453928000)
+        a._update_targets.assert_called_with({'timestamp': 14539230000, 'value': 0.5})
+        assert not l.records
+
 
 def mock_application():
     tf = mock.Mock()
