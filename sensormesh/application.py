@@ -66,7 +66,7 @@ class Controller(object):
             return
 
         for k in kwargs:
-            if data.get(k) is not None:
+            if data.get(k) is None:
                 data[k] = kwargs[k]
 
         self._update_targets(data)

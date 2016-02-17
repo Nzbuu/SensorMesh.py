@@ -141,6 +141,9 @@ class TestController:
         assert a._targets[0].update.call_count == 1
         assert a._targets[1].update.call_count == 1
 
+        a._read_sources.assert_called_with(timestamp=1453928000)
+        a._update_targets.assert_called_with({'timestamp': 1453928000, 'value': 0.5})
+
         # Check that no events are logged
         assert not l_warn.records
 
