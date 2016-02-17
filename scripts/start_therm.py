@@ -55,16 +55,16 @@ t = TextLogger(**csv_config)
 app.add_target(t)
 
 # Run application
-logging.INFO('Starting Application')
+logging.info('Starting Application')
 try:
     app.run()
 except KeyboardInterrupt:
-    logging.INFO('Stopped Application due to KeyboardInterrupt')
+    logging.info('Stopped Application due to KeyboardInterrupt')
     print("Goodbye!")
 except Exception as e:
-    logging.INFO('Aborted Application due to %r', e)
+    logging.error('Aborted Application due to %r', e)
     raise
 else:
-    logging.INFO('Finished Application')
+    logging.info('Finished Application')
 finally:
     print("Stop!")
