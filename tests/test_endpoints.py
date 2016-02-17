@@ -119,7 +119,7 @@ class TestSource:
     def test_read_continues_when_checks_pass(self):
         s = mock_source(name='mock_source')
 
-        with testfixtures.LogCapture(level=logging.INFO) as l:
+        with testfixtures.LogCapture(level=logging.DEBUG) as l:
             with s:
                 result = s.read(timestamp=1)
 
@@ -137,7 +137,7 @@ class TestSource:
         s = mock_source(name='mock_source')
         s._check_conditions = mock.Mock(return_value=(False, 'MyCondition(threshold=9)'))
 
-        with testfixtures.LogCapture(level=logging.INFO) as l:
+        with testfixtures.LogCapture(level=logging.DEBUG) as l:
             with s:
                 result = s.read(timestamp=1)
 
@@ -160,7 +160,7 @@ class TestTarget:
 
         data = {'timestamp': 2, 'field1': 5, 'field2': -7}
 
-        with testfixtures.LogCapture(level=logging.INFO) as l:
+        with testfixtures.LogCapture(level=logging.DEBUG) as l:
             with t:
                 t.update(data)
 
@@ -179,7 +179,7 @@ class TestTarget:
 
         data = {'timestamp': 2, 'field1': 5, 'field2': -7}
 
-        with testfixtures.LogCapture(level=logging.INFO) as l:
+        with testfixtures.LogCapture(level=logging.DEBUG) as l:
             with t:
                 t.update(data)
 
