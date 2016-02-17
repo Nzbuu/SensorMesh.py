@@ -156,6 +156,20 @@ class TestController:
         # Check that no events are logged
         assert not l_warn.records
 
+    def test_step_skips_update_when_only_null_data(self):
+        a = mock_application()
+        a._sources[0].read.return_value = {'value': None}
+
+        with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
+            a._step(timestamp=1453928000)
+
+        assert a._sources[0].read.call_count == 1
+        assert a._targets[0].update.call_count == 0
+        assert a._targets[1].update.call_count == 0
+
+        # Check that no events are logged
+        assert not l_warn.records
+
     def test_target_exceptions_are_logged_and_continue(self):
         a = mock_application()
 

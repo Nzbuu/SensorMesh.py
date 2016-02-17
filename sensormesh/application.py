@@ -61,7 +61,7 @@ class Controller(object):
     def _step(self, **kwargs):
         data = self._read_sources(**kwargs)
 
-        if not data:
+        if all(v is None for v in data.values()):
             logger.info('Read data is empty')
             return
 
@@ -73,7 +73,6 @@ class Controller(object):
 
     def _read_sources(self, **kwargs):
         data = {}
-        duplicate_fields = set()
         for s in self._sources:
             s_data = s.read(**kwargs)
             data.update(**s_data)
