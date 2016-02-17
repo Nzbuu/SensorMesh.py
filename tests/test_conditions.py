@@ -3,6 +3,12 @@ import pytest
 from sensormesh.conditions import *
 
 
+class TestCondition:
+    def test_has_default_str_method(self):
+        o = Condition()
+        assert str(o) == 'Condition()'
+
+
 class TestTimeCheck:
     def test_requires_time_step_argument(self):
         with pytest.raises(TypeError):
