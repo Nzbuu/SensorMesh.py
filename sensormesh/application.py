@@ -4,7 +4,7 @@ import json
 import contextlib
 import logging
 
-from .exceptions import ConfigurationError
+from .exceptions import ConfigurationError, DuplicateFieldError
 
 logger = logging.getLogger(__name__)
 
@@ -73,9 +73,17 @@ class Controller(object):
 
     def _read_sources(self, **kwargs):
         data = {}
+        duplicate_fields = set()
         for s in self._sources:
             s_data = s.read(**kwargs)
+            duplicate_fields.update(data.keys() & s_data.keys())
             data.update(**s_data)
+
+        if duplicate_fields:
+            duplicate_fields = sorted(duplicate_fields)
+            str = 'Duplicate data fields found: {0!s}'.format(duplicate_fields)
+            logger.critical(str)
+            raise DuplicateFieldError(str)
 
         return data
 
