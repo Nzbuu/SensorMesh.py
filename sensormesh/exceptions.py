@@ -4,3 +4,7 @@ class SensorMeshError(Exception):
 
 class ConfigurationError(SensorMeshError):
     pass
+
+
+class DuplicateFieldError(SensorMeshError):
+    pass

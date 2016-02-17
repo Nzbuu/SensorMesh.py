@@ -1,7 +1,10 @@
 import csv
 import os.path
+import logging
 
 from .endpoints import DataTarget
+
+logger = logging.getLogger(__name__)
 
 
 class TextLogger(DataTarget):
@@ -34,10 +37,11 @@ class TextLogger(DataTarget):
 
             self._file = open(self._filename, self._filemode, newline='')
             self._writer = csv.DictWriter(
-                    self._file,
-                    fieldnames=list(self._adapter.remote_names),
+                self._file,
+                fieldnames=list(self._adapter.remote_names),
             )
             if create_file:
+                logger.info('Creating %r for %s', self._filename, self)
                 self._writer.writeheader()
 
     def close(self):
@@ -54,7 +58,7 @@ class TextLogger(DataTarget):
 
     def __str__(self):
         return "{0}(name={1!r}, filename={2!r})".format(
-                self.__class__.__name__,
-                self._name,
-                self._filename
+            self.__class__.__name__,
+            self._name,
+            self._filename
         )

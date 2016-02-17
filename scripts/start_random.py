@@ -23,8 +23,12 @@ cfg_man = ConfigManager()
 app = Controller()
 app.set_steps(time_step=10, num_steps=5)
 
-# Source
-s = DataSourceWrapper(source=random.random, name='Random numbers')
+# Source 1
+s = DataSourceWrapper(source=random.random, name='rand 1', fields=('value1',))
+app.add_source(s)
+
+# Source 2
+s = DataSourceWrapper(source=random.random, name='rand 2', fields=('value2',))
 app.add_source(s)
 
 # Target 1
@@ -41,7 +45,7 @@ app.add_target(t)
 csv_config = {
     'filename': 'testdata.csv',
     'mode': 'a',
-    'fields': ['timestamp', 'value']
+    'fields': ['timestamp', 'value1', 'value2']
 }
 t = TextLogger(**csv_config)
 app.add_target(t)
