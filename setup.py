@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="SensorMesh",
-    version="0.0.2.dev2",
+    version="0.0.3.dev1",
     packages=find_packages(),
 
     install_requires=['requests', 'python-dateutil'],
