@@ -81,10 +81,10 @@ class Controller(object):
 
         if duplicate_fields:
             duplicate_fields = sorted(duplicate_fields)
-            str = 'Duplicate data fields found: {0!s}'.format(
+            message = 'Duplicate data fields found: {0!s}'.format(
                 duplicate_fields)
-            logger.critical(str)
-            raise DuplicateFieldError(str)
+            logger.critical(message)
+            raise DuplicateFieldError(message)
 
         return data
 
