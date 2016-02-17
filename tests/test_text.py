@@ -1,6 +1,7 @@
 import unittest.mock as mock
 
 import pytest
+import testfixtures
 
 from sensormesh.text import *
 
@@ -25,16 +26,16 @@ class TestTextLogger:
     def test_requires_valid_mode(self):
         with pytest.raises(ValueError):
             _ = TextLogger(
-                    filename='temp_logfile.txt',
-                    mode='x',
-                    fields=['value']
+                filename='temp_logfile.txt',
+                mode='x',
+                fields=['value']
             )
 
     def test_can_create_with_filename(self):
         l = TextLogger(
-                filename='temp_logfile.txt',
-                name='CsvLogger',
-                fields=['timestamp', 'values']
+            filename='temp_logfile.txt',
+            name='CsvLogger',
+            fields=['timestamp', 'values']
         )
         assert l.name == 'CsvLogger'
         assert l.filename == 'temp_logfile.txt'
@@ -45,11 +46,12 @@ class TestTextLogger:
         mock_file = mock.mock_open()
 
         with mock.patch('os.path.isfile', mock_isfile), \
-             mock.patch('builtins.open', mock_file):
+             mock.patch('builtins.open', mock_file), \
+             testfixtures.LogCapture(level=logging.INFO) as logs:
             o = TextLogger(
-                    filename='temp_file.txt',
-                    mode='a',
-                    fields=['timestamp', 'value']
+                filename='temp_file.txt',
+                mode='a',
+                fields=['timestamp', 'value']
             )
             data = {'timestamp': 100, 'value': 200}
             with o:
@@ -67,16 +69,24 @@ class TestTextLogger:
             mock.call('100,200\r\n'),
         ])
 
+        assert len(logs.records) == 4
+        assert_record_is(logs.records[0], 'INFO', "Opening TextLogger(name='', filename='temp_file.txt')")
+        assert_record_is(logs.records[1], 'INFO',
+                         "Creating 'temp_file.txt' for TextLogger(name='', filename='temp_file.txt')")
+        assert_record_is(logs.records[2], 'INFO', "Updating TextLogger(name='', filename='temp_file.txt')")
+        assert_record_is(logs.records[3], 'INFO', "Closing TextLogger(name='', filename='temp_file.txt')")
+
     def test_can_continue_existing_file(self):
         mock_isfile = mock.Mock(return_value=True)
         mock_file = mock.mock_open()
 
         with mock.patch('os.path.isfile', mock_isfile), \
-             mock.patch('builtins.open', mock_file):
+             mock.patch('builtins.open', mock_file), \
+             testfixtures.LogCapture(level=logging.INFO) as logs:
             o = TextLogger(
-                    filename='temp_file.txt',
-                    mode='a',
-                    fields=['timestamp', 'value']
+                filename='temp_file.txt',
+                mode='a',
+                fields=['timestamp', 'value']
             )
             data = {'timestamp': 150, 'value': 250}
             with o:
@@ -91,6 +101,11 @@ class TestTextLogger:
         assert file_handle.write.call_count == 1
         file_handle.write.assert_called_with('150,250\r\n')
 
+        assert len(logs.records) == 3
+        assert_record_is(logs.records[0], 'INFO', "Opening TextLogger(name='', filename='temp_file.txt')")
+        assert_record_is(logs.records[1], 'INFO', "Updating TextLogger(name='', filename='temp_file.txt')")
+        assert_record_is(logs.records[2], 'INFO', "Closing TextLogger(name='', filename='temp_file.txt')")
+
     def test_can_write_remote_names(self):
         mock_isfile = mock.Mock(return_value=False)
         mock_file = mock.mock_open()
@@ -98,9 +113,9 @@ class TestTextLogger:
         with mock.patch('os.path.isfile', mock_isfile), \
              mock.patch('builtins.open', mock_file):
             o = TextLogger(
-                    filename='temp_file.txt',
-                    mode='w',
-                    fields=['timestamp', ('value', 'field1')]
+                filename='temp_file.txt',
+                mode='w',
+                fields=['timestamp', ('value', 'field1')]
             )
             data = {'timestamp': 110, 'value': 210}
             with o:
@@ -126,9 +141,9 @@ class TestTextLogger:
         with mock.patch('os.path.isfile', mock_isfile), \
              mock.patch('builtins.open', mock_file):
             o = TextLogger(
-                    filename='temp_file.txt',
-                    mode='w',
-                    fields=['timestamp', 'value']
+                filename='temp_file.txt',
+                mode='w',
+                fields=['timestamp', 'value']
             )
             data = {'timestamp': 1100, 'value': 2100}
             with o:
@@ -154,9 +169,9 @@ class TestTextLogger:
         with mock.patch('os.path.isfile', mock_isfile), \
              mock.patch('builtins.open', mock_file):
             o = TextLogger(
-                    filename='temp_file.txt',
-                    mode='w',
-                    fields=['timestamp', 'r1', 'r2']
+                filename='temp_file.txt',
+                mode='w',
+                fields=['timestamp', 'r1', 'r2']
             )
             data = {'timestamp': 1200, 'r2': 5}
             with o:
@@ -174,3 +189,8 @@ class TestTextLogger:
             mock.call('timestamp,r1,r2\r\n'),
             mock.call('1200,,5\r\n'),
         ])
+
+
+def assert_record_is(record, level, message):
+    assert record.levelname == level
+    assert record.getMessage() == message
