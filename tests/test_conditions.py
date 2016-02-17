@@ -5,8 +5,11 @@ from sensormesh.conditions import *
 
 class TestCondition:
     def test_has_default_str_method(self):
-        o = Condition()
-        assert str(o) == 'Condition()'
+        class MyCondition(Condition):
+            pass
+        
+        o = MyCondition()
+        assert str(o) == 'MyCondition()'
 
 
 class TestTimeCheck:
