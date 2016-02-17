@@ -2,6 +2,9 @@ class Condition:
     def check(self, **kwargs):
         raise NotImplementedError()
 
+    def update(self, **kwargs):
+        raise NotImplementedError()
+
 
 class TimeCheck(Condition):
     def __init__(self, time_step):
@@ -21,11 +24,11 @@ class TimeCheck(Condition):
             # Take first time that exceeds next one
             result = timestamp >= self._time_next
 
-        if result:
-            # Calculate time of next read/update
-            self._time_next = timestamp + self._time_step
-
         return result
+
+    def update(self, timestamp, **kwargs):
+        # Calculate time of next read/update
+        self._time_next = timestamp + self._time_step
 
     def __str__(self):
         return '{0}(time_step={1})'.format(

@@ -48,7 +48,14 @@ class DataEndpoint(object):
         self._conditions.append(condition)
 
     def _check_conditions(self, **kwargs):
-        return all(cond.check(**kwargs) for cond in self._conditions)
+        for cond in self._conditions:
+            if not cond.check(**kwargs):
+                return False, str(cond)
+        return True, None
+
+    def _update_conditions(self, **kwargs):
+        for cond in self._conditions:
+            cond.update(**kwargs)
 
     def __enter__(self):
         self.open()
@@ -72,13 +79,15 @@ class DataSource(DataEndpoint):
         super().__init__(*args, **kwargs)
 
     def read(self, **kwargs):
-        if self._check_conditions(**kwargs):
+        result, reason = self._check_conditions(**kwargs)
+        if result:
             logger.info('Read %s', str(self))
+            self._update_conditions(**kwargs)
             data_in = self._read()
             data = self._process_data(data_in)
             return data
         else:
-            logger.info('Skip read %s', str(self))
+            logger.info('Skip read %s because of %s', str(self), reason)
             return {}
 
     def _read(self):
@@ -96,12 +105,14 @@ class DataTarget(DataEndpoint):
         super().__init__(*args, **kwargs)
 
     def update(self, data):
-        if self._check_conditions(**data):
+        result, reason = self._check_conditions(**data)
+        if result:
+            self._update_conditions(**data)
             logger.info('Update %s', str(self))
             data_out = self._prepare_update(data)
             self._update(data_out)
         else:
-            logger.info('Skip update %s', str(self))
+            logger.info('Skip update %s because of %s', str(self), reason)
 
     def _prepare_update(self, data):
         if self._adapter.count:

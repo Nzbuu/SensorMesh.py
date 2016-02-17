@@ -20,28 +20,35 @@ class TestTimeCheck:
         with pytest.raises(ValueError):
             _ = TimeCheck(-1)
 
-    def test_passes_first_step(self):
+    def test_passes_first_step_always(self):
         obj = TimeCheck(time_step=1)
         result = obj.check(timestamp=0)
         assert result
 
-    def test_passes_second_step_with_zero_step(self):
+    def test_passes_next_step_with_zero_step(self):
         obj = TimeCheck(time_step=0)
-        _ = obj.check(timestamp=0)
-        result = obj.check(timestamp=0)
+        obj.update(timestamp=0)  # record pass at time 0
+        result = obj.check(timestamp=0)  # next step
         assert result
 
-    def test_fails_second_step_with_small_step(self):
+    def test_fails_next_step_with_small_step(self):
         obj = TimeCheck(time_step=1)
-        _ = obj.check(timestamp=0)
-        result = obj.check(timestamp=0.1)
+        obj.update(timestamp=0)  # record pass at time 0
+        result = obj.check(timestamp=0.1)  # next step
         assert not result
+
+    def test_passes_next_step_without_update(self):
+        obj = TimeCheck(time_step=1)
+        result_first = obj.check(timestamp=0)  # first step
+        assert result_first
+        result_next = obj.check(timestamp=0.1)  # next step
+        assert result_next
 
     def test_fails_until_time_elapsed(self):
         obj = TimeCheck(time_step=5)
         t = 0
-        _ = obj.check(timestamp=t)
-        while not obj.check(timestamp=t):
+        obj.update(timestamp=t)  # record pass at time t
+        while not obj.check(timestamp=t):  # next steps
             t += 2
         assert t == 6
 
