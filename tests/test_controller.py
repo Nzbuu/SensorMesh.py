@@ -135,7 +135,9 @@ class TestController:
         with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
             a._step(timestamp=1453928000)
 
+        assert a._read_sources.call_count == 1
         assert a._sources[0].read.call_count == 1
+        assert a._update_targets.call_count == 1
         assert a._targets[0].update.call_count == 1
         assert a._targets[1].update.call_count == 1
 
@@ -149,7 +151,9 @@ class TestController:
         with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
             a._step(timestamp=1453928000)
 
+        assert a._read_sources.call_count == 1
         assert a._sources[0].read.call_count == 1
+        assert a._update_targets.call_count == 0
         assert a._targets[0].update.call_count == 0
         assert a._targets[1].update.call_count == 0
 
@@ -163,7 +167,9 @@ class TestController:
         with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
             a._step(timestamp=1453928000)
 
+        assert a._read_sources.call_count == 1
         assert a._sources[0].read.call_count == 1
+        assert a._update_targets.call_count == 0
         assert a._targets[0].update.call_count == 0
         assert a._targets[1].update.call_count == 0
 
@@ -180,7 +186,9 @@ class TestController:
         with testfixtures.LogCapture(level=logging.WARNING) as l:
             a._step(timestamp=1453928000)
 
+        assert a._read_sources.call_count == 1
         assert a._sources[0].read.call_count == 1
+        assert a._update_targets.call_count == 1
         assert a._targets[0].update.call_count == 1
         assert a._targets[1].update.call_count == 1
 
@@ -202,6 +210,9 @@ def mock_application():
     for _ in range(2):
         t = mock_target()
         a.add_target(t)
+
+    a._read_sources = mock.Mock(wraps=a._read_sources)
+    a._update_targets = mock.Mock(wraps=a._update_targets)
 
     return a
 
