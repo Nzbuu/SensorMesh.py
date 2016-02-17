@@ -16,21 +16,21 @@ class TestController:
         a = Controller()
         s = mock_source('Mock Source')
         a.add_source(s)
-        assert a.get_source_name() == 'Mock Source'
+        assert a.get_source_names() == ('Mock Source',)
 
-    def test_cannot_add_2_sources(self):
+    def test_can_add_2_sources(self):
         a = Controller()
-        s1 = mock_source()
-        s2 = mock_source()
+        s1 = mock_source('Source 1')
+        s2 = mock_source('Source 2')
         a.add_source(s1)
-        with pytest.raises(ConfigurationError):
-            a.add_source(s2)
+        a.add_source(s2)
+        assert a.get_source_names() == ('Source 1', 'Source 2')
 
     def test_can_add_target(self):
         a = Controller()
         t = mock_target('Mock Target')
         a.add_target(t)
-        assert a.get_target_names() == ['Mock Target']
+        assert a.get_target_names() == ('Mock Target',)
 
     def test_can_add_2_targets(self):
         a = Controller()
@@ -38,7 +38,7 @@ class TestController:
         t2 = mock_target('Mock Target 2')
         a.add_target(t1)
         a.add_target(t2)
-        assert a.get_target_names() == ['Mock Target 1', 'Mock Target 2']
+        assert a.get_target_names() == ('Mock Target 1', 'Mock Target 2')
 
     def test_cannot_start_without_target(self):
         a = Controller()
@@ -67,12 +67,12 @@ class TestController:
         assert a._trigger._delayfcn.call_count == 0  # Never sleeps
 
         # All resources started
-        assert a._source.open.call_count == 1
+        assert a._sources[0].open.call_count == 1
         assert a._targets[0].open.call_count == 1
         assert a._targets[1].open.call_count == 1
 
         # All resources stopped
-        assert a._source.close.call_count == 1
+        assert a._sources[0].close.call_count == 1
         assert a._targets[0].close.call_count == 1
         assert a._targets[1].close.call_count == 1
 
@@ -92,12 +92,12 @@ class TestController:
         assert a._trigger._delayfcn.call_count == 1  # Don't delay after final step
 
         # All resources started
-        assert a._source.open.call_count == 1
+        assert a._sources[0].open.call_count == 1
         assert a._targets[0].open.call_count == 1
         assert a._targets[1].open.call_count == 1
 
         # All resources stopped
-        assert a._source.close.call_count == 1
+        assert a._sources[0].close.call_count == 1
         assert a._targets[0].close.call_count == 1
         assert a._targets[1].close.call_count == 1
 
@@ -117,12 +117,12 @@ class TestController:
         assert a._trigger._delayfcn.call_count == 1  # Don't delay after final step
 
         # All resources started
-        assert a._source.open.call_count == 1
+        assert a._sources[0].open.call_count == 1
         assert a._targets[0].open.call_count == 1
         assert a._targets[1].open.call_count == 1
 
         # All resources stopped
-        assert a._source.close.call_count == 1
+        assert a._sources[0].close.call_count == 1
         assert a._targets[0].close.call_count == 1
         assert a._targets[1].close.call_count == 1
 
@@ -135,7 +135,7 @@ class TestController:
         with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
             a._step(timestamp=1453928000)
 
-        assert a._source.read.call_count == 1
+        assert a._sources[0].read.call_count == 1
         assert a._targets[0].update.call_count == 1
         assert a._targets[1].update.call_count == 1
 
@@ -144,12 +144,12 @@ class TestController:
 
     def test_step_skips_update_when_no_data(self):
         a = mock_application()
-        a._source.read.return_value = None
+        a._sources[0].read.return_value = {}
 
         with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
             a._step(timestamp=1453928000)
 
-        assert a._source.read.call_count == 1
+        assert a._sources[0].read.call_count == 1
         assert a._targets[0].update.call_count == 0
         assert a._targets[1].update.call_count == 0
 
@@ -166,7 +166,7 @@ class TestController:
         with testfixtures.LogCapture(level=logging.WARNING) as l:
             a._step(timestamp=1453928000)
 
-        assert a._source.read.call_count == 1
+        assert a._sources[0].read.call_count == 1
         assert a._targets[0].update.call_count == 1
         assert a._targets[1].update.call_count == 1
 
