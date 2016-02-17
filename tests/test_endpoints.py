@@ -1,6 +1,9 @@
 import unittest.mock as mock
+import logging
 
-from sensormesh.endpoints import DataEndpoint
+import testfixtures
+
+from sensormesh.endpoints import DataEndpoint, DataSource, DataTarget
 from sensormesh.conditions import Condition
 
 
@@ -112,13 +115,87 @@ class TestBase:
         c2.update.assert_called_once_with(value=4)
 
 
+class TestSource:
+    def test_read_continues_when_checks_pass(self):
+        s = mock_source()
+
+        with testfixtures.LogCapture(level=logging.INFO) as l:
+            with s:
+                result = s.read(timestamp=1)
+
+        assert result == {'field1': 5, 'field2': -7}
+        s._check_conditions.assert_called_once_with(timestamp=1)
+        s._read.assert_called_once_with()
+        s._update_conditions.assert_called_once_with(timestamp=1)
+
+    def test_read_stops_when_checks_fail(self):
+        s = mock_source()
+        s._check_conditions = mock.Mock(return_value=(False, 'MyCondition(threshold=10)'))
+
+        with testfixtures.LogCapture(level=logging.INFO) as l:
+            with s:
+                result = s.read(timestamp=1)
+
+        assert result == {}
+        s._check_conditions.assert_called_once_with(timestamp=1)
+        assert s._read.call_count == 0
+        assert s._update_conditions.call_count == 0
+
+
+class TestTarget:
+    def test_update_continues_when_checks_pass(self):
+        t = mock_target()
+
+        data = {'timestamp': 2, 'field1': 5, 'field2': -7}
+
+        with testfixtures.LogCapture(level=logging.INFO) as l:
+            with t:
+                t.update(data)
+
+        t._check_conditions.assert_called_once_with(**data)
+        t._update.assert_called_once_with(data)
+        t._update_conditions.assert_called_once_with(**data)
+
+    def test_update_stops_when_checks_fail(self):
+        t = mock_target()
+        t._check_conditions = mock.Mock(return_value=(False, 'MyCondition(threshold=10)'))
+
+        data = {'timestamp': 2, 'field1': 5, 'field2': -7}
+
+        with testfixtures.LogCapture(level=logging.INFO) as l:
+            with t:
+                t.update(data)
+
+        t._check_conditions.assert_called_once_with(**data)
+        assert t._update.call_count == 0
+        assert t._update_conditions.call_count == 0
+
+
+def mock_source():
+    obj = DataSource()
+    obj._read = mock.Mock(return_value={'field1': 5, 'field2': -7})
+    obj._check_conditions = mock.Mock(return_value=(True, None))
+    obj._update_conditions = mock.Mock()
+    obj.__str__ = mock.Mock(return_value='MockSource(param=0)')
+    return obj
+
+
+def mock_target():
+    obj = DataTarget()
+    obj._update = mock.Mock()
+    obj._check_conditions = mock.Mock(return_value=(True, None))
+    obj._update_conditions = mock.Mock()
+    obj.__str__ = mock.Mock(return_value='MockSource(param=0)')
+    return obj
+
+
 def mock_condition(**kwargs):
     if not kwargs:
         kwargs['return_value'] = True
     str = kwargs.pop('str', 'Condition()')
 
-    cond = mock.MagicMock(spec=Condition)
-    cond.check = mock.MagicMock(**kwargs)
-    cond.__str__.return_value = str
+    obj = mock.MagicMock(spec=Condition)
+    obj.check = mock.MagicMock(**kwargs)
+    obj.__str__.return_value = str
 
-    return cond
+    return obj

@@ -7,7 +7,7 @@ class TestCondition:
     def test_has_default_str_method(self):
         class MyCondition(Condition):
             pass
-        
+
         o = MyCondition()
         assert str(o) == 'MyCondition()'
 
