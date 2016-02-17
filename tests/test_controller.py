@@ -229,6 +229,43 @@ class TestController:
         a._update_targets.assert_called_with({'timestamp': 14539230000, 'value': 0.5})
         assert not l.records
 
+    def test_read_sources_calls_all_sources(self):
+        a = mock_application()
+        a.add_source(mock_source('Source 2', fieldX=2))
+
+        with testfixtures.LogCapture(level=logging.WARNING) as l:
+            data = a._read_sources(timestamp=1453928000)
+
+        assert data == {'value': 0.5, 'fieldX': 2}
+        assert not l.records
+
+    def test_read_sources_throws_for_duplicate_fields(self):
+        a = mock_application()
+        a.add_source(mock_source('Source 2', value=2))
+
+        with testfixtures.LogCapture(level=logging.WARNING) as l:
+            with pytest.raises(DuplicateFieldError):
+                _ = a._read_sources(timestamp=1453928000)
+
+        assert len(l.records) == 1
+        assert l.records[0].levelname == 'CRITICAL'
+        assert (l.records[0].getMessage() ==
+                "Duplicate data fields found: ['value']")
+
+    def test_list_of_duplicate_fields_is_sorted_and_unique(self):
+        a = mock_application()
+        a.add_source(mock_source('Source 2', value=2, xyz=3, aaa=4))
+        a.add_source(mock_source('Source 3', value=0, xyz=1, aaa=-1))
+
+        with testfixtures.LogCapture(level=logging.WARNING) as l:
+            with pytest.raises(DuplicateFieldError):
+                _ = a._read_sources(timestamp=1453928000)
+
+        assert len(l.records) == 1
+        assert l.records[0].levelname == 'CRITICAL'
+        assert (l.records[0].getMessage() ==
+                "Duplicate data fields found: ['aaa', 'value', 'xyz']")
+
 
 def mock_application():
     tf = mock.Mock()
