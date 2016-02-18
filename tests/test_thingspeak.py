@@ -11,7 +11,7 @@ from sensormesh.thingspeak import (
 
 class TestThingSpeakSource:
     def test_cannot_create_source_without_api(self):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValueError):
             _ = ThingSpeakSource(name='Test Source')
 
     def test_cannot_create_source_with_empty_api(self):
@@ -57,7 +57,7 @@ class TestThingSpeakSource:
 
 class TestThingSpeakLogger:
     def test_cannot_create_logger_without_api(self):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValueError):
             _ = ThingSpeakLogger(name='Test Logger')
 
     def test_can_create_logger_with_empty_api(self):

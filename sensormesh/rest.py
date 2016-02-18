@@ -4,19 +4,16 @@ from .endpoints import DataSource, DataTarget
 
 
 class RestApi(object):
-    @classmethod
-    def configure_api(cls, api):
-        if isinstance(api, dict):
-            api = cls(**api)
-
-        return api
+    pass
 
 
 class RestTarget(DataTarget):
-    def __init__(self, api, *args, **kwargs):
+    def __init__(self, api=None, api_cls=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if api:
+        if isinstance(api, dict):
+            self._api = api_cls(**api)
+        elif api:
             self._api = api
         else:
             raise ValueError('Missing API input.')
@@ -26,10 +23,12 @@ class RestTarget(DataTarget):
 
 
 class RestSource(DataSource):
-    def __init__(self, api, *args, **kwargs):
+    def __init__(self, api=None, api_cls=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if api:
+        if isinstance(api, dict):
+            self._api = api_cls(**api)
+        elif api:
             self._api = api
         else:
             raise ValueError('Missing API input.')
