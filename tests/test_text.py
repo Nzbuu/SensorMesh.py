@@ -1,9 +1,10 @@
 import unittest.mock as mock
+import logging
 
 import pytest
 import testfixtures
 
-from sensormesh.text import *
+from sensormesh.text import TextLogger
 
 
 class TestTextLogger:

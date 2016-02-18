@@ -2,7 +2,7 @@ import unittest.mock as mock
 
 import pytest
 
-from sensormesh.rest import *
+from sensormesh.rest import RestSource, RestTarget
 
 
 class TestRestSource:

@@ -1,6 +1,6 @@
 import unittest.mock as mock
 
-from sensormesh.console import *
+from sensormesh.console import ConsoleDisplay
 
 
 class TestConsoleDisplay:

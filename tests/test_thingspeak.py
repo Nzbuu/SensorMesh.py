@@ -5,7 +5,8 @@ import pytest
 import responses
 import requests.exceptions
 
-from sensormesh.thingspeak import *
+from sensormesh.thingspeak import (
+    ThingSpeakApi, ThingSpeakLogger, ThingSpeakSource, ConfigurationError)
 
 
 class TestThingSpeakSource:

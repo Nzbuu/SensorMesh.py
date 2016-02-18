@@ -1,6 +1,6 @@
 import pytest
 
-from sensormesh.conditions import *
+from sensormesh.conditions import Condition, TimeCheck
 
 
 class TestCondition:
