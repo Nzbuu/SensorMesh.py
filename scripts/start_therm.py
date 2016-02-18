@@ -10,6 +10,7 @@ from sensormesh.sources import DataSourceWrapper
 from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 from sensormesh.text import TextLogger
+from sensormesh.twitter import TwitterUpdate
 from sensormesh.conditions import TimeCheck
 
 
@@ -53,6 +54,12 @@ csv_config = {
     'fields': ['timestamp', 'temperature']
 }
 t = TextLogger(**csv_config)
+app.add_target(t)
+
+# Target 4
+twt_config = cfg_man.load_config_file('twitter_therm.json')
+t = TwitterUpdate(**twt_config)
+t.add_condition(TimeCheck(900))
 app.add_target(t)
 
 # Run application
