@@ -3,7 +3,8 @@ import logging
 import logging.config
 import json
 
-from sensormesh.application import Controller, ConfigManager
+from sensormesh.config import ConfigManager
+from sensormesh.application import Controller
 from sensormesh.sources import DataSourceWrapper
 from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger

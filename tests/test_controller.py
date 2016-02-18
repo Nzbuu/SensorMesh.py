@@ -4,7 +4,7 @@ import logging
 import pytest
 import testfixtures
 
-from sensormesh.application import *
+from sensormesh.application import Controller, DuplicateFieldError, ConfigurationError
 from sensormesh.endpoints import DataSource, DataTarget
 
 

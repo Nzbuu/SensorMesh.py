@@ -77,13 +77,8 @@ class ThingSpeakApi(RestApi):
 
 
 class ThingSpeakLogger(RestTarget):
-    def __init__(self, api=None, *args, **kwargs):
-        # Create API instance
-        #   Note that this modifies kwargs
-        api = ThingSpeakApi.configure_api(api, kwargs)
-
-        # Create instance
-        super().__init__(*args, api=api, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, api_cls=ThingSpeakApi, **kwargs)
 
     def _prepare_update(self, data):
         data_out = super()._prepare_update(data)
@@ -99,13 +94,8 @@ class ThingSpeakLogger(RestTarget):
 
 
 class ThingSpeakSource(RestSource):
-    def __init__(self, api=None, *args, **kwargs):
-        # Create API instance
-        #   Note that this modifies kwargs
-        api = ThingSpeakApi.configure_api(api, kwargs)
-
-        # Construct instance
-        super().__init__(*args, api=api, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, api_cls=ThingSpeakApi, **kwargs)
 
     def _process_data(self, content):
         data = super()._process_data(content)

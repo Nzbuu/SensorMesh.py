@@ -2,17 +2,17 @@ import unittest.mock as mock
 
 import pytest
 
-from sensormesh.rest import *
+from sensormesh.rest import RestSource, RestTarget
 
 
 class TestRestSource:
     def test_cannot_create_source_without_api(self):
-        with pytest.raises(TypeError):
-            o = RestSource()
+        with pytest.raises(ValueError):
+            _ = RestSource()
 
     def test_cannot_create_source_with_empty_api(self):
         with pytest.raises(ValueError):
-            o = RestSource(api=None)
+            _ = RestSource(api=None)
 
     def test_can_create_with_api(self):
         mock_api = mock.Mock()
@@ -60,7 +60,7 @@ class TestRestSource:
 
 class TestRestTarget:
     def test_cannot_create_target_without_api(self):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValueError):
             o = RestTarget()
 
     def test_cannot_create_target_with_empty_api(self):
