@@ -1,7 +1,7 @@
 import unittest.mock as mock
 import json
 
-from sensormesh.application import ConfigManager
+from sensormesh.config import ConfigManager
 
 
 class TestConfigManager:

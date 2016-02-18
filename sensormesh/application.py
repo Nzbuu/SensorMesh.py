@@ -1,6 +1,4 @@
-import os.path
 import time
-import json
 import contextlib
 import logging
 
@@ -131,20 +129,3 @@ class TimeTrigger(object):
                 time_start_next = time_finish_now
 
         logger.info('Finished iterator')
-
-
-class ConfigManager(object):
-    def __init__(self):
-        self._map = {
-            '.json': self.load_json_file,
-        }
-
-    def load_config_file(self, filename):
-        _, fileext = os.path.splitext(filename)
-        load_fcn = self._map[fileext]
-        return load_fcn(filename)
-
-    def load_json_file(self, filename):
-        with open(filename) as cfg_file:
-            cfg_data = json.load(cfg_file)
-        return cfg_data
