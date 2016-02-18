@@ -5,7 +5,7 @@ setup(
     version="0.0.3.dev1",
     packages=find_packages(),
 
-    install_requires=['requests', 'python-dateutil'],
+    install_requires=['requests', 'python-dateutil', 'tweepy'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest', 'pytest-cov', 'responses', 'textfixtures'],
 

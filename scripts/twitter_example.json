@@ -1,0 +1,12 @@
+{
+  "name": "",
+  "api": {
+    "consumer_token": null,
+    "consumer_secret": null,
+    "access_token": null,
+    "access_token_secret": null
+  },
+  "message": "This is a number: {value}",
+  "fields": [
+  ]
+}
