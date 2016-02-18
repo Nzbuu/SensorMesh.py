@@ -6,8 +6,8 @@ logger = logging.getLogger(__name__)
 
 
 class DataEndpoint(object):
-    def __init__(self, name='', fields=(), when=()):
-        super().__init__()
+    def __init__(self, name='', fields=(), when=(), *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._name = name
         self._conditions = []
         self._adapter = DataAdapter()
