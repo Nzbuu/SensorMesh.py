@@ -9,7 +9,6 @@ class TwitterApi(RestApi):
         super().__init__()
 
         auth = tweepy.OAuthHandler(consumer_token, consumer_secret)
-        auth.secure = True
         auth.set_access_token(access_token, access_token_secret)
 
         self._api = tweepy.API(auth)
