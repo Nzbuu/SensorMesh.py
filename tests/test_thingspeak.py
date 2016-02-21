@@ -27,20 +27,20 @@ class TestThingSpeakSource:
         assert obj._api.channel == 3
 
     def test_can_inject_api(self):
-        api = mock.Mock(spec=ThingSpeakApi)
+        api = mock.MagicMock(spec=ThingSpeakApi)
         obj = ThingSpeakSource(api=api)
         assert obj._api is api
 
     def test_can_read_with_api(self):
-        mock_api = mock.Mock(spec=ThingSpeakApi)
+        mock_api = mock.MagicMock(spec=ThingSpeakApi)
         mock_api.get_data.return_value = canned_responses['last.json']
 
         obj = ThingSpeakSource(
-                api=mock_api,
-                fields=[
-                    ('Server Temp', 'field1'),
-                    ('timestamp', 'created_at')
-                ]
+            api=mock_api,
+            fields=[
+                ('Server Temp', 'field1'),
+                ('timestamp', 'created_at')
+            ]
         )
 
         with obj:
@@ -69,20 +69,20 @@ class TestThingSpeakLogger:
         assert obj._api.key == 'ZYXWVUTSRQP0987654321'
 
     def test_can_inject_api(self):
-        api = mock.Mock(spec=ThingSpeakApi)
+        api = mock.MagicMock(spec=ThingSpeakApi)
         obj = ThingSpeakLogger(api=api)
         assert obj._api is api
 
     def test_can_update_with_api(self):
-        mock_api = mock.Mock()
+        mock_api = mock.MagicMock()
         mock_api.post_update.return_value = canned_responses['update.json']
 
         obj = ThingSpeakLogger(
-                api=mock_api,
-                fields=[
-                    ('Server Temp', 'field1'),
-                    ('timestamp', 'created_at')
-                ]
+            api=mock_api,
+            fields=[
+                ('Server Temp', 'field1'),
+                ('timestamp', 'created_at')
+            ]
         )
 
         data = {
@@ -106,9 +106,9 @@ class TestThingSpeakApi:
 
     def test_can_configure_properties(self):
         api = ThingSpeakApi(
-                key='ABCDEFGHIJ1234567890',
-                channel=700,
-                base_url='https://api.example.com:6666'
+            key='ABCDEFGHIJ1234567890',
+            channel=700,
+            base_url='https://api.example.com:6666'
         )
         assert api.base_url == 'https://api.example.com:6666'
         assert api.key == 'ABCDEFGHIJ1234567890'
@@ -116,34 +116,34 @@ class TestThingSpeakApi:
 
     def test_url_for_update(self):
         api = ThingSpeakApi(
-                key='ABCDEFGHIJ1234567890',
-                channel=700,
-                base_url='https://api.example.com:6666'
+            key='ABCDEFGHIJ1234567890',
+            channel=700,
+            base_url='https://api.example.com:6666'
         )
         assert (api._get_url('update') ==
                 'https://api.example.com:6666/update.json')
 
     def test_url_for_last(self):
         api = ThingSpeakApi(
-                key='ABCDEFGHIJ1234567890',
-                channel=700,
-                base_url='https://api.example.com:6666'
+            key='ABCDEFGHIJ1234567890',
+            channel=700,
+            base_url='https://api.example.com:6666'
         )
         assert (api._get_url('last') ==
                 'https://api.example.com:6666/channels/700/feed/last.json')
 
     def test_can_get_data_with_url(self):
         api = ThingSpeakApi(
-                key='ABCDEFGHIJKLMNOPQRST',
-                channel=666,
-                base_url='https://api.example.com:6666'
+            key='ABCDEFGHIJKLMNOPQRST',
+            channel=666,
+            base_url='https://api.example.com:6666'
         )
 
         with responses.RequestsMock() as r_mock:
             r_mock.add(
-                    r_mock.GET,
-                    'https://api.example.com:6666/channels/666/feed/last.json',
-                    json=canned_responses['last.json']
+                r_mock.GET,
+                'https://api.example.com:6666/channels/666/feed/last.json',
+                json=canned_responses['last.json']
             )
             data = api.get_data()
 
@@ -157,8 +157,8 @@ class TestThingSpeakApi:
 
     def test_cannot_get_data_without_channel(self):
         api = ThingSpeakApi(
-                key='ABCDEFGHIJKLMNOPQRST',
-                base_url='https://api.example.com:6666'
+            key='ABCDEFGHIJKLMNOPQRST',
+            base_url='https://api.example.com:6666'
         )
 
         with responses.RequestsMock() as r_mock, \
@@ -169,15 +169,15 @@ class TestThingSpeakApi:
 
     def test_can_get_data_without_key(self):
         api = ThingSpeakApi(
-                channel=666,
-                base_url='https://api.example.com:6666'
+            channel=666,
+            base_url='https://api.example.com:6666'
         )
 
         with responses.RequestsMock() as r_mock:
             r_mock.add(
-                    r_mock.GET,
-                    'https://api.example.com:6666/channels/666/feed/last.json',
-                    json=canned_responses['last.json']
+                r_mock.GET,
+                'https://api.example.com:6666/channels/666/feed/last.json',
+                json=canned_responses['last.json']
             )
             data = api.get_data()
 
@@ -191,15 +191,15 @@ class TestThingSpeakApi:
 
     def test_get_data_connection_error(self):
         api = ThingSpeakApi(
-                channel=666,
-                base_url='https://api.example.com:6666'
+            channel=666,
+            base_url='https://api.example.com:6666'
         )
 
         with responses.RequestsMock() as r_mock:
             r_mock.add(
-                    r_mock.GET,
-                    'https://api.example.com:6666/channels/666/feed/last.json',
-                    body=requests.exceptions.ConnectionError()
+                r_mock.GET,
+                'https://api.example.com:6666/channels/666/feed/last.json',
+                body=requests.exceptions.ConnectionError()
             )
 
             with pytest.raises(requests.exceptions.ConnectionError):
@@ -211,17 +211,17 @@ class TestThingSpeakApi:
 
     def test_can_post_update_with_url(self):
         api = ThingSpeakApi(
-                key='ZYXWVUTSRQP0987654321',
-                channel=666,
-                base_url='https://api.example.com:6666'
+            key='ZYXWVUTSRQP0987654321',
+            channel=666,
+            base_url='https://api.example.com:6666'
         )
         data = {"created_at": "2016-01-27T20:52:20", "field1": "60.0 F"}
 
         with responses.RequestsMock() as r_mock:
             r_mock.add(
-                    r_mock.POST,
-                    'https://api.example.com:6666/update.json',
-                    json=canned_responses['update.json']
+                r_mock.POST,
+                'https://api.example.com:6666/update.json',
+                json=canned_responses['update.json']
             )
             api.post_update(data)
 
@@ -233,16 +233,16 @@ class TestThingSpeakApi:
 
     def test_can_post_update_without_channel(self):
         api = ThingSpeakApi(
-                key='ZYXWVUTSRQP0987654321',
-                base_url='https://api.example.com:6666'
+            key='ZYXWVUTSRQP0987654321',
+            base_url='https://api.example.com:6666'
         )
         data = {"created_at": "2016-01-27T20:52:20", "field1": "60.0 F"}
 
         with responses.RequestsMock() as r_mock:
             r_mock.add(
-                    r_mock.POST,
-                    'https://api.example.com:6666/update.json',
-                    json=canned_responses['update.json']
+                r_mock.POST,
+                'https://api.example.com:6666/update.json',
+                json=canned_responses['update.json']
             )
             api.post_update(data)
 
@@ -254,8 +254,8 @@ class TestThingSpeakApi:
 
     def test_cannot_post_update_without_key(self):
         api = ThingSpeakApi(
-                channel=666,
-                base_url='https://api.example.com:6666'
+            channel=666,
+            base_url='https://api.example.com:6666'
         )
         data = {"created_at": "2016-01-27T20:52:20", "field1": "60.0 F"}
 
@@ -267,16 +267,16 @@ class TestThingSpeakApi:
 
     def test_post_update_connection_error(self):
         api = ThingSpeakApi(
-                key='ZYXWVUTSRQP0987654321',
-                base_url='https://api.example.com:6666'
+            key='ZYXWVUTSRQP0987654321',
+            base_url='https://api.example.com:6666'
         )
         data = {"created_at": "2016-01-27T20:52:20", "field1": "60.0 F"}
 
         with responses.RequestsMock() as r_mock:
             r_mock.add(
-                    r_mock.POST,
-                    'https://api.example.com:6666/update.json',
-                    body=requests.exceptions.ConnectionError()
+                r_mock.POST,
+                'https://api.example.com:6666/update.json',
+                body=requests.exceptions.ConnectionError()
             )
 
             with pytest.raises(requests.exceptions.ConnectionError):
