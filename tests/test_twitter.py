@@ -1,15 +1,17 @@
 import unittest.mock as mock
 
-import responses
 import pytest
+import responses
+import tweepy
 
 from sensormesh.twitter import TwitterApi, TwitterUpdate
 
 
 class TestTwitterApi:
-    @mock.patch('tweepy.API')
-    @mock.patch('tweepy.OAuthHandler')
-    def test_calls_api_to_update_status(self, mock_auth, mock_api):
+    def test_calls_api_to_update_status(self, monkeypatch):
+        monkeypatch.setattr(tweepy, 'API', mock.MagicMock())
+        monkeypatch.setattr(tweepy, 'OAuthHandler', mock.MagicMock())
+
         with responses.RequestsMock() as r_mock:
             api = TwitterApi()
             api.post_update({'message': 'This is a status update!', 'string': 'This is ignored'})
