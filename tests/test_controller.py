@@ -183,6 +183,34 @@ class TestController:
         # Check that no events are logged
         assert not l_warn.records
 
+    def test_source_exceptions_are_logged_and_continue(self):
+        a = mock_application()
+
+        s_fail = a._sources[0]
+        s_fail.read.side_effect = ValueError('Invalid value')
+
+        s = mock_source(name='Source 2', output=1)
+        a.add_source(s)
+
+        with testfixtures.LogCapture(level=logging.WARNING) as l:
+            a._step(timestamp=1453928000.0)
+
+        assert a._read_sources.call_count == 1
+        assert a._sources[0].read.call_count == 1
+        assert a._sources[1].read.call_count == 1
+        a._read_sources.assert_called_with(timestamp=1453928000.0)
+
+        assert a._update_targets.call_count == 1
+        assert a._targets[0].update.call_count == 1
+        assert a._targets[1].update.call_count == 1
+        a._update_targets.assert_called_with({'timestamp': 1453928000.0, 'output': 1})
+
+        # Check that exception is logged
+        assert len(l.records) == 1
+        assert l.records[0].levelname == 'ERROR'
+        assert (l.records[0].getMessage() ==
+                "Failed to read DataSource(name='Source 1') because of ValueError('Invalid value',)")
+
     def test_target_exceptions_are_logged_and_continue(self):
         a = mock_application()
 
