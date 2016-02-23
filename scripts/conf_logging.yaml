@@ -1,0 +1,27 @@
+version: 1
+formatters:
+  detailed:
+    class: "logging.Formatter"
+    format: "%(asctime)s %(name)-15s %(levelname)-8s %(processName)-10s %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  display:
+    class: "logging.Formatter"
+    format: "%(asctime)s - %(levelname)s - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+handlers:
+  console:
+    class: "logging.StreamHandler"
+    formatter: display
+    level: WARNING
+  file:
+    class: "logging.FileHandler"
+    filename: "example.log"
+    mode: w
+    formatter: detailed
+    level: DEBUG
+loggers: {}
+root:
+  handlers:
+    - console
+    - file
+  level: DEBUG
