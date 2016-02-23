@@ -3,7 +3,6 @@ import unittest.mock as mock
 import pytest
 import responses
 import tweepy
-import datetime
 
 from sensormesh.twitter import TwitterApi, TwitterUpdate
 
@@ -15,9 +14,11 @@ class TestTwitterApi:
 
         with responses.RequestsMock() as r_mock:
             api = TwitterApi()
+            api.open()
             api.post_update({'message': 'This is a status update!', 'string': 'This is ignored'})
+            api._api.update_status.assert_called_with(status='This is a status update!')
+            api.close()
 
-        api._api.update_status.assert_called_with(status='This is a status update!')
         assert not r_mock.calls
 
 
