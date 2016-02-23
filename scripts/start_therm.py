@@ -15,7 +15,7 @@ from sensormesh.conditions import TimeCheck
 
 
 # Configure logging
-with open('log_config.yaml', 'r') as f:
+with open('conf_logging.yaml', 'r') as f:
     log_config = yaml.load(f)
 log_config['disable_existing_loggers'] = False
 logging.config.dictConfig(log_config)
