@@ -114,6 +114,32 @@ class TestBase:
         c1.update.assert_called_once_with(value=4)
         c2.update.assert_called_once_with(value=4)
 
+    def test_can_use_object_as_context_manager(self):
+        obj = DataEndpoint(name='mock_obj')
+
+        with testfixtures.LogCapture(level=logging.DEBUG) as l:
+            with obj as context:
+                # Check that context is the same object
+                assert context is obj
+
+                assert len(l.records) == 1
+                assert_record_is(l.records[0], 'INFO', "Opening DataEndpoint(name='mock_obj')")
+
+        assert len(l.records) == 2
+        assert_record_is(l.records[1], 'INFO', "Closing DataEndpoint(name='mock_obj')")
+
+    def test_can_open_and_close_object(self):
+        obj = DataEndpoint(name='mock_obj')
+
+        with testfixtures.LogCapture(level=logging.DEBUG) as l:
+            obj.open()
+            assert len(l.records) == 1
+            assert_record_is(l.records[0], 'INFO', "Opening DataEndpoint(name='mock_obj')")
+
+            obj.close()
+            assert len(l.records) == 2
+            assert_record_is(l.records[1], 'INFO', "Closing DataEndpoint(name='mock_obj')")
+
 
 class TestSource:
     def test_read_continues_when_checks_pass(self):
@@ -204,7 +230,7 @@ class TestTarget:
         data = [
             {'timestamp': 2, 'field1': 5, 'field2': -7},
             {'timestamp': 3, 'field1': 6}
-            ]
+        ]
         data_all = {
             'timestamp': 3, 'field1': 6, 'field2': -7
         }
@@ -230,7 +256,7 @@ class TestTarget:
         data = [
             {'timestamp': 2, 'field1': 5, 'field2': -7},
             {'timestamp': 3, 'field1': 6}
-            ]
+        ]
 
         with testfixtures.LogCapture(level=logging.DEBUG) as l:
             with t:

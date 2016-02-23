@@ -8,10 +8,29 @@ class TwitterApi(RestApi):
                  access_token=None, access_token_secret=None):
         super().__init__()
 
-        auth = tweepy.OAuthHandler(consumer_token, consumer_secret)
-        auth.set_access_token(access_token, access_token_secret)
+        self._props = {
+            'consumer_token': consumer_token,
+            'consumer_secret': consumer_secret,
+            'access_token': access_token,
+            'access_token_secret': access_token_secret,
+        }
+        self._api = None
 
+    def open(self):
+        super().open()
+
+        # Create OAuth handler
+        auth = tweepy.OAuthHandler(
+            self._props['consumer_token'], self._props['consumer_secret'])
+        auth.set_access_token(
+            self._props['access_token'], self._props['access_token_secret'])
+
+        # Create tweepy API instance
         self._api = tweepy.API(auth)
+
+    def close(self):
+        self._api = None
+        super().close()
 
     def post_update(self, data):
         self._api.update_status(status=data['message'])

@@ -1,4 +1,8 @@
-from .endpoints import DataSource, DataTarget
+import logging
+
+from .endpoints import DataSource, DataTarget, DataEndpoint
+
+logger = logging.getLogger(__name__)
 
 
 class RestApi(object):
@@ -10,11 +14,28 @@ class RestApi(object):
             raise ValueError('Missing API input.')
         return api
 
+    def open(self):
+        logger.info('Opening %s', self)
 
-class ApiMixin(object):
+    def close(self):
+        logger.info('Closing %s', self)
+
+    def __str__(self):
+        return '{0}()'.format(self.__class__.__name__)
+
+
+class ApiMixin(DataEndpoint):
     def __init__(self, api=None, api_cls=RestApi, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._api = api_cls.create_api(api)
+
+    def open(self):
+        super().open()
+        self._api.open()
+
+    def close(self):
+        self._api.close()
+        super().close()
 
 
 class RestTarget(ApiMixin, DataTarget):
