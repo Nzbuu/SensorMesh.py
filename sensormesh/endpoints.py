@@ -79,16 +79,27 @@ class DataSource(DataEndpoint):
         super().__init__(*args, **kwargs)
 
     def read(self, **kwargs):
+        # Check whether to continue with read
         result, reason = self._check_conditions(**kwargs)
         if result:
             logger.info('Reading %s', self)
-            self._update_conditions(**kwargs)
+
+            # Do read
             data_in = self._read()
+
+            # Process data packet from read
             data = self._process_data(data_in)
-            return data
+
+            # Record successful read
+            self._update_conditions(**kwargs)
         else:
+            # Log skipped read
             logger.info('Skipping read of %s because of %s', self, reason)
-            return {}
+
+            # Return empty data packet
+            data = {}
+
+        return data
 
     def _read(self):
         raise NotImplementedError()
@@ -104,14 +115,31 @@ class DataTarget(DataEndpoint):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Cache of unused data
+        self._data = {}
+
     def update(self, data):
-        result, reason = self._check_conditions(**data)
+        # Update cache of unused data
+        self._data.update(data)
+
+        # Check whether to continue with update
+        result, reason = self._check_conditions(**self._data)
         if result:
-            self._update_conditions(**data)
             logger.info('Updating %s', self)
-            data_out = self._prepare_update(data)
+
+            # Prepare data packet for update
+            data_out = self._prepare_update(self._data)
+
+            # Do update
             self._update(data_out)
+
+            # Record successful update
+            self._update_conditions(**self._data)
+
+            # Clear cache of unused data
+            self._data = {}
         else:
+            # Log skipped update
             logger.info('Skipping update of %s because of %s', self, reason)
 
     def _prepare_update(self, data):
