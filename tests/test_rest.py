@@ -113,9 +113,11 @@ class TestApiMixin:
                 # Check that context is the same object
                 assert context is obj
 
+                assert len(l.records) == 2
+                assert_record_is(l.records[0], 'INFO', "Opening ApiMixin(name='mock_obj')")
+                assert_record_is(l.records[1], 'INFO', "Opening RestApi()")
+
         assert len(l.records) == 4
-        assert_record_is(l.records[0], 'INFO', "Opening ApiMixin(name='mock_obj')")
-        assert_record_is(l.records[1], 'INFO', "Opening RestApi()")
         assert_record_is(l.records[2], 'INFO', "Closing RestApi()")
         assert_record_is(l.records[3], 'INFO', "Closing ApiMixin(name='mock_obj')")
 

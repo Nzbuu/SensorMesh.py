@@ -122,8 +122,10 @@ class TestBase:
                 # Check that context is the same object
                 assert context is obj
 
+                assert len(l.records) == 1
+                assert_record_is(l.records[0], 'INFO', "Opening DataEndpoint(name='mock_obj')")
+
         assert len(l.records) == 2
-        assert_record_is(l.records[0], 'INFO', "Opening DataEndpoint(name='mock_obj')")
         assert_record_is(l.records[1], 'INFO', "Closing DataEndpoint(name='mock_obj')")
 
     def test_can_open_and_close_object(self):
