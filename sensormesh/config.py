@@ -4,7 +4,7 @@ import json
 import yaml
 
 
-class ConfigManager(object):
+class ConfigLoader(object):
     def __init__(self):
         self._map = {
             '.json': self.load_json_file,

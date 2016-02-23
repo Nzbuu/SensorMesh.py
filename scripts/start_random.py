@@ -4,7 +4,7 @@ import logging.config
 
 import yaml
 
-from sensormesh.config import ConfigManager
+from sensormesh.config import ConfigLoader
 from sensormesh.application import Controller
 from sensormesh.sources import DataSourceWrapper
 from sensormesh.console import ConsoleDisplay
@@ -21,7 +21,7 @@ log_config['disable_existing_loggers'] = False
 logging.config.dictConfig(log_config)
 
 # Configuration loader class
-cfg_man = ConfigManager()
+cfgr = ConfigLoader()
 
 # Configure App
 app = Controller()
@@ -40,7 +40,7 @@ t = ConsoleDisplay(name='stdout')
 app.add_target(t)
 
 # Target 2
-tsl_config = cfg_man.load_config_file('thingspeak_random.json')
+tsl_config = cfgr.load_config_file('thingspeak_random.json')
 t = ThingSpeakLogger(**tsl_config)
 t.add_condition(TimeCheck(15))
 app.add_target(t)
@@ -55,7 +55,7 @@ t = TextLogger(**csv_config)
 app.add_target(t)
 
 # Target 4
-twt_config = cfg_man.load_config_file('twitter_random.json')
+twt_config = cfgr.load_config_file('twitter_random.json')
 t = TwitterUpdate(**twt_config)
 t.add_condition(TimeCheck(900))
 app.add_target(t)
