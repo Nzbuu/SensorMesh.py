@@ -1,6 +1,8 @@
 import unittest.mock as mock
 import json
 
+import yaml
+
 from sensormesh.config import ConfigManager
 
 
@@ -17,11 +19,25 @@ class TestConfigManager:
 
     def test_can_read_json_config_file(self):
         test_data = {'name': 'test_thing', 'key': 'ABCDEFGHIJ', 'feed': {'field1': 'A'}}
+        read_data = json.dumps(test_data)
+
         cfg_man = ConfigManager()
 
-        mock_file = mock.mock_open(read_data=json.dumps(test_data))
+        mock_file = mock.mock_open(read_data=read_data)
         with mock.patch('builtins.open', mock_file):
             cfg_data = cfg_man.load_config_file('config.json')
+
+        assert cfg_data == test_data
+
+    def test_can_read_yaml_config_file(self):
+        test_data = {'name': 'test_thing', 'key': 'ABCDEFGHIJ', 'feed': {'field1': 'A'}}
+        read_data = yaml.dump(test_data)
+
+        cfg_man = ConfigManager()
+
+        mock_file = mock.mock_open(read_data=read_data)
+        with mock.patch('builtins.open', mock_file):
+            cfg_data = cfg_man.load_config_file('config.yaml')
 
         assert cfg_data == test_data
 
