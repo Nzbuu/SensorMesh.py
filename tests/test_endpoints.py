@@ -194,6 +194,58 @@ class TestTarget:
                           "of MyCondition(threshold=10)"))
         assert_record_is(l.records[2], 'INFO', "Closing DataTarget(name='mock_target')")
 
+    def test_data_from_skipped_update_used_by_next(self):
+        t = mock_target(name='mock_target')
+        t._check_conditions = mock.Mock(side_effect=[
+            (False, 'MyCondition(threshold=10)'),
+            (True, None)
+        ])
+
+        data = [
+            {'timestamp': 2, 'field1': 5, 'field2': -7},
+            {'timestamp': 3, 'field1': 6}
+            ]
+        data_all = {
+            'timestamp': 3, 'field1': 6, 'field2': -7
+        }
+
+        with testfixtures.LogCapture(level=logging.DEBUG) as l:
+            with t:
+                t.update(data[0])
+
+                t._check_conditions.assert_called_once_with(**data[0])
+                assert t._update.call_count == 0
+                assert t._update_conditions.call_count == 0
+
+                t.update(data[1])
+
+                t._check_conditions.assert_called_with(**data_all)
+                t._update.assert_called_with(data_all)
+                t._update_conditions.assert_called_with(**data_all)
+
+    def test_data_from_successful_update_is_not_in_next(self):
+        t = mock_target(name='mock_target')
+        t._check_conditions = mock.Mock(return_value=(True, None))
+
+        data = [
+            {'timestamp': 2, 'field1': 5, 'field2': -7},
+            {'timestamp': 3, 'field1': 6}
+            ]
+
+        with testfixtures.LogCapture(level=logging.DEBUG) as l:
+            with t:
+                t.update(data[0])
+
+                t._check_conditions.assert_called_with(**data[0])
+                t._update.assert_called_with(data[0])
+                t._update_conditions.assert_called_with(**data[0])
+
+                t.update(data[1])
+
+                t._check_conditions.assert_called_with(**data[1])
+                t._update.assert_called_with(data[1])
+                t._update_conditions.assert_called_with(**data[1])
+
 
 def mock_source(**kwargs):
     obj = DataSource(**kwargs)
