@@ -11,19 +11,23 @@ class RestApi(object):
         return api
 
 
-class RestTarget(DataTarget):
+class ApiMixin(object):
     def __init__(self, api=None, api_cls=RestApi, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._api = api_cls.create_api(api)
+
+
+class RestTarget(ApiMixin, DataTarget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def _update(self, data):
         self._api.post_update(data)
 
 
-class RestSource(DataSource):
-    def __init__(self, api=None, api_cls=RestApi, *args, **kwargs):
+class RestSource(ApiMixin, DataSource):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._api = api_cls.create_api(api)
 
     def _read(self):
         return self._api.get_data()

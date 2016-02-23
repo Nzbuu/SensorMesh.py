@@ -1,10 +1,12 @@
-requests==2.9.1
-
 # thingspeak
 python-dateutil==2.4.2
+requests==2.9.1
+
+# twitter
+tweepy==3.5.0
 
 # tests
 pytest==2.8.7
 pytest-cov==2.2.1
 responses==0.5.1
-testfixtures==4.8.0
+testfixtures==4.9.0
