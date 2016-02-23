@@ -1,0 +1,6 @@
+# API Secrets
+*_secrets.*
+
+# Generated files
+*.log
+*.csv
