@@ -73,9 +73,15 @@ class Controller(object):
         data = {}
         duplicate_fields = set()
         for s in self._sources:
-            s_data = s.read(**kwargs)
-            duplicate_fields.update(data.keys() & s_data.keys())
-            data.update(**s_data)
+            try:
+                s_data = s.read(**kwargs)
+            except Exception as e:
+                # Log exception as error, rather than exception for simpler
+                # log message. Continue afterwards.
+                logger.error('Failed to read %s because of %r', s, e)
+            else:
+                duplicate_fields.update(data.keys() & s_data.keys())
+                data.update(**s_data)
 
         if duplicate_fields:
             duplicate_fields = sorted(duplicate_fields)
