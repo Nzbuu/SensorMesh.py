@@ -53,3 +53,38 @@ class TestConfigManager:
 
         assert cfg_data == {}
         cnfgr._load_file.assert_called_once_with('/folder/config.cnfg', mock_cnfg)
+
+    def test_includes_are_merged(self):
+        mock_test = mock.Mock()
+        mock_cnfg = mock.Mock()
+
+        cnfgr = ConfigLoader()
+        cnfgr._map = {'.test': mock_test, '.cnfg': mock_cnfg}
+
+        cnfgr._load_file = mock.Mock(side_effect=[
+            {  # data from /folder/config.cnfg
+                'api': {
+                    '!include': 'secrets.test',
+                    'channel': 5
+                },
+                'name': 'wayne'
+            },
+            {  # data from secrets.test
+                'secret': 'ssshh'
+            }
+        ])
+
+        cfg_data = cnfgr.load_config_file('/folder/config.cnfg')
+
+        assert cfg_data == {
+            'api': {
+                'secret': 'ssshh',
+                'channel': 5
+            },
+            'name': 'wayne'
+        }
+
+        cnfgr._load_file.assert_has_calls([
+            mock.call('/folder/config.cnfg', mock_cnfg),
+            mock.call('secrets.test', mock_test)
+        ])

@@ -18,6 +18,10 @@ class ConfigLoader(object):
         # load file
         config = self._load_file(filename, load_fcn)
 
+        # parse includes
+        if isinstance(config, dict):
+            config = self._parse_config(config)
+
         return config
 
     def _get_load_fcn(self, filename):
@@ -28,4 +32,17 @@ class ConfigLoader(object):
     def _load_file(self, filename, load_fcn):
         with open(filename) as cfg_file:
             config = load_fcn(cfg_file)
+        return config
+
+    def _parse_config(self, config):
+        include_file = config.pop('!include', None)
+
+        for k in config:
+            if isinstance(config[k], dict):
+                config[k] = self._parse_config(config[k])
+
+        if include_file:
+            include_cfg = self.load_config_file(include_file)
+            config.update(include_cfg)
+
         return config
