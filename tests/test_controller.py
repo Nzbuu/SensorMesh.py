@@ -56,7 +56,7 @@ class TestController:
 
     def test_runs_with_zero_step(self):
         a = mock_application()
-        a._trigger._timefcn.side_effect = [1453928000, 1453928000.1, 1453928000.2]
+        a._trigger._timefcn.side_effect = [1453928000.0, 1453928000.1, 1453928000.2]
         a.set_steps(time_step=0, num_steps=2)
         a._step = mock.Mock()
 
@@ -81,7 +81,7 @@ class TestController:
 
     def test_runs_with_nonzero_step(self):
         a = mock_application()
-        a._trigger._timefcn.side_effect = [1453928000, 1453928000.1, 1453928001.1]
+        a._trigger._timefcn.side_effect = [1453928000.0, 1453928000.1, 1453928001.1]
         a.set_steps(time_step=1, num_steps=2)
         a._step = mock.Mock()
 
@@ -106,7 +106,7 @@ class TestController:
 
     def test_skips_missing_steps(self):
         a = mock_application()
-        a._trigger._timefcn.side_effect = [1453928000, 1453928001.1, 1453928003.1]
+        a._trigger._timefcn.side_effect = [1453928000.0, 1453928001.1, 1453928003.1]
         a.set_steps(time_step=1, num_steps=2)
         a._step = mock.Mock()
 
@@ -133,16 +133,16 @@ class TestController:
         a = mock_application()
 
         with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
-            a._step(timestamp=1453928000)
+            a._step(timestamp=1453928000.0)
 
         assert a._read_sources.call_count == 1
         assert a._sources[0].read.call_count == 1
-        a._read_sources.assert_called_with(timestamp=1453928000)
+        a._read_sources.assert_called_with(timestamp=1453928000.0)
 
         assert a._update_targets.call_count == 1
         assert a._targets[0].update.call_count == 1
         assert a._targets[1].update.call_count == 1
-        a._update_targets.assert_called_with({'timestamp': 1453928000, 'value': 0.5})
+        a._update_targets.assert_called_with({'timestamp': 1453928000.0, 'value': 0.5})
 
         # Check that no events are logged
         assert not l_warn.records
@@ -152,11 +152,11 @@ class TestController:
         a._sources[0].read.return_value = {}
 
         with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
-            a._step(timestamp=1453928000)
+            a._step(timestamp=1453928000.0)
 
         assert a._read_sources.call_count == 1
         assert a._sources[0].read.call_count == 1
-        a._read_sources.assert_called_with(timestamp=1453928000)
+        a._read_sources.assert_called_with(timestamp=1453928000.0)
 
         assert a._update_targets.call_count == 0
         assert a._targets[0].update.call_count == 0
@@ -170,11 +170,11 @@ class TestController:
         a._sources[0].read.return_value = {'value': None}
 
         with testfixtures.LogCapture(level=logging.WARNING) as l_warn:
-            a._step(timestamp=1453928000)
+            a._step(timestamp=1453928000.0)
 
         assert a._read_sources.call_count == 1
         assert a._sources[0].read.call_count == 1
-        a._read_sources.assert_called_with(timestamp=1453928000)
+        a._read_sources.assert_called_with(timestamp=1453928000.0)
 
         assert a._update_targets.call_count == 0
         assert a._targets[0].update.call_count == 0
@@ -218,16 +218,16 @@ class TestController:
         t_fail.update.side_effect = ValueError('Invalid value')
 
         with testfixtures.LogCapture(level=logging.WARNING) as l:
-            a._step(timestamp=1453928000)
+            a._step(timestamp=1453928000.0)
 
         assert a._read_sources.call_count == 1
         assert a._sources[0].read.call_count == 1
-        a._read_sources.assert_called_with(timestamp=1453928000)
+        a._read_sources.assert_called_with(timestamp=1453928000.0)
 
         assert a._update_targets.call_count == 1
         assert a._targets[0].update.call_count == 1
         assert a._targets[1].update.call_count == 1
-        a._update_targets.assert_called_with({'timestamp': 1453928000, 'value': 0.5})
+        a._update_targets.assert_called_with({'timestamp': 1453928000.0, 'value': 0.5})
 
         # Check that exception is logged
         assert len(l.records) == 1
@@ -240,21 +240,21 @@ class TestController:
         a._sources[0].read.return_value = {'value': 0.5, 'timestamp': None}
 
         with testfixtures.LogCapture(level=logging.WARNING) as l:
-            a._step(timestamp=1453928000)
+            a._step(timestamp=1453928000.0)
 
-        a._read_sources.assert_called_with(timestamp=1453928000)
-        a._update_targets.assert_called_with({'timestamp': 1453928000, 'value': 0.5})
+        a._read_sources.assert_called_with(timestamp=1453928000.0)
+        a._update_targets.assert_called_with({'timestamp': 1453928000.0, 'value': 0.5})
         assert not l.records
 
     def test_step_does_not_override_data(self):
         a = mock_application()
-        a._sources[0].read.return_value = {'value': 0.5, 'timestamp': 14539230000}
+        a._sources[0].read.return_value = {'value': 0.5, 'timestamp': 14539230000.0}
 
         with testfixtures.LogCapture(level=logging.WARNING) as l:
-            a._step(timestamp=1453928000)
+            a._step(timestamp=1453928000.0)
 
-        a._read_sources.assert_called_with(timestamp=1453928000)
-        a._update_targets.assert_called_with({'timestamp': 14539230000, 'value': 0.5})
+        a._read_sources.assert_called_with(timestamp=1453928000.0)
+        a._update_targets.assert_called_with({'timestamp': 14539230000.0, 'value': 0.5})
         assert not l.records
 
     def test_read_sources_calls_all_sources(self):
@@ -262,7 +262,7 @@ class TestController:
         a.add_source(mock_source('Source 2', fieldX=2))
 
         with testfixtures.LogCapture(level=logging.WARNING) as l:
-            data = a._read_sources(timestamp=1453928000)
+            data = a._read_sources(timestamp=1453928000.0)
 
         assert data == {'value': 0.5, 'fieldX': 2}
         assert not l.records
@@ -273,7 +273,7 @@ class TestController:
 
         with testfixtures.LogCapture(level=logging.WARNING) as l:
             with pytest.raises(DuplicateFieldError):
-                _ = a._read_sources(timestamp=1453928000)
+                _ = a._read_sources(timestamp=1453928000.0)
 
         assert len(l.records) == 1
         assert l.records[0].levelname == 'CRITICAL'
@@ -287,7 +287,7 @@ class TestController:
 
         with testfixtures.LogCapture(level=logging.WARNING) as l:
             with pytest.raises(DuplicateFieldError):
-                _ = a._read_sources(timestamp=1453928000)
+                _ = a._read_sources(timestamp=1453928000.0)
 
         assert len(l.records) == 1
         assert l.records[0].levelname == 'CRITICAL'
