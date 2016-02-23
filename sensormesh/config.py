@@ -36,6 +36,7 @@ class ConfigLoader(object):
 
     def _parse_config(self, config):
         include_file = config.pop('!include', None)
+        include_node = config.pop('!include_node', None)
 
         for k in config:
             if isinstance(config[k], dict):
@@ -43,6 +44,9 @@ class ConfigLoader(object):
 
         if include_file:
             include_cfg = self.load_config_file(include_file)
+            if include_node:
+                include_cfg = include_cfg[include_node]
+
             config.update(include_cfg)
 
         return config

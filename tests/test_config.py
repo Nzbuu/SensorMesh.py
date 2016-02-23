@@ -1,6 +1,7 @@
 import unittest.mock as mock
 import json
 
+import pytest
 import yaml
 
 from sensormesh.config import ConfigLoader
@@ -88,3 +89,65 @@ class TestConfigManager:
             mock.call('/folder/config.cnfg', mock_cnfg),
             mock.call('secrets.test', mock_test)
         ])
+
+    def test_included_node_is_merged(self):
+        mock_test = mock.Mock()
+        mock_cnfg = mock.Mock()
+
+        cnfgr = ConfigLoader()
+        cnfgr._map = {'.test': mock_test, '.cnfg': mock_cnfg}
+
+        cnfgr._load_file = mock.Mock(side_effect=[
+            {  # data from /folder/config.cnfg
+                'api': {
+                    '!include': 'secrets.test',
+                    '!include_node': 'object1',
+                    'channel': 5
+                },
+                'name': 'wayne'
+            },
+            {  # data from secrets.test
+                'object1': {
+                    'secret': 'ssshh'
+                },
+                'object2': {
+                    'secret': 'password1'
+                }
+            }
+        ])
+
+        cfg_data = cnfgr.load_config_file('/folder/config.cnfg')
+
+        assert cfg_data == {
+            'api': {
+                'secret': 'ssshh',
+                'channel': 5
+            },
+            'name': 'wayne'
+        }
+
+    def test_rasies_when_included_node_is_missing(self):
+        mock_test = mock.Mock()
+        mock_cnfg = mock.Mock()
+
+        cnfgr = ConfigLoader()
+        cnfgr._map = {'.test': mock_test, '.cnfg': mock_cnfg}
+
+        cnfgr._load_file = mock.Mock(side_effect=[
+            {  # data from /folder/config.cnfg
+                'api': {
+                    '!include': 'secrets.test',
+                    '!include_node': 'object1',
+                    'channel': 5
+                },
+                'name': 'wayne'
+            },
+            {  # data from secrets.test
+                'object2': {
+                    'secret': 'password1'
+                }
+            }
+        ])
+
+        with pytest.raises(KeyError):
+            cfg_data = cnfgr.load_config_file('/folder/config.cnfg')
