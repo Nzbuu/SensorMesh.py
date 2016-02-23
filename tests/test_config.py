@@ -47,8 +47,11 @@ class TestConfigManager:
 
         cfg_man = ConfigLoader()
         cfg_man._map = {'.test': mock_test, '.cnfg': mock_cnfg}
-        cfg_data = cfg_man.load_config_file('/folder/config.cnfg')
+
+        mock_file = mock.mock_open(read_data='')
+        with mock.patch('builtins.open', mock_file):
+            cfg_data = cfg_man.load_config_file('/folder/config.cnfg')
 
         assert cfg_data == {}
-        mock_cnfg.assert_called_once_with('/folder/config.cnfg')
+        mock_cnfg.assert_called_once_with(mock_file())
         assert not mock_test.called
