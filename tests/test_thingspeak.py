@@ -50,7 +50,7 @@ class TestThingSpeakSource:
         mock_api.get_data.assert_called_with()
 
         assert data == {
-            'timestamp': 1453927930,
+            'timestamp': 1453927930.0,
             'Server Temp': '58.5 F',
         }
 
@@ -86,7 +86,7 @@ class TestThingSpeakLogger:
         )
 
         data = {
-            'timestamp': 1453927940,
+            'timestamp': 1453927940.0,
             'Server Temp': '60.0 F',
         }
         with obj:

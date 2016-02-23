@@ -3,6 +3,7 @@ import unittest.mock as mock
 import pytest
 import responses
 import tweepy
+import datetime
 
 from sensormesh.twitter import TwitterApi, TwitterUpdate
 
@@ -39,7 +40,7 @@ class TestTwitterUpdate:
 
         obj = TwitterUpdate(
             api=mock_api,
-            message='The temperature is {field1}',
+            message='The temperature is {field1} at {created_at:.1f}',
             fields=[
                 ('Server Temp', 'field1'),
                 ('timestamp', 'created_at'),
@@ -47,16 +48,16 @@ class TestTwitterUpdate:
         )
 
         data = {
-            'timestamp': 1453927940,
+            'timestamp': 1453927940.01,
             'Server Temp': '60.0 F',
         }
         with obj:
             obj.update(data)
 
         data_out = {
-            'created_at': 1453927940,
+            'created_at': 1453927940.01,
             'field1': '60.0 F',
-            'message': 'The temperature is 60.0 F'
+            'message': 'The temperature is 60.0 F at 1453927940.0'
         }
 
         assert mock_api.post_update.call_count == 1
