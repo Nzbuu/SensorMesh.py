@@ -1,5 +1,4 @@
 from datetime import datetime
-from string import Template
 
 import requests
 import dateutil.parser
@@ -18,8 +17,8 @@ class ThingSpeakApi(RestApi):
             'channel': channel,
         }
         self._templates = {
-            'update': Template(r'$base_url/update.json'),
-            'last': Template(r'$base_url/channels/$channel/feed/last.json'),
+            'update': '{base_url}/update.json',
+            'last': '{base_url}/channels/{channel}/feed/last.json',
         }
 
     @property
@@ -56,8 +55,8 @@ class ThingSpeakApi(RestApi):
         response.raise_for_status()
 
     def _get_url(self, name):
-        t = self._templates[name]
-        return t.substitute(self._props)
+        f_str = self._templates[name]
+        return f_str.format(**self._props)
 
     def _prepare_headers(self, write=False):
         key = self._get_key(write=write)
