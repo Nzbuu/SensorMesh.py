@@ -1,7 +1,7 @@
 import logging
 import logging.config
-import json
 
+import yaml
 from w1thermsensor import W1ThermSensor
 
 from sensormesh.config import ConfigManager
@@ -15,8 +15,8 @@ from sensormesh.conditions import TimeCheck
 
 
 # Configure logging
-with open('log_config.json', 'r') as f:
-    log_config = json.load(f)
+with open('log_config.yaml', 'r') as f:
+    log_config = yaml.load(f)
 log_config['disable_existing_loggers'] = False
 logging.config.dictConfig(log_config)
 

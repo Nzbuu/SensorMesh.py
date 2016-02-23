@@ -1,3 +1,5 @@
+PyYAML==3.11
+
 # thingspeak
 python-dateutil==2.4.2
 requests==2.9.1
