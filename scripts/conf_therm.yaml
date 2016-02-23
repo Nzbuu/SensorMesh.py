@@ -1,0 +1,29 @@
+trigger:
+  time_step: 300
+  num_steps: 100000
+targets:
+  console:
+    name: "stdout"
+  thingspeak:
+    name: "w1therm test"
+    api:
+      '!include': "conf_secrets.yaml"
+      '!include_node': thingspeak_therm
+    fields:
+      - [timestamp, created_at]
+      - [temperature, field2]
+  csv_file:
+    name: "CSV File"
+    filename: "thermdata.csv"
+    mode: a
+    fields:
+      - timestamp
+      - temperature
+  twitter:
+    api:
+      '!include': "conf_secrets.yaml"
+      '!include_node': twitter_robot
+    message: "It's {temperature:.1f}\u00B0C here at {timestamp:.0f}"
+    fields:
+      - timestamp
+      - temperature

@@ -1,0 +1,31 @@
+trigger:
+  time_step: 10
+  num_steps: 5
+targets:
+  console:
+    name: "stdout"
+  thingspeak:
+    name: "test_channel"
+    api:
+      '!include': "conf_secrets.yaml"
+      '!include_node': thingspeak_random
+    fields:
+      - [timestamp, created_at]
+      - [value1, field2]
+      - [value2, field3]
+  csv_file:
+    name: "CSV File"
+    filename: "testdata.csv"
+    mode: a
+    fields:
+      - timestamp
+      - value1
+      - value2
+  twitter:
+    api:
+      '!include': "conf_secrets.yaml"
+      '!include_node': twitter_robot
+    message: "This is a random number: {value1}, and so is this: {value2}"
+    fields:
+      - value1
+      - value2

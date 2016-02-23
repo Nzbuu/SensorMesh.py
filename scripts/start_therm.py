@@ -22,10 +22,13 @@ logging.config.dictConfig(log_config)
 
 # Configuration loader class
 cfgr = ConfigLoader()
+config = cfgr.load_config_file('conf_therm.yaml')
 
 # Configure App
 app = Controller()
-app.set_steps(time_step=300, num_steps=100000)
+
+tgr_config = config['trigger']
+app.set_steps(**tgr_config)
 
 # Source
 o = W1ThermSensor()
@@ -38,26 +41,23 @@ s = DataSourceWrapper(
 app.add_source(s)
 
 # Target 1
-t = ConsoleDisplay(name='stdout')
+csl_config = config['targets']['console']
+t = ConsoleDisplay(**csl_config)
 app.add_target(t)
 
 # Target 2
-tsl_config = cfgr.load_config_file('thingspeak_therm.json')
+tsl_config = config['targets']['thingspeak']
 t = ThingSpeakLogger(**tsl_config)
 t.add_condition(TimeCheck(15))
 app.add_target(t)
 
 # Target 3
-csv_config = {
-    'filename': 'logdata_therm.csv',
-    'mode': 'a',
-    'fields': ['timestamp', 'temperature']
-}
+csv_config = config['targets']['csv_file']
 t = TextLogger(**csv_config)
 app.add_target(t)
 
 # Target 4
-twt_config = cfgr.load_config_file('twitter_therm.json')
+twt_config = config['targets']['twitter']
 t = TwitterUpdate(**twt_config)
 t.add_condition(TimeCheck(900))
 app.add_target(t)
