@@ -75,7 +75,7 @@ class Controller(object):
         for s in self._sources:
             try:
                 s_data = s.read(**kwargs)
-            except Exception as e:
+            except Exception as e:  # pylint:disable=broad-except
                 # Log exception as error, rather than exception for simpler
                 # log message. Continue afterwards.
                 logger.error('Failed to read %s because of %r', s, e)
@@ -96,7 +96,7 @@ class Controller(object):
         for t in self._targets:
             try:
                 t.update(data)
-            except Exception as e:
+            except Exception as e:  # pylint:disable=broad-except
                 # Log exception as error, rather than exception for simpler
                 # log message. Continue afterwards.
                 logger.error('Failed to update %s because of %r', t, e)

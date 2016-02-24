@@ -1,5 +1,6 @@
-strictness: medium
+strictness: high
 test-warnings: yes
 max-line-length: 80
 ignore-paths:
   - tests
+  - scripts
