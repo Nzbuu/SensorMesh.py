@@ -1,6 +1,8 @@
+import unittest.mock as mock
+
 import pytest
 
-from sensormesh.conditions import Condition, DeltaTime
+from sensormesh.conditions import Condition, ConditionFactory, DeltaTime
 
 
 class TestCondition:
@@ -10,6 +12,38 @@ class TestCondition:
 
         o = MyCondition()
         assert str(o) == 'MyCondition()'
+
+
+class TestConditionFactory:
+    def test_create_condition_with_no_arguments(self):
+        fact = mock_factory()
+        cond = fact.create_condition('type_1', [])
+        assert cond == mock.sentinel.type_1
+        fact._map['type_1'].assert_called_with()
+        assert not fact._map['type_2'].called
+
+    def test_create_condition_with_one_argument(self):
+        fact = mock_factory()
+        cond = fact.create_condition('type_1', 5)
+        assert cond == mock.sentinel.type_1
+        fact._map['type_1'].assert_called_with(5)
+        assert not fact._map['type_2'].called
+
+    def test_create_condition_with_multiple_argument(self):
+        fact = mock_factory()
+        cond = fact.create_condition('type_2', [1, 2, 'jack'])
+        assert cond == mock.sentinel.type_2
+        fact._map['type_2'].assert_called_with(1, 2, 'jack')
+        assert not fact._map['type_1'].called
+
+
+def mock_factory():
+    obj = ConditionFactory()
+    obj._map = {
+        'type_1': mock.MagicMock(return_value=mock.sentinel.type_1),
+        'type_2': mock.MagicMock(return_value=mock.sentinel.type_2),
+    }
+    return obj
 
 
 class TestDeltaTimeCond:
