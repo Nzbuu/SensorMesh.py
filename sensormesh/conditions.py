@@ -5,12 +5,11 @@ class ConditionFactory:
             'delta_time_exceeds': DeltaTime
         }
 
-    def prepare_conds(self, input):
-        if isinstance(input, dict):
-            output = [self.create_cond(name, args) for name, args in input.items()]
-        else:
-            output = input
-        return output
+    def prepare_conditions(self, conditions):
+        if isinstance(conditions, dict):
+            conditions = [self.create_cond(name, args)
+                          for name, args in conditions.items()]
+        return conditions
 
     def create_cond(self, name, args):
         cond_cls = self._map[name]

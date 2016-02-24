@@ -15,7 +15,7 @@ class DataEndpoint(object):
 
         if isinstance(when, dict):
             cond_fact = ConditionFactory()
-            when = cond_fact.prepare_conds(when)
+            when = cond_fact.prepare_conditions(when)
         for condition in when:
             self.add_condition(condition)
 
