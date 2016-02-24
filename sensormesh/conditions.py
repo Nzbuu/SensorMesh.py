@@ -1,3 +1,26 @@
+class ConditionFactory:
+    def __init__(self):
+        super().__init__()
+        self._map = {
+            'delta_time_exceeds': DeltaTime
+        }
+
+    def prepare_conds(self, input):
+        if isinstance(input, dict):
+            output = [self.create_cond(name, args) for name, args in input.items()]
+        else:
+            output = input
+        return output
+
+    def create_cond(self, name, args):
+        cond_cls = self._map[name]
+
+        if isinstance(args, (list, tuple)):
+            return cond_cls(*args)
+        else:
+            return cond_cls(args)
+
+
 class Condition:
     def check(self, **kwargs):
         raise NotImplementedError()

@@ -1,6 +1,7 @@
 import logging
 
 from .utils import DataAdapter
+from .conditions import ConditionFactory
 
 logger = logging.getLogger(__name__)
 
@@ -12,6 +13,9 @@ class DataEndpoint(object):
         self._conditions = []
         self._adapter = DataAdapter()
 
+        if isinstance(when, dict):
+            cond_fact = ConditionFactory()
+            when = cond_fact.prepare_conds(when)
         for condition in when:
             self.add_condition(condition)
 
@@ -19,9 +23,7 @@ class DataEndpoint(object):
             if isinstance(name, str):
                 self._add_field(name)
             else:
-                self._add_field(
-                    local_name=name[0],
-                    remote_name=name[1])
+                self._add_field(*name)
 
     @property
     def name(self):
