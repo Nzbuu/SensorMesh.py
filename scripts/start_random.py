@@ -11,7 +11,7 @@ from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 from sensormesh.text import TextLogger
 # from sensormesh.twitter import TwitterUpdate
-from sensormesh.conditions import TimeCheck
+from sensormesh.conditions import DeltaTime
 
 
 # Configure logging
@@ -46,7 +46,7 @@ app.add_target(t)
 # Target 2
 tsl_config = config['targets']['thingspeak']
 t = ThingSpeakLogger(**tsl_config)
-t.add_condition(TimeCheck(15))
+t.add_condition(DeltaTime(15))
 app.add_target(t)
 
 # Target 3
