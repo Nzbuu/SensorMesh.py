@@ -4,7 +4,7 @@ import logging
 import testfixtures
 
 from sensormesh.endpoints import DataEndpoint, DataSource, DataTarget
-from sensormesh.conditions import Condition
+from sensormesh.conditions import Condition, ConditionFactory
 
 
 class TestBase:
@@ -30,10 +30,22 @@ class TestBase:
         assert o.fields == ['l']
         assert o._adapter._local_to_remote == {'l': 'r'}
 
-    def test_can_configure_conditions(self):
+    def test_can_configure_conditions_from_list(self):
         mock_cond = mock.MagicMock()
         o = DataEndpoint(when=[mock_cond])
         assert o._conditions == [mock_cond]
+
+    def test_can_configure_conditions_from_dictionary(self, monkeypatch):
+        mock_fact = ConditionFactory()
+        mock_fact.create_condition = mock.MagicMock(return_value=mock.sentinel.condition)
+        monkeypatch.setattr('sensormesh.endpoints.ConditionFactory', mock.MagicMock(return_value=mock_fact))
+
+        o = DataEndpoint(when={'type_1': 2, 'type_2': [2, 3, 4]})
+
+        mock_fact.create_condition.assert_has_calls(
+            [mock.call('type_1', 2), mock.call('type_2', [2, 3, 4])],
+            any_order=True)
+        assert o._conditions == [mock.sentinel.condition, mock.sentinel.condition]
 
     def test_can_add_conditions(self):
         mock_cond = mock_condition()
