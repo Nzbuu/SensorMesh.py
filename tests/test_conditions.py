@@ -26,15 +26,31 @@ class TestConditionFactory:
         fact = mock_factory()
         cond = fact.create_condition('type_1', 5)
         assert cond == mock.sentinel.type_1
-        fact._map['type_1'].assert_called_with(5)
+        fact._map['type_1'].assert_called_once_with(5)
         assert not fact._map['type_2'].called
 
     def test_create_condition_with_multiple_argument(self):
         fact = mock_factory()
         cond = fact.create_condition('type_2', [1, 2, 'jack'])
         assert cond == mock.sentinel.type_2
-        fact._map['type_2'].assert_called_with(1, 2, 'jack')
+        fact._map['type_2'].assert_called_once_with(1, 2, 'jack')
         assert not fact._map['type_1'].called
+
+    def test_create_conditions_from_dictionary(self):
+        fact = mock_factory()
+        conds = fact.prepare_conditions({
+            'type_3': (),
+            'type_1': -1,
+            'type_2': [4, None, 'bob']})
+
+        # Note that the order of the outputs in the list cannot be guaranteed
+        assert len(conds) == 3
+        assert mock.sentinel.type_1 in conds
+        assert mock.sentinel.type_2 in conds
+        assert mock.sentinel.type_3 in conds
+        fact._map['type_1'].assert_called_once_with(-1)
+        fact._map['type_2'].assert_called_once_with(4, None, 'bob')
+        fact._map['type_3'].assert_called_once_with()
 
 
 def mock_factory():
@@ -42,6 +58,7 @@ def mock_factory():
     obj._map = {
         'type_1': mock.MagicMock(return_value=mock.sentinel.type_1),
         'type_2': mock.MagicMock(return_value=mock.sentinel.type_2),
+        'type_3': mock.MagicMock(return_value=mock.sentinel.type_3),
     }
     return obj
 
