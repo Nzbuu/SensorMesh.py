@@ -12,6 +12,8 @@ targets:
     fields:
       - [timestamp, created_at]
       - [temperature, field2]
+    when:
+      delta_time_exceeds: 15
   csv_file:
     name: "CSV File"
     filename: "thermdata.csv"
@@ -24,3 +26,5 @@ targets:
       '!include': "conf_secrets.yaml"
       '!include_node': twitter_robot
     message: "It's {temperature:.1f}\u00B0C here at {timestamp:.0f}"
+    when:
+      delta_time_exceeds: 900
