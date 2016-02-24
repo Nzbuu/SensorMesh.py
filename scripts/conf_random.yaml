@@ -26,6 +26,3 @@ targets:
       '!include': "conf_secrets.yaml"
       '!include_node': twitter_robot
     message: "This is a random number: {value1}, and so is this: {value2}"
-    fields:
-      - value1
-      - value2

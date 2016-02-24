@@ -24,6 +24,3 @@ targets:
       '!include': "conf_secrets.yaml"
       '!include_node': twitter_robot
     message: "It's {temperature:.1f}\u00B0C here at {timestamp:.0f}"
-    fields:
-      - timestamp
-      - temperature
