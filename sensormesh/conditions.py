@@ -7,11 +7,11 @@ class ConditionFactory:
 
     def prepare_conditions(self, conditions):
         if isinstance(conditions, dict):
-            conditions = [self.create_cond(name, args)
+            conditions = [self.create_condition(name, args)
                           for name, args in conditions.items()]
         return conditions
 
-    def create_cond(self, name, args):
+    def create_condition(self, name, args):
         cond_cls = self._map[name]
 
         if isinstance(args, (list, tuple)):
