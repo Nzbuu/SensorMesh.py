@@ -11,7 +11,6 @@ from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 from sensormesh.text import TextLogger
 # from sensormesh.twitter import TwitterUpdate
-from sensormesh.conditions import DeltaTime
 
 
 # Configure logging
