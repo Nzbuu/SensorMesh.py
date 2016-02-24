@@ -1,3 +1,4 @@
+# configuration
 PyYAML==3.11
 
 # thingspeak
@@ -11,4 +12,4 @@ tweepy==3.5.0
 pytest==2.8.7
 pytest-cov==2.2.1
 responses==0.5.1
-testfixtures==4.9.0
+testfixtures==4.9.1
