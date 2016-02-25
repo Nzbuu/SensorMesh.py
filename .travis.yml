@@ -5,13 +5,6 @@ language: python
 python:
   - 3.5
   - 3.4
-  - pypy3
-  - nightly
-
-matrix:
-  allow_failures:
-    - python: pypy3 # Currently only Python 3.2.5 compatible
-    - python: nightly
 
 install:
   - pip install --disable-pip-version-check --upgrade pip
