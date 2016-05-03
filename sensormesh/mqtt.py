@@ -22,13 +22,13 @@ class MqttApi(DataApi):
                  keepalive=60):
         super().__init__()
 
-        o = urlsplit(url)
+        url_parts = urlsplit(url)
         self._props = {
             'client_id': client_id,
-            'host': o.hostname,
-            'port': o.port or 1883,
-            'username': username or o.username,
-            'password': password or o.password,
+            'host': url_parts.hostname,
+            'port': url_parts.port or 1883,
+            'username': username or url_parts.username,
+            'password': password or url_parts.password,
             'keepalive': keepalive,
         }
         self._client = None
@@ -71,18 +71,18 @@ class MqttApi(DataApi):
 
         return client
 
-    def _handle_mqtt_log(self, client, userdata, level, string):
+    def _handle_mqtt_log(self, client, userdata, level, string):  # pylint: disable=W6013,R0201
         logger.log(log_level_std[level], string)
 
-    def _handle_mqtt_connect(self, client, userdata, flags, rc):
+    def _handle_mqtt_connect(self, client, userdata, flags, rc):  # pylint: disable=W6013,R0201
         logger.info("Connected: %s:%d result=%d %s",
-                    client._host, client._port, rc, flags)
+                    client._host, client._port, rc, flags)  # pylint: disable=W0212
 
-    def _handle_mqtt_disconnect(self, client, userdata, rc):
+    def _handle_mqtt_disconnect(self, client, userdata, rc):  # pylint: disable=W6013,R0201
         logger.info("Disconnected: %s:%d result=%d",
-                    client._host, client._port, rc)
+                    client._host, client._port, rc)  # pylint: disable=W0212
 
-    def _handle_mqtt_publish(self, client, userdata, mid):
+    def _handle_mqtt_publish(self, client, userdata, mid):  # pylint: disable=W6013,R0201
         logger.info("Published: mid=%d", mid)
 
 
