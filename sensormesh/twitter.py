@@ -1,9 +1,10 @@
 import tweepy
 
-from .rest import RestTarget, RestApi
+from .endpoints import DataApi
+from .rest import RestTarget
 
 
-class TwitterApi(RestApi):
+class TwitterApi(DataApi):
     def __init__(self, consumer_token=None, consumer_secret=None,
                  access_token=None, access_token_secret=None):
         super().__init__()

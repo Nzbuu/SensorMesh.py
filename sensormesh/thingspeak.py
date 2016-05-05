@@ -3,11 +3,12 @@ from datetime import datetime
 import requests
 import dateutil.parser
 
-from .rest import RestSource, RestTarget, RestApi
+from .endpoints import DataApi
+from .rest import RestSource, RestTarget
 from .exceptions import ConfigurationError
 
 
-class ThingSpeakApi(RestApi):
+class ThingSpeakApi(DataApi):
     def __init__(self, key=None, channel=None,
                  base_url='https://api.thingspeak.com'):
         super().__init__()
