@@ -1,11 +1,27 @@
 import logging
+import unittest.mock as mock
 
+import pytest
 import testfixtures
 
 from sensormesh.endpoints import DataApi, ApiMixin
 
 
 class TestApiMixin:
+    def test_cannot_create_without_api(self):
+        with pytest.raises(ValueError):
+            _ = ApiMixin()
+
+    def test_cannot_create_with_empty_api(self):
+        with pytest.raises(ValueError):
+            _ = ApiMixin(api=None)
+
+    def test_can_create_with_api(self):
+        mock_api = mock.MagicMock()
+        o = ApiMixin(api=mock_api, name='service')
+        assert o._api is mock_api
+        assert o.name == 'service'
+
     def test_can_use_object_as_context_manager(self):
         mock_api = DataApi()
         obj = ApiMixin(api=mock_api, name='mock_obj')

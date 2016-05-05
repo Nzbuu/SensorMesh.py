@@ -1,7 +1,6 @@
 import tweepy
 
-from .endpoints import DataApi
-from .rest import RestTarget
+from .endpoints import ApiMixin, DataTarget, DataApi
 
 
 class TwitterApi(DataApi):
@@ -33,16 +32,15 @@ class TwitterApi(DataApi):
         self._client = None
         super().close()
 
-    def post_update(self, data):
-        self._client.update_status(status=data['message'])
+    def post_update(self, message):
+        self._client.update_status(status=message)
 
 
-class TwitterUpdate(RestTarget):
+class TwitterUpdate(ApiMixin, DataTarget):
     def __init__(self, message='', *args, **kwargs):
         super().__init__(*args, api_cls=TwitterApi, **kwargs)
         self._message = message
 
-    def _prepare_update(self, data):
-        data_out = super()._prepare_update(data)
-        data_out['message'] = self._message.format(**data_out)
-        return data_out
+    def _update(self, data):
+        message = self._message.format(**data)
+        self._api.post_update(message)

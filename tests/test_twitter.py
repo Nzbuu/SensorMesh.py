@@ -17,7 +17,7 @@ class TestTwitterApi:
             assert api._client is None  # No API object yet
 
             api.open()
-            api.post_update({'message': 'This is a status update!', 'string': 'This is ignored'})
+            api.post_update('This is a status update!')
             api._client.update_status.assert_called_with(status='This is a status update!')
 
             api.close()
@@ -59,11 +59,7 @@ class TestTwitterUpdate:
         with obj:
             obj.update(data)
 
-        data_out = {
-            'created_at': 1453927940.01,
-            'field1': '60.0 F',
-            'message': 'The temperature is 60.0 F at 1453927940.0'
-        }
+        data_out = 'The temperature is 60.0 F at 1453927940.0'
 
         assert mock_api.post_update.call_count == 1
         mock_api.post_update.assert_called_with(data_out)
