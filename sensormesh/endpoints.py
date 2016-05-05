@@ -152,3 +152,36 @@ class DataTarget(DataEndpoint):
 
     def _update(self, data):
         raise NotImplementedError()
+
+
+class DataApi(object):
+    @classmethod
+    def create_api(cls, api):
+        if isinstance(api, dict):
+            api = cls(**api)
+        elif not api:
+            raise ValueError('Missing API input.')
+        return api
+
+    def open(self):
+        logger.info('Opening %s', self)
+
+    def close(self):
+        logger.info('Closing %s', self)
+
+    def __str__(self):
+        return '{0}()'.format(self.__class__.__name__)
+
+
+class ApiMixin(DataEndpoint):
+    def __init__(self, api=None, api_cls=DataApi, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._api = api_cls.create_api(api)
+
+    def open(self):
+        super().open()
+        self._api.open()
+
+    def close(self):
+        self._api.close()
+        super().close()

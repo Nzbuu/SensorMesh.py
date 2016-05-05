@@ -3,11 +3,11 @@ from datetime import datetime
 import requests
 import dateutil.parser
 
-from .rest import RestSource, RestTarget, RestApi
+from .endpoints import DataTarget, DataSource, ApiMixin, DataApi
 from .exceptions import ConfigurationError
 
 
-class ThingSpeakApi(RestApi):
+class ThingSpeakApi(DataApi):
     def __init__(self, key=None, channel=None,
                  base_url='https://api.thingspeak.com'):
         super().__init__()
@@ -75,7 +75,7 @@ class ThingSpeakApi(RestApi):
             return None
 
 
-class ThingSpeakLogger(RestTarget):
+class ThingSpeakLogger(ApiMixin, DataTarget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, api_cls=ThingSpeakApi, **kwargs)
 
@@ -91,8 +91,11 @@ class ThingSpeakLogger(RestTarget):
 
         return data_out
 
+    def _update(self, data):
+        self._api.post_update(data)
 
-class ThingSpeakSource(RestSource):
+
+class ThingSpeakSource(ApiMixin, DataSource):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, api_cls=ThingSpeakApi, **kwargs)
 
@@ -105,3 +108,6 @@ class ThingSpeakSource(RestSource):
             data['timestamp'] = ts.timestamp()
 
         return data
+
+    def _read(self):
+        return self._api.get_data()
