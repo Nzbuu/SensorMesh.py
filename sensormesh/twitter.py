@@ -15,7 +15,7 @@ class TwitterApi(DataApi):
             'access_token': access_token,
             'access_token_secret': access_token_secret,
         }
-        self._api = None
+        self._client = None
 
     def open(self):
         super().open()
@@ -27,14 +27,14 @@ class TwitterApi(DataApi):
             self._props['access_token'], self._props['access_token_secret'])
 
         # Create tweepy API instance
-        self._api = tweepy.API(auth)
+        self._client = tweepy.API(auth)
 
     def close(self):
-        self._api = None
+        self._client = None
         super().close()
 
     def post_update(self, data):
-        self._api.update_status(status=data['message'])
+        self._client.update_status(status=data['message'])
 
 
 class TwitterUpdate(RestTarget):
