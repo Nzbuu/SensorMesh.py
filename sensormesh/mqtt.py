@@ -18,6 +18,7 @@ log_level_std = {
 
 class MqttApi(DataApi):
     def __init__(self, url, client_id=None,
+                 username=None, password=None,
                  keepalive=60):
         super().__init__()
 
@@ -26,6 +27,8 @@ class MqttApi(DataApi):
             'client_id': client_id,
             'host': o.hostname,
             'port': o.port or 1883,
+            'username': username or o.username,
+            'password': password or o.password,
             'keepalive': keepalive,
         }
         self._client = None
@@ -57,6 +60,9 @@ class MqttApi(DataApi):
             client_id=self._props['client_id'],
             clean_session=True,
         )
+        if self._props['username']:
+            client.username_pw_set(
+                self._props['username'], self._props['password'])
 
         client.on_log = self._handle_mqtt_log
         client.on_connect = self._handle_mqtt_connect
