@@ -8,6 +8,9 @@ requests==2.13.0
 # twitter
 tweepy==3.5.0
 
+# mqtt
+paho-mqtt==1.1
+
 # tests
 pytest==3.0.6
 coverage==4.3.4
