@@ -1,9 +1,19 @@
 import json
+import logging
 from urllib.parse import urlsplit
 
 import paho.mqtt.client as mqtt
 
 from .endpoints import DataTarget, DataApi, ApiMixin
+
+logger = logging.getLogger(__name__)
+log_level_std = {
+    mqtt.MQTT_LOG_INFO: logging.INFO,
+    mqtt.MQTT_LOG_NOTICE: logging.INFO,  # No direct equivalent
+    mqtt.MQTT_LOG_WARNING: logging.WARNING,
+    mqtt.MQTT_LOG_ERR: logging.ERROR,
+    mqtt.MQTT_LOG_DEBUG: logging.DEBUG,
+}
 
 
 class MqttApi(DataApi):
@@ -25,6 +35,8 @@ class MqttApi(DataApi):
 
         self._client = self._prepare_client()
 
+        logger.info("Connecting: %s:%d",
+                    self._props['host'], self._props['port'])
         self._client.connect(host=self._props['host'], port=self._props['port'],
                              keepalive=self._props['keepalive'])
         self._client.loop_start()
@@ -45,7 +57,27 @@ class MqttApi(DataApi):
             client_id=self._props['client_id'],
             clean_session=True,
         )
+
+        client.on_log = self._handle_mqtt_log
+        client.on_connect = self._handle_mqtt_connect
+        client.on_disconnect = self._handle_mqtt_disconnect
+        client.on_publish = self._handle_mqtt_publish
+
         return client
+
+    def _handle_mqtt_log(self, client, userdata, level, string):
+        logger.log(log_level_std[level], string)
+
+    def _handle_mqtt_connect(self, client, userdata, flags, rc):
+        logger.info("Connected: %s:%d result=%d %s",
+                    client._host, client._port, rc, flags)
+
+    def _handle_mqtt_disconnect(self, client, userdata, rc):
+        logger.info("Disconnected: %s:%d result=%d",
+                    client._host, client._port, rc)
+
+    def _handle_mqtt_publish(self, client, userdata, mid):
+        logger.info("Published: mid=%d", mid)
 
 
 class MqttUpdate(ApiMixin, DataTarget):
