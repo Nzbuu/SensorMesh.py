@@ -30,3 +30,9 @@ targets:
     message: "This is a random number: {value1}, and so is this: {value2}"
     when:
       delta_time_exceeds: 900
+  mqtt:
+    api:
+      '!include': "conf_secrets.yaml"
+      '!include_node': mqtt_cloud
+    topic: "random/values"
+    qos: 0

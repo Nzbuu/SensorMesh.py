@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import random
-import logging
 import logging.config
 
 import yaml
@@ -13,6 +12,7 @@ from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 from sensormesh.text import TextLogger
 # from sensormesh.twitter import TwitterUpdate
+from sensormesh.mqtt import MqttUpdate
 
 
 # Configure logging
@@ -58,6 +58,11 @@ app.add_target(t)
 # twt_config = config['targets']['twitter']
 # t = TwitterUpdate(**twt_config)
 # app.add_target(t)
+
+# Target 5
+csv_config = config['targets']['mqtt']
+t = MqttUpdate(**csv_config)
+app.add_target(t)
 
 # Run application
 logging.info('Starting Application')
