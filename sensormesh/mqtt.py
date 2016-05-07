@@ -31,12 +31,10 @@ class MqttApi(DataApi):
             'password': password or url_parts.password,
             'keepalive': keepalive,
         }
-        self._client = None
+        self._client = self._prepare_client()
 
     def open(self):
         super().open()
-
-        self._client = self._prepare_client()
 
         logger.info("Connecting: %s:%d",
                     self._props['host'], self._props['port'])
@@ -45,9 +43,8 @@ class MqttApi(DataApi):
         self._client.loop_start()
 
     def close(self):
-        self._client.loop_stop()
         self._client.disconnect()
-        self._client = None
+        self._client.loop_stop()
 
         super().close()
 

@@ -14,14 +14,12 @@ class TestTwitterApi:
 
         with responses.RequestsMock() as r_mock:
             api = TwitterApi()
-            assert api._client is None  # No API object yet
 
             api.open()
             api.post_update('This is a status update!')
             api._client.update_status.assert_called_with(status='This is a status update!')
 
             api.close()
-            assert api._client is None  # API object deleted
 
         assert not r_mock.calls
 

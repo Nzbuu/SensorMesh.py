@@ -14,11 +14,9 @@ class TwitterApi(DataApi):
             'access_token': access_token,
             'access_token_secret': access_token_secret,
         }
-        self._client = None
+        self._client = self._prepare_client()
 
-    def open(self):
-        super().open()
-
+    def _prepare_client(self):
         # Create OAuth handler
         auth = tweepy.OAuthHandler(
             self._props['consumer_token'], self._props['consumer_secret'])
@@ -26,11 +24,8 @@ class TwitterApi(DataApi):
             self._props['access_token'], self._props['access_token_secret'])
 
         # Create tweepy API instance
-        self._client = tweepy.API(auth)
-
-    def close(self):
-        self._client = None
-        super().close()
+        client = tweepy.API(auth)
+        return client
 
     def post_update(self, message):
         self._client.update_status(status=message)
