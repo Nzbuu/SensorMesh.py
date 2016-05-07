@@ -12,7 +12,7 @@ from sensormesh.console import ConsoleDisplay
 from sensormesh.thingspeak import ThingSpeakLogger
 from sensormesh.text import TextLogger
 # from sensormesh.twitter import TwitterUpdate
-from sensormesh.mqtt import MqttUpdate
+from sensormesh.mqtt import MqttPublish
 
 
 # Configure logging
@@ -61,7 +61,7 @@ app.add_target(t)
 
 # Target 5
 csv_config = config['targets']['mqtt']
-t = MqttUpdate(**csv_config)
+t = MqttPublish(**csv_config)
 app.add_target(t)
 
 # Run application

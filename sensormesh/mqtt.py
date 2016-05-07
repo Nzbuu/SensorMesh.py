@@ -83,7 +83,7 @@ class MqttApi(DataApi):
         logger.info("Published: mid=%d", mid)
 
 
-class MqttUpdate(ApiMixin, DataTarget):
+class MqttPublish(ApiMixin, DataTarget):
     def __init__(self, topic, qos=0, *args, **kwargs):
         super().__init__(*args, api_cls=MqttApi, **kwargs)
         self._topic = topic
