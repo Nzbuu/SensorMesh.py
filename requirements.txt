@@ -2,14 +2,18 @@
 PyYAML==3.11
 
 # thingspeak
-python-dateutil==2.4.2
-requests==2.9.1
+python-dateutil==2.5.3
+requests==2.10.0
 
 # twitter
 tweepy==3.5.0
 
 # tests
-pytest==2.8.7
-pytest-cov==2.2.1
+pytest==2.9.2
+coverage==4.1
+pytest-cov==2.3.0
 responses==0.5.1
-testfixtures==4.9.1
+testfixtures==4.10.0
+
+# setup
+bumpversion==0.5.3
