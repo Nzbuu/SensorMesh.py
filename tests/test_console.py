@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import unittest.mock as mock
 
 from sensormesh.console import ConsoleDisplay
