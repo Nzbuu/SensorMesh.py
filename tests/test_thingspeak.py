@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 import unittest.mock as mock
 
@@ -229,7 +231,7 @@ class TestThingSpeakApi:
             the_request = r_mock.calls[0].request
             assert the_request.url == 'https://api.example.com:6666/update.json'
             assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ZYXWVUTSRQP0987654321'
-            assert json.loads(the_request.body) == data
+            assert json.loads(the_request.body.decode()) == data
 
     def test_can_post_update_without_channel(self):
         api = ThingSpeakApi(
@@ -250,7 +252,7 @@ class TestThingSpeakApi:
             the_request = r_mock.calls[0].request
             assert the_request.url == 'https://api.example.com:6666/update.json'
             assert the_request.headers['X-THINGSPEAKAPIKEY'] == 'ZYXWVUTSRQP0987654321'
-            assert json.loads(the_request.body) == data
+            assert json.loads(the_request.body.decode()) == data
 
     def test_cannot_post_update_without_key(self):
         api = ThingSpeakApi(

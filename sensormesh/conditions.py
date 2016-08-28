@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 class ConditionFactory:
     def __init__(self):
         super().__init__()
