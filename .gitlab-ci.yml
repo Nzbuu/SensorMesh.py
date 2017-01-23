@@ -13,7 +13,8 @@ py35:
   stage: test
   image: python:3.5
   artifacts:
-    - coverage.xml
+    paths:
+      - coverage.xml
   script:
     - python -m pytest --cov=sensormesh --cov-report term --cov-report xml
 
@@ -21,6 +22,7 @@ py36:
   stage: test
   image: python:3.6
   artifacts:
-    - coverage.xml
+    paths:
+      - coverage.xml
   script:
     - python -m pytest --cov=sensormesh --cov-report term --cov-report xml
