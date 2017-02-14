@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import tweepy
 
 from .endpoints import ApiMixin, DataTarget, DataApi
