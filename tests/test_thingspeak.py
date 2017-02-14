@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import json
 import unittest.mock as mock
 
