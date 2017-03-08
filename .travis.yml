@@ -18,6 +18,5 @@ after_success:
   - if [[ -n $COVERALLS_REPO_TOKEN ]]; then pip install python-coveralls && coveralls; fi
   - if [[ -n $CODACY_PROJECT_TOKEN ]]; then pip install codacy-coverage && python-codacy-coverage -r coverage.xml; fi
   - if [[ -n $CODECOV_TOKEN ]]; then pip install codecov && codecov; fi
-  - if ($SHIPPABLE); then mkdir -p shippable/testresults && cp result.xml shippable/testresults; fi
-  - if ($SHIPPABLE); then mkdir -p shippable/codecoverage && cp coverage.xml shippable/codecoverage; fi
- 
+  - if [[ $SHIPPABLE = "true" ]]; then mkdir -p shippable/testresults && cp result.xml shippable/testresults; fi
+  - if [[ $SHIPPABLE = "true" ]]; then mkdir -p shippable/codecoverage && cp coverage.xml shippable/codecoverage; fi
