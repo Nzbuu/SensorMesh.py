@@ -15,11 +15,6 @@ script:
   - python -m pytest --cov=sensormesh --cov-report term --cov-report xml
 
 after_success:
-  - pip install python-coveralls
-  - coveralls
-
-  - pip install codacy-coverage
-  - python-codacy-coverage -r coverage.xml
-
-  - pip install codecov
-  - codecov
+  - if [ -z "$COVERALLS_REPO_TOKEN" ]; then pip install python-coveralls && coveralls
+  - if [ -z "$CODACY_PROJECT_TOKEN" ]; then pip install codacy-coverage && python-codacy-coverage -r coverage.xml
+  - if [ -z "$CODECOV_TOKEN" ]; then pip install codecov && codecov
