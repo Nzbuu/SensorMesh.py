@@ -13,7 +13,6 @@ requirements = [
 ]
 test_requirements = [
     'pytest',
-    'pytest-cov',
     'responses',
     'textfixtures'
 ]

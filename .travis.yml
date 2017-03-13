@@ -12,7 +12,9 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - python -m pytest --junitxml=result.xml --cov=sensormesh --cov-report term --cov-report xml
+  - python -m coverage run --source=sensormesh -m py.test --junitxml=result.xml
+  - python -m coverage report -m
+  - python -m coverage xml -o coverage.xml
 
 after_success:
   - if [[ -n $COVERALLS_REPO_TOKEN ]]; then pip install python-coveralls && coveralls; fi
