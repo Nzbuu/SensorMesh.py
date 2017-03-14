@@ -1,0 +1,13 @@
+machine:
+  timezone: Europe/London
+  python:
+    version: 3.6.0
+
+dependencies:
+  pre:
+    - pip install -U pip
+    - pip install -U wheel setuptools
+
+test:
+  override:
+    - py.test
