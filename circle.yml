@@ -7,7 +7,20 @@ dependencies:
   pre:
     - pip install -U pip
     - pip install -U wheel setuptools
+  override:
+    - pip install -r requirements.txt
 
 test:
+  pre:
+    - pwd
+    
   override:
-    - py.test
+    - python -m coverage run --source=sensormesh -m pytest --junitxml=result.xml
+    - python -m coverage report -m
+    - python -m coverage xml -o coverage.xml
+
+  post:
+    - mkdir $CIRCLE_TEST_REPORTS/reports
+    - cp result*.xml $CIRCLE_TEST_REPORTS/reports
+    - mkdir $CIRCLE_ARTIFACTS/coverage
+    - cp coverage.xml $CIRCLE_ARTIFACTS/coverage
