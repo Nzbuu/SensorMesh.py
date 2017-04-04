@@ -5,6 +5,12 @@ language: python
 python:
   - 3.6
   - 3.5
+  - pypy3
+
+matrix:
+  allow_failures:
+    - python: pypy3  # Wait for pypy3 to be updated to v5.7 or newer
+  fast_finish: true
 
 install:
   - pip install --disable-pip-version-check --upgrade pip
